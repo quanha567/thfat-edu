@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" fill="none">
+  <!-- Nền bo tròn nhẹ với màu Navy Brand #1C3480 -->
+  <rect width="200" height="200" rx="44" fill="#1C3480"/>
+  
+  <!-- Vành tròn biểu tượng TF màu trắng -->
+  <circle cx="100" cy="100" r="76" stroke="#FFFFFF" stroke-width="14" fill="none"/>
+  
+  <!-- Chữ TF lồng nhau tinh tế -->
+  <g fill="#FFFFFF">
+    <!-- Nét uốn cong trên -->
+    <path d="M 48 74 C 48 56, 66 48, 100 48 C 134 48, 152 56, 152 74 L 134 74 C 134 64, 120 61, 100 61 C 80 61, 66 64, 66 74 Z"/>
+    
+    <!-- Thanh dọc chữ T -->
+    <rect x="76" y="70" width="16" height="76" rx="3"/>
+    
+    <!-- Thanh ngang chữ T -->
+    <rect x="50" y="70" width="52" height="15" rx="3"/>
+    
+    <!-- Thanh dọc chữ F -->
+    <rect x="108" y="70" width="16" height="76" rx="3"/>
+    
+    <!-- Thanh ngang trên chữ F -->
+    <rect x="108" y="70" width="42" height="15" rx="3"/>
+    
+    <!-- Thanh ngang giữa chữ F -->
+    <rect x="108" y="98" width="34" height="14" rx="3"/>
+    
+    <!-- Cung ôm cung tròn dưới -->
+    <path d="M 60 100 A 50 50 0 0 0 94 148 L 94 134 A 38 38 0 0 1 72 100 Z"/>
+    <path d="M 140 100 A 50 50 0 0 1 106 148 L 106 134 A 38 38 0 0 0 128 100 Z"/>
+  </g>
+</svg>
