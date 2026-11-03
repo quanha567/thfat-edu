@@ -20,7 +20,24 @@ Monorepo được triển khai như một **Vercel Project duy nhất** sử d�
 
 ---
 
-## 2. Bước 1: Tạo Project trên Vercel Dashboard
+## 2. Vô hiệu hóa Auto Build trên Vercel (Disabled Auto Deployments)
+
+Để đảm bảo quy trình kiểm soát chất lượng nghiêm ngặt (chỉ deploy khi CI lint/test/typecheck/scan hoàn toàn vượt qua), cơ chế tự động build khi push Git trên Vercel đã được **tắt hoàn toàn** trong file `vercel.json`:
+
+```json
+{
+  "git": {
+    "deploymentEnabled": false
+  }
+}
+```
+
+- Vercel sẽ **không** tự động tạo deployment khi bạn push commit lên bất kỳ nhánh nào hoặc mở Pull Request.
+- Toàn bộ quá trình build và deploy sẽ được điều phối **100% bởi GitHub Actions** (`.github/workflows/cd.yml`) thông qua Vercel CLI sau khi workflow CI thành công.
+
+---
+
+## 3. Bước 1: Tạo Project trên Vercel Dashboard
 
 1. Truy cập [Vercel Dashboard](https://vercel.com/dashboard).
 2. Nhấn **Add New...** $\rightarrow$ **Project**.
@@ -28,12 +45,12 @@ Monorepo được triển khai như một **Vercel Project duy nhất** sử d�
 4. **Cấu hình:**
    - **Project Name:** `thfat-edu` (hoặc tên tùy chọn).
    - **Root Directory:** Giữ nguyên thư mục gốc `.` (không đổi sang thư mục con).
-5. Vercel sẽ tự động đọc file `vercel.json` ở root để nhận diện cấu trúc đa dịch vụ (`services`).
+5. Vercel sẽ tự động đọc file `vercel.json` ở root để nhận diện cấu trúc đa dịch vụ (`services`) và vô hiệu hóa auto deploy.
 6. Nhấn **Deploy** (hoặc Save).
 
 ---
 
-## 3. Bước 2: Lấy thông tin Credentials từ Vercel
+## 4. Bước 2: Lấy thông tin Credentials từ Vercel
 
 Bạn chỉ cần thu thập **3 thông số**:
 
@@ -51,7 +68,7 @@ Bạn chỉ cần thu thập **3 thông số**:
 
 ---
 
-## 4. Bước 3: Cấu hình GitHub Repository Secrets
+## 5. Bước 3: Cấu hình GitHub Repository Secrets
 
 Vào GitHub Repo $\rightarrow$ **Settings** $\rightarrow$ **Secrets and variables** $\rightarrow$ **Actions** $\rightarrow$ thêm 3 secrets:
 
@@ -63,7 +80,7 @@ Vào GitHub Repo $\rightarrow$ **Settings** $\rightarrow$ **Secrets and variable
 
 ---
 
-## 5. Kiểm thử tại máy Local (`vercel dev`)
+## 6. Kiểm thử tại máy Local (`vercel dev`)
 
 Nhờ cấu trúc Vercel Services, bạn có thể chạy đồng thời cả Frontend và Backend bằng một lệnh duy nhất:
 
