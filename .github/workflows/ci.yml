@@ -30,19 +30,19 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
-      - name: Check code formatting
+      - name: Check code formatting (Frontend & Backend)
         run: bun run format:check
 
-      - name: Run linter
+      - name: Run linter (Frontend & Backend)
         run: bun run lint
 
-      - name: Run typecheck
+      - name: Run typecheck (Frontend & Backend)
         run: bun run typecheck
 
-      - name: Run unit tests
+      - name: Run unit tests (Frontend & Backend)
         run: bun run test
 
-      - name: Build Next.js application
+      - name: Build applications (Frontend & Backend)
         run: bun run build
 
       - name: Run dependency security audit

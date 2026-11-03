@@ -1,0 +1,191 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - preview
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  deploy:
+    name: Deploy Vercel Services
+    # Only proceed if CI succeeded, or if manually triggered via workflow_dispatch
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+      is_prod: ${{ steps.context.outputs.is_prod }}
+      branch: ${{ steps.context.outputs.branch }}
+      sha: ${{ steps.context.outputs.sha }}
+      pr_number: ${{ steps.context.outputs.pr_number }}
+      skipped: ${{ steps.filter.outputs.changes == 'false' && github.event_name != 'workflow_dispatch' }}
+    steps:
+      - name: Resolve Commit & Branch Context
+        id: context
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BRANCH="${{ github.ref_name }}"
+            SHA="${{ github.sha }}"
+            PR_NUMBER=""
+            IS_PROD="${{ github.event.inputs.environment == 'production' && 'true' || 'false' }}"
+          else
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+            SHA="${{ github.event.workflow_run.head_sha }}"
+            PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number || '' }}"
+            if [ "$BRANCH" = "main" ] && [ -z "$PR_NUMBER" ]; then
+              IS_PROD="true"
+            else
+              IS_PROD="false"
+            fi
+          fi
+
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "is_prod=$IS_PROD" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.context.outputs.sha }}
+          fetch-depth: 2
+
+      - name: Check for deployable changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changes:
+              - 'thfat-edu-fe/**'
+              - 'thfat-edu-be/**'
+              - 'package.json'
+              - 'bun.lock'
+              - 'vercel.json'
+              - '.github/workflows/cd.yml'
+
+      - name: Validate Vercel Secrets
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID }}" ]; then
+            echo "::error::Missing Vercel secrets (VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID). See docs/DEPLOYMENT.md."
+            exit 1
+          fi
+
+      - name: Setup Bun
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        run: bun install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ "${{ steps.context.outputs.is_prod }}" = "true" ]; then
+            vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Build Project Artifacts
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ "${{ steps.context.outputs.is_prod }}" = "true" ]; then
+            vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Deploy Prebuilt Artifacts to Vercel
+        id: deploy
+        if: ${{ steps.filter.outputs.changes == 'true' || github.event_name == 'workflow_dispatch' }}
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+        run: |
+          if [ "${{ steps.context.outputs.is_prod }}" = "true" ]; then
+            OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          else
+            OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          fi
+          DEPLOY_URL=$(echo "$OUTPUT" | grep -o 'https://[^ ]*' | tail -n 1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Project deployed successfully to: $DEPLOY_URL"
+
+  notify:
+    name: Summary & Notification
+    needs: deploy
+    if: always() && needs.deploy.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post GitHub Actions Step Summary
+        run: |
+          echo "## 🚀 Continuous Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ needs.deploy.outputs.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`${{ needs.deploy.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Environment:** \`${{ needs.deploy.outputs.is_prod == 'true' && 'Production' || 'Preview / Staging' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          DEPLOY_URL="${{ needs.deploy.outputs.url }}"
+          if [ -n "$DEPLOY_URL" ]; then
+            echo "| Service | Mount Path | Deployment URL |" >> $GITHUB_STEP_SUMMARY
+            echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🌐 **Frontend** (\`thfat-edu-fe\`) | \`/\` | [$DEPLOY_URL]($DEPLOY_URL) |" >> $GITHUB_STEP_SUMMARY
+            echo "| 🦊 **Backend** (\`thfat-edu-be\`) | \`/api\` | [$DEPLOY_URL/api]($DEPLOY_URL/api) |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "⏭️ **Deployment Skipped:** No code changes detected in application services." >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment Preview URL on Pull Request
+        if: ${{ needs.deploy.outputs.pr_number != '' && needs.deploy.outputs.url != '' }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt("${{ needs.deploy.outputs.pr_number }}", 10);
+            if (!prNumber) return;
+
+            const url = "${{ needs.deploy.outputs.url }}";
+            const sha = "${{ needs.deploy.outputs.sha }}";
+
+            let commentBody = `### 🚀 Vercel Deployment Preview Ready!\n\n`;
+            commentBody += `Unified Services deployed for commit \`${sha.substring(0, 7)}\`:\n\n`;
+            commentBody += `- 🌐 **Frontend:** [${url}](${url})\n`;
+            commentBody += `- 🦊 **Backend API:** [${url}/api](${url}/api)\n\n`;
+            commentBody += `*Services routing: \`/api/*\` &rarr; \`thfat-edu-be\`, \`/*\` &rarr; \`thfat-edu-fe\`.*`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody
+            });

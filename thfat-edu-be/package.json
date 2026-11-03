@@ -1,15 +1,22 @@
 {
   "name": "thfat-edu-be",
   "version": "1.0.50",
+  "type": "module",
   "main": "src/index.ts",
   "module": "src/index.ts",
   "types": "src/index.ts",
   "scripts": {
     "dev": "bun run --watch src/index.ts",
+    "build": "bun build src/index.ts --target bun --outdir dist",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"No tests in backend yet\""
+    "lint": "oxlint",
+    "lint:fix": "oxlint --fix",
+    "format": "oxfmt --write .",
+    "format:check": "oxfmt --check .",
+    "test": "bun test"
   },
   "dependencies": {
+    "@elysiajs/cors": "^1.4.2",
     "elysia": "^1.4.30"
   },
   "devDependencies": {
