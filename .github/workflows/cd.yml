@@ -1,0 +1,310 @@
+name: CD
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Environment to deploy"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - production
+          - preview
+
+permissions:
+  contents: read
+  pull-requests: write
+  issues: write
+
+jobs:
+  prepare:
+    name: Prepare & Detect Changes
+    # Only proceed if CI succeeded, or if manually triggered via workflow_dispatch
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    outputs:
+      is_prod: ${{ steps.detect.outputs.is_prod }}
+      branch: ${{ steps.detect.outputs.branch }}
+      sha: ${{ steps.detect.outputs.sha }}
+      pr_number: ${{ steps.detect.outputs.pr_number }}
+      deploy_fe: ${{ steps.detect.outputs.deploy_fe }}
+      deploy_be: ${{ steps.detect.outputs.deploy_be }}
+    steps:
+      - name: Resolve Commit & Branch Context
+        id: context
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            BRANCH="${{ github.ref_name }}"
+            SHA="${{ github.sha }}"
+            PR_NUMBER=""
+            IS_PROD="${{ github.event.inputs.environment == 'production' && 'true' || 'false' }}"
+          else
+            BRANCH="${{ github.event.workflow_run.head_branch }}"
+            SHA="${{ github.event.workflow_run.head_sha }}"
+            PR_NUMBER="${{ github.event.workflow_run.pull_requests[0].number || '' }}"
+            if [ "$BRANCH" = "main" ] && [ -z "$PR_NUMBER" ]; then
+              IS_PROD="true"
+            else
+              IS_PROD="false"
+            fi
+          fi
+
+          echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+          echo "sha=$SHA" >> $GITHUB_OUTPUT
+          echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+          echo "is_prod=$IS_PROD" >> $GITHUB_OUTPUT
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.context.outputs.sha }}
+          fetch-depth: 2
+
+      - name: Detect Monorepo Changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            frontend:
+              - 'thfat-edu-fe/**'
+              - 'thfat-edu-be/**'
+              - 'package.json'
+              - 'bun.lock'
+              - '.github/workflows/cd.yml'
+            backend:
+              - 'thfat-edu-be/**'
+              - 'package.json'
+              - 'bun.lock'
+              - '.github/workflows/cd.yml'
+
+      - name: Compute Deploy Flags
+        id: detect
+        run: |
+          echo "branch=${{ steps.context.outputs.branch }}" >> $GITHUB_OUTPUT
+          echo "sha=${{ steps.context.outputs.sha }}" >> $GITHUB_OUTPUT
+          echo "pr_number=${{ steps.context.outputs.pr_number }}" >> $GITHUB_OUTPUT
+          echo "is_prod=${{ steps.context.outputs.is_prod }}" >> $GITHUB_OUTPUT
+
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "deploy_fe=true" >> $GITHUB_OUTPUT
+            echo "deploy_be=true" >> $GITHUB_OUTPUT
+          else
+            echo "deploy_fe=${{ steps.filter.outputs.frontend }}" >> $GITHUB_OUTPUT
+            echo "deploy_be=${{ steps.filter.outputs.backend }}" >> $GITHUB_OUTPUT
+          fi
+
+  deploy-fe:
+    name: Deploy Frontend (Next.js)
+    needs: prepare
+    if: ${{ needs.prepare.outputs.deploy_fe == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Validate Vercel Secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID_FE }}" ]; then
+            echo "::error::Missing Vercel secrets for Frontend (VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID_FE). See docs/DEPLOYMENT.md."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment
+        working-directory: thfat-edu-fe
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Build Project Artifacts
+        working-directory: thfat-edu-fe
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Deploy Artifacts to Vercel
+        id: deploy
+        working-directory: thfat-edu-fe
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_FE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          else
+            OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          fi
+          DEPLOY_URL=$(echo "$OUTPUT" | grep -o 'https://[^ ]*' | tail -n 1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Frontend deployed successfully to: $DEPLOY_URL"
+
+  deploy-be:
+    name: Deploy Backend (Elysia)
+    needs: prepare
+    if: ${{ needs.prepare.outputs.deploy_be == 'true' }}
+    runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.deploy.outputs.url }}
+    steps:
+      - name: Validate Vercel Secrets
+        run: |
+          if [ -z "${{ secrets.VERCEL_TOKEN }}" ] || [ -z "${{ secrets.VERCEL_ORG_ID }}" ] || [ -z "${{ secrets.VERCEL_PROJECT_ID_BE }}" ]; then
+            echo "::error::Missing Vercel secrets for Backend (VERCEL_TOKEN, VERCEL_ORG_ID, or VERCEL_PROJECT_ID_BE). See docs/DEPLOYMENT.md."
+            exit 1
+          fi
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.sha }}
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment
+        working-directory: thfat-edu-be
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_BE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            vercel pull --yes --environment=production --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel pull --yes --environment=preview --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Build Project Artifacts
+        working-directory: thfat-edu-be
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_BE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            vercel build --prod --token=${{ secrets.VERCEL_TOKEN }}
+          else
+            vercel build --token=${{ secrets.VERCEL_TOKEN }}
+          fi
+
+      - name: Deploy Artifacts to Vercel
+        id: deploy
+        working-directory: thfat-edu-be
+        env:
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID_BE }}
+        run: |
+          if [ "${{ needs.prepare.outputs.is_prod }}" = "true" ]; then
+            OUTPUT=$(vercel deploy --prebuilt --prod --token=${{ secrets.VERCEL_TOKEN }})
+          else
+            OUTPUT=$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }})
+          fi
+          DEPLOY_URL=$(echo "$OUTPUT" | grep -o 'https://[^ ]*' | tail -n 1)
+          echo "url=$DEPLOY_URL" >> $GITHUB_OUTPUT
+          echo "Backend deployed successfully to: $DEPLOY_URL"
+
+  notify:
+    name: Summary & Notification
+    needs: [prepare, deploy-fe, deploy-be]
+    if: always() && needs.prepare.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Post GitHub Actions Step Summary
+        run: |
+          echo "## 🚀 Continuous Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- **Commit:** \`${{ needs.prepare.outputs.sha }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Branch:** \`${{ needs.prepare.outputs.branch }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "- **Target Environment:** \`${{ needs.prepare.outputs.is_prod == 'true' && 'Production' || 'Preview / Staging' }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Service | Status | Deployment URL |" >> $GITHUB_STEP_SUMMARY
+          echo "| :--- | :--- | :--- |" >> $GITHUB_STEP_SUMMARY
+
+          FE_URL="${{ needs.deploy-fe.outputs.url }}"
+          FE_STATUS="${{ needs.deploy-fe.result }}"
+          if [ "$FE_STATUS" = "success" ]; then
+            echo "| 🌐 **Frontend** (\`thfat-edu-fe\`) | ✅ Success | [$FE_URL]($FE_URL) |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$FE_STATUS" = "skipped" ]; then
+            echo "| 🌐 **Frontend** (\`thfat-edu-fe\`) | ⏭️ Skipped (No changes) | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🌐 **Frontend** (\`thfat-edu-fe\`) | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+          BE_URL="${{ needs.deploy-be.outputs.url }}"
+          BE_STATUS="${{ needs.deploy-be.result }}"
+          if [ "$BE_STATUS" = "success" ]; then
+            echo "| 🦊 **Backend** (\`thfat-edu-be\`) | ✅ Success | [$BE_URL]($BE_URL) |" >> $GITHUB_STEP_SUMMARY
+          elif [ "$BE_STATUS" = "skipped" ]; then
+            echo "| 🦊 **Backend** (\`thfat-edu-be\`) | ⏭️ Skipped (No changes) | - |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| 🦊 **Backend** (\`thfat-edu-be\`) | ❌ Failed | - |" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Comment Preview URLs on Pull Request
+        if: ${{ needs.prepare.outputs.pr_number != '' && (needs.deploy-fe.result == 'success' || needs.deploy-be.result == 'success') }}
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const prNumber = parseInt("${{ needs.prepare.outputs.pr_number }}", 10);
+            if (!prNumber) return;
+
+            const feUrl = "${{ needs.deploy-fe.outputs.url }}";
+            const beUrl = "${{ needs.deploy-be.outputs.url }}";
+            const sha = "${{ needs.prepare.outputs.sha }}";
+
+            let commentBody = `### 🚀 Vercel Deployment Preview Ready!\n\n`;
+            commentBody += `Built for commit \`${sha.substring(0, 7)}\`:\n\n`;
+
+            if (feUrl) {
+              commentBody += `- 🌐 **Frontend:** [${feUrl}](${feUrl})\n`;
+            }
+            if (beUrl) {
+              commentBody += `- 🦊 **Backend:** [${beUrl}](${beUrl})\n`;
+            }
+            commentBody += `\n*Deployed automatically via GitHub Actions CD workflow.*`;
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              body: commentBody
+            });
+
