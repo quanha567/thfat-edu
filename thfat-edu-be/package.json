@@ -1,15 +1,18 @@
 {
   "name": "thfat-edu-be",
   "version": "1.0.50",
+  "main": "src/index.ts",
+  "module": "src/index.ts",
+  "types": "src/index.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "bun run --watch src/index.ts"
+    "dev": "bun run --watch src/index.ts",
+    "typecheck": "tsc --noEmit",
+    "test": "echo \"No tests in backend yet\""
   },
   "dependencies": {
-    "elysia": "latest"
+    "elysia": "^1.4.30"
   },
   "devDependencies": {
     "bun-types": "latest"
-  },
-  "module": "src/index.js"
+  }
 }
