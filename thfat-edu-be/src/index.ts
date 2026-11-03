@@ -1,6 +1,10 @@
 import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 
+const routes = new Elysia()
+  .get("/", () => "Hello Elysia")
+  .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }));
+
 export const app = new Elysia()
   .use(
     cors({
@@ -31,8 +35,8 @@ export const app = new Elysia()
       methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     }),
   )
-  .get("/", () => "Hello Elysia")
-  .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }));
+  .use(routes)
+  .group("/api", (app) => app.use(routes));
 
 export type App = typeof app;
 

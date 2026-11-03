@@ -1,0 +1,35 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "services": {
+    "thfat-edu-be": {
+      "root": "thfat-edu-be",
+      "framework": "elysia"
+    },
+    "thfat-edu-fe": {
+      "root": "thfat-edu-fe",
+      "framework": "nextjs",
+      "bindings": [
+        {
+          "type": "service",
+          "service": "thfat-edu-be",
+          "format": "url",
+          "env": "BACKEND_URL"
+        }
+      ]
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "thfat-edu-be"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "thfat-edu-fe"
+      }
+    }
+  ]
+}
