@@ -18,6 +18,13 @@ export class UnauthorizedError extends AppError {
   }
 }
 
+export class ForbiddenError extends AppError {
+  constructor(message = "Forbidden") {
+    super(message, 403, "FORBIDDEN");
+    this.name = "ForbiddenError";
+  }
+}
+
 export class NotFoundError extends AppError {
   constructor(message = "Resource not found") {
     super(message, 404, "NOT_FOUND");
@@ -36,9 +43,21 @@ export function handleApplicationError({ code, error, set }: TErrorContext) {
     set.status = 401;
 
     return {
-      success: false,
-      code: "UNAUTHORIZED",
-      message: (error as Error).message,
+      type: "about:blank",
+      title: "Unauthorized",
+      status: 401,
+      detail: (error as Error).message,
+    };
+  }
+
+  if (code === "FORBIDDEN" || error instanceof ForbiddenError) {
+    set.status = 403;
+
+    return {
+      type: "about:blank",
+      title: "Forbidden",
+      status: 403,
+      detail: (error as Error).message,
     };
   }
 
@@ -90,6 +109,7 @@ export function handleApplicationError({ code, error, set }: TErrorContext) {
 export const errorHandlerPlugin = new Elysia({ name: "app:error-handler" })
   .error({
     UNAUTHORIZED: UnauthorizedError,
+    FORBIDDEN: ForbiddenError,
     NOT_FOUND: NotFoundError,
     APP_ERROR: AppError,
   })

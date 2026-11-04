@@ -22,6 +22,9 @@
     "build": "bun --filter thfat-edu-fe build && bun --filter thfat-edu-be build",
     "build:fe": "bun --filter thfat-edu-fe build",
     "build:be": "bun --filter thfat-edu-be build",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f postgres",
     "scan": "bun pm scan",
     "prepare": "husky"
   },

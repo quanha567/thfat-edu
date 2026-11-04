@@ -23,7 +23,7 @@ export function getApiBaseUrl(): string {
     return `${window.location.origin}/api`;
   }
 
-  return "http://localhost:3000";
+  return "http://localhost:3001";
 }
 
 /**
@@ -32,7 +32,9 @@ export function getApiBaseUrl(): string {
  */
 export const api: ReturnType<typeof treaty<App>> = new Proxy({} as ReturnType<typeof treaty<App>>, {
   get(_target, prop) {
-    const client = treaty<App>(getApiBaseUrl());
+    const client = treaty<App>(getApiBaseUrl(), {
+      fetch: { credentials: "include" },
+    });
 
     return (client as Record<string | symbol, unknown>)[prop];
   },
