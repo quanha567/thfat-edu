@@ -15,7 +15,7 @@ import { useLogin } from "../hooks/use-login";
 import { type TAuthUser } from "../types";
 
 const loginSchema = z.object({
-  email: z.string().min(1, "Vui lòng nhập email").email("Định dạng email không hợp lệ"),
+  email: z.email("Định dạng email không hợp lệ").min(1, "Vui lòng nhập email"),
   password: z.string().min(6, "Mật khẩu tối thiểu 6 ký tự"),
   rememberMe: z.boolean(),
 });
