@@ -1,8 +1,6 @@
 import type { QuizQuestion, QuizResult } from "./types";
 
-/**
- * Calculates quiz results based on questions and student's submitted answers.
- */
+/** Calculates quiz results based on questions and student's submitted answers. */
 export function calculateQuizResult(
   questions: QuizQuestion[],
   answers: Record<string, string>,
@@ -23,6 +21,7 @@ export function calculateQuizResult(
 
   for (const q of questions) {
     totalPoints += q.points;
+
     if (answers[q.id] === q.correctOptionId) {
       correctCount += 1;
       earnedPoints += q.points;
@@ -40,9 +39,7 @@ export function calculateQuizResult(
   };
 }
 
-/**
- * Standard atomic masses (g/mol) for common chemical elements.
- */
+/** Standard atomic masses (g/mol) for common chemical elements. */
 export const ATOMIC_MASSES: Record<string, number> = {
   H: 1.008,
   He: 4.003,
@@ -64,16 +61,17 @@ export const ATOMIC_MASSES: Record<string, number> = {
   Ba: 137.33,
 };
 
-/**
- * Computes molar mass given element count map, e.g. { H: 2, O: 1 } -> 18.015 g/mol
- */
+/** Computes molar mass given element count map, e.g. { H: 2, O: 1 } -> 18.015 g/mol */
 export function calculateMolarMass(elements: Record<string, number>): number {
   let mass = 0;
+
   for (const [symbol, count] of Object.entries(elements)) {
     const atomicMass = ATOMIC_MASSES[symbol];
+
     if (atomicMass !== undefined) {
       mass += atomicMass * count;
     }
   }
+
   return Math.round(mass * 1000) / 1000;
 }

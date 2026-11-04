@@ -47,3 +47,11 @@ _Avoid_: Storybook, style guide page, component playground
 **Auth Page**:
 Trang xác thực tài khoản (`/login`) với kiến trúc split-screen hiển thị hero visual và form tương tác, dùng framer-motion để xử lý micro-interactions và hiệu ứng chuyển cảnh.
 _Avoid_: sign-in screen, login view
+
+**User**:
+Học sinh, giáo viên hoặc quản trị viên tham gia vào nền tảng ThFat Edu.
+_Avoid_: Account, client, customer
+
+**Account**:
+Phương thức liên kết xác thực (mật khẩu nội bộ hoặc nhà cung cấp OAuth như Google) gắn với một User.
+_Avoid_: Profile, user credentials

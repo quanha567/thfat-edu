@@ -1,21 +1,5 @@
 "use client";
 
-import {
-  AlertCircle,
-  Atom,
-  BookOpen,
-  CheckCircle2,
-  ChevronRight,
-  GraduationCap,
-  Info,
-  Layers,
-  Palette,
-  Sparkles,
-  Type,
-} from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
-
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -67,6 +51,22 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Toggle } from "@/components/ui/toggle";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  AlertCircle,
+  Atom,
+  BookOpen,
+  CheckCircle2,
+  ChevronRight,
+  GraduationCap,
+  Info,
+  Layers,
+  Palette,
+  Sparkles,
+  Type,
+} from "lucide-react";
+import Image from "next/image";
+import type { ReactNode } from "react";
+import { useState } from "react";
 
 /* ── helpers ── */
 const shades = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950];
@@ -138,15 +138,7 @@ const navSections = [
 ];
 
 /* ── Section wrapper ── */
-function Section({
-  id,
-  title,
-  children,
-}: {
-  id: string;
-  title: string;
-  children: React.ReactNode;
-}) {
+function Section({ id, title, children }: { id: string; title: string; children: ReactNode }) {
   return (
     <section id={id} className="scroll-mt-8 space-y-6">
       <div className="flex items-center gap-3">
@@ -159,7 +151,7 @@ function Section({
 }
 
 /* ── Demo block ── */
-function Demo({ label, children }: { label: string; children: React.ReactNode }) {
+function Demo({ label, children }: { label: string; children: ReactNode }) {
   return (
     <div className="space-y-3">
       <p className="text-label text-neutral-500">{label}</p>

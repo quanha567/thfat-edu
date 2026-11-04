@@ -1,11 +1,11 @@
+import { Providers } from "@/components/providers";
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
 import "katex/dist/katex.min.css";
 import "katex/contrib/mhchem";
-
-import { Providers } from "@/components/providers";
+import type { ReactNode } from "react";
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",
@@ -33,7 +33,7 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="vi" className={`${beVietnamPro.variable} ${geistMono.variable} h-full antialiased`}>
       <body className="bg-background text-foreground flex min-h-full flex-col">

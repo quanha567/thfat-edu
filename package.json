@@ -3,12 +3,14 @@
   "private": true,
   "workspaces": [
     "thfat-edu-fe",
-    "thfat-edu-be"
+    "thfat-edu-be",
+    "packages/*"
   ],
   "scripts": {
     "dev:fe": "bun --filter thfat-edu-fe dev",
     "dev:be": "bun --filter thfat-edu-be dev",
     "lint": "bun --filter thfat-edu-fe lint && bun --filter thfat-edu-be lint",
+    "lint:fix": "bun --filter thfat-edu-fe lint:fix && bun --filter thfat-edu-be lint:fix",
     "lint:fe": "bun --filter thfat-edu-fe lint",
     "lint:be": "bun --filter thfat-edu-be lint",
     "format": "bun --filter thfat-edu-fe format && bun --filter thfat-edu-be format",
@@ -27,6 +29,7 @@
     "@commitlint/cli": "^21.2.4",
     "@commitlint/config-conventional": "^21.2.4",
     "@socketsecurity/bun-security-scanner": "^1.1.3",
+    "@stylistic/eslint-plugin": "^5.10.0",
     "elysia": "^1.4.30",
     "husky": "^9.1.7",
     "lint-staged": "^17.6.0",

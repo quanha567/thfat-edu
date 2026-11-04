@@ -1,5 +1,11 @@
 "use client";
 
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Spinner } from "@/components/ui/spinner";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -14,16 +20,8 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import * as React from "react";
 import { useForm } from "react-hook-form";
-import * as z from "zod";
-
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Spinner } from "@/components/ui/spinner";
+import { z } from "zod";
 
 const loginSchema = z.object({
   email: z
@@ -84,6 +82,7 @@ export default function LoginPage() {
   const handleGoogleLogin = async () => {
     setAuthError(null);
     setIsGoogleSubmitting(true);
+
     try {
       await new Promise((resolve) => setTimeout(resolve, 1200));
     } catch {

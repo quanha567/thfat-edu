@@ -1,17 +1,5 @@
 "use client";
 
-import {
-  FlaskConical,
-  Atom,
-  CheckCircle2,
-  Sparkles,
-  ArrowRight,
-  BookOpen,
-  ShieldCheck,
-  Zap,
-} from "lucide-react";
-import { useState } from "react";
-
 import { Chem } from "@/components/chemistry/chem";
 import { ChemRenderer } from "@/components/chemistry/chem-renderer";
 import { Badge } from "@/components/ui/badge";
@@ -24,6 +12,17 @@ import {
   CardContent,
   CardFooter,
 } from "@/components/ui/card";
+import {
+  FlaskConical,
+  Atom,
+  CheckCircle2,
+  Sparkles,
+  ArrowRight,
+  BookOpen,
+  ShieldCheck,
+  Zap,
+} from "lucide-react";
+import { useState } from "react";
 
 const SAMPLE_QUESTION = {
   title: "Câu hỏi trắc nghiệm minh họa",
@@ -190,9 +189,11 @@ export default function Home() {
               {SAMPLE_QUESTION.options.map((opt) => {
                 const isSelected = selectedOption === opt.id;
                 let borderClass = "border-slate-200 hover:border-indigo-300 hover:bg-slate-50";
+
                 if (isSelected) {
                   borderClass = "border-indigo-600 bg-indigo-50/50 ring-2 ring-indigo-500/20";
                 }
+
                 if (isSubmitted) {
                   if (opt.id === SAMPLE_QUESTION.correctId) {
                     borderClass = "border-emerald-500 bg-emerald-50 ring-2 ring-emerald-500/20";

@@ -1,5 +1,6 @@
 {
   "thfat-edu-fe/**/*.{js,jsx,ts,tsx}": ["oxlint --fix", "oxfmt --write"],
   "thfat-edu-be/**/*.{js,ts}": ["oxlint --fix", "oxfmt --write"],
+  "packages/**/*.{js,jsx,ts,tsx}": ["oxlint --fix", "oxfmt --write"],
   "**/*.{json,css,md}": ["oxfmt --write"]
 }

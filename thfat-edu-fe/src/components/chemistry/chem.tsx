@@ -15,9 +15,9 @@ interface ChemProps {
 }
 
 /**
- * Component to render chemical formulas and reactions with KaTeX and mhchem extension.
- * Example: <Chem formula="2H2 + O2 -> 2H2O" />
- * Example: <Chem formula="Fe + 2HCl -> FeCl2 + H2 ^" display />
+ * Component to render chemical formulas and reactions with KaTeX and mhchem extension. Example:
+ * <Chem formula="2H2 + O2 -> 2H2O" /> Example: <Chem formula="Fe + 2HCl -> FeCl2 + H2 ^" display
+ * />
  */
 export function Chem({ formula, math, display = false, className = "" }: ChemProps) {
   const latex = formula ? `\\ce{${formula}}` : math || "";
@@ -30,6 +30,7 @@ export function Chem({ formula, math, display = false, className = "" }: ChemPro
       });
     } catch (e) {
       console.error("Failed to render chemical formula:", e);
+
       return latex;
     }
   }, [latex, display]);

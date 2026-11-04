@@ -1,17 +1,15 @@
 import { cn } from "cn";
-import * as React from "react";
+import type { SVGProps } from "react";
 
-export interface LogoProps extends React.SVGProps<SVGSVGElement> {
+export type LogoProps = SVGProps<SVGSVGElement> & {
   variant?: "icon" | "horizontal" | "vertical" | "full";
   theme?: "navy" | "white" | "gold";
   size?: number | string;
   className?: string;
   showTagline?: boolean;
-}
+};
 
-/**
- * Biểu tượng lồng chữ TF nguyên bản trong hình tròn của ThFat Edu
- */
+/** Biểu tượng lồng chữ TF nguyên bản trong hình tròn của ThFat Edu */
 export function LogoIcon({
   className,
   color = "currentColor",
@@ -82,8 +80,8 @@ export function LogoIcon({
 }
 
 /**
- * Component Logo toàn diện của ThFat Edu
- * Hỗ trợ các biến thể: icon, horizontal (cho Navbar), vertical/full (cho Poster, Login, Hero)
+ * Component Logo toàn diện của ThFat Edu Hỗ trợ các biến thể: icon, horizontal (cho Navbar),
+ * vertical/full (cho Poster, Login, Hero)
  */
 export function Logo({
   variant = "horizontal",

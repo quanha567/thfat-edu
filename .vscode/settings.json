@@ -19,7 +19,5 @@
   "[json]": {
     "editor.defaultFormatter": "oxc.oxc-vscode"
   },
-  "oxc.lint.enable": true,
-  "oxc.fmt.enable": true,
   "typescript.tsdk": "node_modules/typescript/lib"
 }

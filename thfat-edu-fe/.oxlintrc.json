@@ -1,6 +1,8 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "nextjs", "vitest", "typescript", "jsx-a11y", "import", "promise"],
+  "jsPlugins": [{ "name": "stylistic", "specifier": "@stylistic/eslint-plugin" }],
+  "jsPlugins": [{ "name": "stylistic", "specifier": "@stylistic/eslint-plugin" }],
   "categories": {
     "correctness": "error",
     "suspicious": "warn",
@@ -9,10 +11,49 @@
   "rules": {
     "react/react-in-jsx-scope": "off",
     "react/set-state-in-effect": "warn",
+    "react/no-namespace": "error",
+    "import/no-namespace": "error",
+    "import/newline-after-import": "error",
+    "stylistic/padding-line-between-statements": [
+      "error",
+      { "blankLine": "always", "prev": "*", "next": "return" }
+    ],
+    "vitest/padding-around-test-blocks": "error",
+    "vitest/padding-around-after-all-blocks": "error",
     "import/no-unassigned-import": "off",
     "import/no-named-as-default-member": "off",
-    "typescript/no-explicit-any": "warn",
+    "typescript/no-explicit-any": "error",
+    "typescript/no-non-null-assertion": "error",
+    "typescript/no-restricted-types": [
+      "error",
+      {
+        "types": {
+          "React.FC": {
+            "message": "Do not use React.FC. Define normal function components with explicit prop types."
+          },
+          "React.FunctionComponent": {
+            "message": "Do not use React.FunctionComponent. Define normal function components with explicit prop types."
+          },
+          "React.ReactNode": {
+            "message": "Import ReactNode directly: `import type { ReactNode } from 'react'`."
+          },
+          "React.ReactElement": {
+            "message": "Import ReactElement directly: `import type { ReactElement } from 'react'`."
+          }
+        }
+      }
+    ],
+    "typescript/consistent-type-imports": ["error", { "fixStyle": "separate-type-imports" }],
     "typescript/no-unused-vars": "error",
+    "max-params": ["error", { "max": 3 }],
+    "max-depth": ["error", { "max": 3 }],
+    "prefer-const": "error",
+    "no-var": "error",
+    "eqeqeq": "error",
+    "no-nested-ternary": "error",
+    "no-else-return": "error",
+    "prefer-template": "error",
+    "no-param-reassign": "error",
     "no-debugger": "error",
     "no-console": ["warn", { "allow": ["warn", "error"] }]
   },

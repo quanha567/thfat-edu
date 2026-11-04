@@ -10,8 +10,16 @@
   "bracketSpacing": true,
   "bracketSameLine": false,
   "arrowParens": "always",
-  "sortImports": true,
+  "endOfLine": "lf",
+  "insertFinalNewline": true,
+  "sortImports": {
+    "newlinesBetween": true,
+    "order": "asc",
+    "ignoreCase": true,
+    "internalPattern": ["@/*", "~/"]
+  },
   "sortTailwindcss": true,
   "sortPackageJson": true,
+  "jsdoc": true,
   "ignorePatterns": [".next/**", "node_modules/**", "dist/**", "*.min.js", "*.min.css"]
 }
