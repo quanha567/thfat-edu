@@ -1,6 +1,6 @@
 # ThFat Edu
 
-Nền tảng học tập trực tuyến dành cho học sinh Việt Nam, tập trung vào luyện đề và kiểm tra kiến thức.
+Nền tảng luyện thi & thi thử trực tuyến môn Hóa học dành cho học sinh lớp 12 và thí sinh tự do, xây dựng theo phương pháp và lộ trình của Thầy Fat.
 
 ## Language
 
@@ -47,6 +47,10 @@ _Avoid_: Storybook, style guide page, component playground
 **Auth Page**:
 Trang xác thực tài khoản (`/login`) với kiến trúc split-screen hiển thị hero visual và form tương tác, dùng framer-motion để xử lý micro-interactions và hiệu ứng chuyển cảnh.
 _Avoid_: sign-in screen, login view
+
+**Exam Room**:
+Màn hình phòng thi trực tuyến với đồng hồ đếm ngược, giao diện tập trung và danh sách câu hỏi trắc nghiệm, mô phỏng kỳ thi thử trên máy tính.
+_Avoid_: quiz screen, test page
 
 **User**:
 Học sinh, giáo viên hoặc quản trị viên tham gia vào nền tảng ThFat Edu.

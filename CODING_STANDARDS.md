@@ -331,7 +331,67 @@ export function useLogin() {
 }
 ```
 
-### 5.4 Accessibility & Performance
+### 5.4 Component Slicing & File Length Limits
+
+- **File Length Ceiling**: No component or page file should exceed **200 lines** (target $\le 150$ lines). Any file exceeding this limit must be split.
+- **Thin Page Architecture (`page.tsx`)**:
+  - `page.tsx` must only serve as an orchestrator (routing params, high-level layout, Suspense boundaries, and composing sections).
+  - Never place hundreds of lines of section UI, long static lists, or inline form states directly inside `page.tsx`.
+- **Colocated Section Slicing**:
+  - Complex views with multiple sections/tabs must extract each section into a standalone component inside a `components/` subfolder colocated with the route (e.g. `src/app/design/components/color-section.tsx`).
+- **Data & Constants Segregation**:
+  - Static datasets, configuration dictionaries, or mock lists $\ge 15$ lines must reside in dedicated `<name>.constants.ts` or `<name>.data.ts` files.
+- **No Inline Helper Components (`rerender-no-inline-components`)**:
+  - Do not define temporary component functions (e.g. `function Section()`, `function Demo()`) inside a parent component file. Extract them to their own typed files.
+
+### 5.5 React 19 & Next.js 16 Modern Engineering Standards
+
+- **`ref` as a Prop (React 19)**:
+  - In React 19, `ref` is a standard prop on function components. Deprecate `forwardRef` for all new components.
+  - Type the ref explicitly in the props type:
+    ```ts
+    type TCustomInputProps = {
+      label: string;
+      ref?: Ref<HTMLInputElement>;
+    };
+
+    export function CustomInput({ label, ref }: TCustomInputProps) {
+      return <input ref={ref} placeholder={label} />;
+    }
+    ```
+- **Imperative Control without Re-renders (`useImperativeHandle` + `ref`)**:
+  - For components with high-frequency updates (e.g. CBT exam countdown timer, audio/media scrubbers, chemical molecule canvas), expose imperative control methods via `useImperativeHandle` instead of pushing state updates up to the parent:
+    ```ts
+    export type TTimerHandle = {
+      reset: () => void;
+      getRemainingSeconds: () => number;
+    };
+
+    type TTimerProps = {
+      initialSeconds: number;
+      ref?: Ref<TTimerHandle>;
+    };
+
+    export function ExamTimer({ initialSeconds, ref }: TTimerProps) {
+      const remainingRef = useRef(initialSeconds);
+
+      useImperativeHandle(ref, () => ({
+        reset: () => {
+          remainingRef.current = initialSeconds;
+        },
+        getRemainingSeconds: () => remainingRef.current,
+      }));
+
+      return <div>{/* Timer UI */}</div>;
+    }
+    ```
+- **Re-render Prevention with `useRef` (`rerender-use-ref-transient-values`)**:
+  - Store transient values (timers, animation frames, previous state, values read only inside event listeners) in `useRef` rather than `useState` to prevent wasteful re-render cycles.
+- **Push `"use client"` to the Leaves**:
+  - In Next.js 16 App Router, keep pages and layout containers as React Server Components (RSC) by default.
+  - Only mark leaf interactive components with `"use client"`. Do not mark an entire 500+ line page as client-rendered if 80% of it is static display.
+
+### 5.6 Accessibility & Performance
 
 - **WCAG 2.1 AA Compliance**:
   - Always provide accessible labels (`aria-label`, `aria-labelledby`, or visible text).

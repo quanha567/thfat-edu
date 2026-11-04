@@ -1,3 +1,5 @@
+import { Elysia } from "elysia";
+
 export class AppError extends Error {
   constructor(
     public override message: string,
@@ -23,13 +25,13 @@ export class NotFoundError extends AppError {
   }
 }
 
-export interface ErrorContext {
+export type TErrorContext = {
   code: string | number;
   error: unknown;
   set: { status?: number | string };
-}
+};
 
-export const handleApplicationError = ({ code, error, set }: ErrorContext) => {
+export function handleApplicationError({ code, error, set }: TErrorContext) {
   if (code === "UNAUTHORIZED" || error instanceof UnauthorizedError) {
     set.status = 401;
 
@@ -83,4 +85,12 @@ export const handleApplicationError = ({ code, error, set }: ErrorContext) => {
       ? "An internal server error occurred"
       : (error as Error).message || "Unknown error",
   };
-};
+}
+
+export const errorHandlerPlugin = new Elysia({ name: "app:error-handler" })
+  .error({
+    UNAUTHORIZED: UnauthorizedError,
+    NOT_FOUND: NotFoundError,
+    APP_ERROR: AppError,
+  })
+  .onError({ as: "global" }, handleApplicationError);

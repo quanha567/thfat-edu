@@ -10,25 +10,21 @@ import type { App } from "thfat-edu-be";
  *    window.location.origin
  * 4. Local development fallback: http://localhost:3000
  */
-export const getApiBaseUrl = (): string => {
-  // Runtime binding for serverless functions (resolves at runtime in functions, not at build time)
+export function getApiBaseUrl(): string {
   if (process.env.BACKEND_URL) {
     return process.env.BACKEND_URL;
   }
 
-  // Public env override (e.g. for external API or preview)
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
 
-  // Browser client-side fallback on the same domain
   if (typeof window !== "undefined") {
     return `${window.location.origin}/api`;
   }
 
-  // Local standalone development default
   return "http://localhost:3000";
-};
+}
 
 /**
  * Typesafe Elysia API client via Eden Treaty. Evaluates getApiBaseUrl() dynamically to ensure

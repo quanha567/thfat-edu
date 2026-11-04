@@ -40,5 +40,12 @@ Always read and adhere to [CODING_STANDARDS.md](file:///d:/projects/thfat-edu/CO
   1. `src/components/ui/` for shadcn/ui primitives.
   2. `src/components/` for shared multi-feature components.
   3. `src/features/<feature>/components/` for feature-specific components.
+- **File Length & Slicing**: Max 200 lines per component/page. Use Thin Page Architecture; colocate multi-section page components in `components/` subfolder.
+- **Constants Separation**: Extract static datasets and dictionaries $\ge 15$ lines into `.constants.ts` or `.data.ts`.
+- **React 19 & Next.js 16**:
+  - Use `ref` directly as a prop (no `forwardRef`).
+  - Use `useImperativeHandle` + `ref` for high-frequency or imperative UI controls (e.g. CBT timer, canvas) to avoid state re-renders.
+  - Use `useRef` for transient values read in callbacks/listeners.
+  - Push `"use client"` down to interactive leaf components; keep pages/layouts RSC by default.
 - **Custom Hooks**: Put React Query operations inside dedicated `use-<action>.ts` hooks in `features/<feature>/hooks/`. Components must not call the raw API directly.
 - **State Segregation**: React Query for server data, Zustand only for global UI states, `nuqs` for query/search parameters.
