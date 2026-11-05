@@ -1,3 +1,5 @@
+import { extractText } from "unpdf";
+
 import { env } from "../../config/env";
 import { type TSectionType } from "../../db/schema/quizzes";
 
@@ -85,34 +87,46 @@ export function normalizeExamData(raw: Partial<TParsedExamData>): TParsedExamDat
   };
 }
 
-export async function parseExamWithNvidia(imageBuffersBase64: string[]): Promise<TParsedExamData> {
+export async function extractPdfText(pdfBase64: string): Promise<string> {
+  const buffer = Buffer.from(pdfBase64, "base64");
+  const result = await extractText(new Uint8Array(buffer));
+  const pagesText = Array.isArray(result.text)
+    ? result.text.join("\n\n")
+    : String(result.text || "");
+
+  return pagesText.trim();
+}
+
+export async function parseExamFromPdf(pdfBase64: string): Promise<TParsedExamData> {
   const apiKey = env.NVIDIA_API_KEY;
   if (!apiKey) {
     throw new Error("NVIDIA_API_KEY chưa được cấu hình trong biến môi trường.");
   }
 
+  const extractedText = await extractPdfText(pdfBase64);
+  if (!extractedText || extractedText.length < 20) {
+    throw new Error(
+      "Không thể đọc được nội dung chữ từ file PDF. Nếu đây là file scan ảnh, vui lòng sử dụng file PDF có lớp văn bản số hoặc tạo đề thủ công.",
+    );
+  }
+
   const systemPrompt = `Bạn là chuyên gia thẩm định và số hóa đề thi môn Hóa học cho học sinh THPT và ôn thi Đánh giá Năng lực (ĐGNL).
-Nhiệm vụ của bạn là đọc các hình ảnh đề thi được cung cấp và bóc tách thành cấu trúc JSON chuẩn mực tuyệt đối với 4 phần (tổng 150 điểm thô):
-1. Phần I (true_false): Đúng / Sai gồm các câu hỏi, mỗi câu có các ý a, b, c, d (mỗi ý 1.50 điểm).
-2. Phần II (group_mcq): Chùm câu hỏi trắc nghiệm dựa trên đoạn thông tin/ngữ cảnh/thí nghiệm (mỗi câu trắc nghiệm 1.50 điểm).
-3. Phần III (matching): Câu hỏi ghép hợp nối cột (mỗi cặp ghép 1.50 điểm).
-4. Phần IV (short_answer): Câu hỏi trả lời ngắn/điền số (mỗi câu 6.00 điểm, kèm danh sách acceptableAnswers).
+Nhiệm vụ của bạn là đọc nội dung đề thi được cung cấp và bóc tách thành cấu trúc JSON chuẩn mực tuyệt đối với 4 phần (tổng 150 điểm thô):
+1. Phần I (true_false): Đúng / Sai gồm các câu hỏi, mỗi câu có các ý a, b, c, d (mỗi ý 1.50 điểm, correctAnswer là "true" hoặc "false").
+2. Phần II (group_mcq): Chùm câu hỏi trắc nghiệm dựa trên đoạn thông tin/ngữ cảnh/thí nghiệm (mỗi câu trắc nghiệm 1.50 điểm, options gồm 4 lựa chọn A, B, C, D, correctAnswer là "A", "B", "C" hoặc "D").
+3. Phần III (matching): Câu hỏi ghép hợp nối cột (mỗi cặp ghép 1.50 điểm, content là vế Cột A, correctAnswer là vế ghép Cột B).
+4. Phần IV (short_answer): Câu hỏi trả lời ngắn/điền số (mỗi câu 6.00 điểm, kèm danh sách acceptableAnswers chứa các dạng đáp án số hoặc từ tương đương).
 
 Quy tắc công thức hóa học: Bắt buộc viết dưới dạng chuẩn KaTeX / LaTeX với cú pháp \\ce{...} (ví dụ \\ce{Fe^{3+}}, \\ce{H2SO4}, \\ce{Al2(SO4)3}).
-Chỉ trả về duy nhất định dạng JSON thuần túy (không kèm markdown backticks \`\`\`json).`;
+Chỉ trả về duy nhất định dạng JSON thuần túy (không kèm bất kỳ văn bản giải thích hoặc markdown backticks nào khác).`;
 
-  const contentPayload: unknown[] = [
-    { type: "text", text: "Trích xuất đề thi Hóa học này thành JSON 4 phần theo đúng hướng dẫn." },
-  ];
+  const userPrompt = `Dưới đây là toàn bộ nội dung đề thi Hóa học trích xuất từ file PDF:
 
-  for (const b64 of imageBuffersBase64) {
-    contentPayload.push({
-      type: "image_url",
-      image_url: {
-        url: `data:image/png;base64,${b64}`,
-      },
-    });
-  }
+--- BẮT ĐẦU NỘI DUNG ĐỀ THI ---
+${extractedText}
+--- KẾT THÚC NỘI DUNG ĐỀ THI ---
+
+Hãy bóc tách thành đối tượng JSON có các trường: title, durationMinutes (mặc định 50), totalPoints (150.00), và mảng sections chứa 4 phần theo đúng yêu cầu.`;
 
   const response = await fetch(`${env.NVIDIA_BASE_URL}/chat/completions`, {
     method: "POST",
@@ -124,7 +138,7 @@ Chỉ trả về duy nhất định dạng JSON thuần túy (không kèm markdo
       model: env.NVIDIA_MODEL,
       messages: [
         { role: "system", content: systemPrompt },
-        { role: "user", content: contentPayload },
+        { role: "user", content: userPrompt },
       ],
       temperature: 0.1,
       max_tokens: 4096,
@@ -141,13 +155,17 @@ Chỉ trả về duy nhất định dạng JSON thuần túy (không kèm markdo
   };
 
   const rawContent = result.choices?.[0]?.message?.content?.trim() ?? "{}";
-  const cleanedJson = rawContent.replace(/^```json\s*/, "").replace(/\s*```$/, "");
+  const cleanedJson = rawContent
+    .replace(/^```json\s*/i, "")
+    .replace(/^```\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
 
   let parsedJson: Partial<TParsedExamData>;
   try {
     parsedJson = JSON.parse(cleanedJson) as Partial<TParsedExamData>;
   } catch {
-    throw new Error("Không thể chuyển đổi phản hồi từ NVIDIA Vision thành JSON hợp lệ.");
+    throw new Error("Không thể chuyển đổi phản hồi từ AI thành cấu trúc đề thi hợp lệ.");
   }
 
   return normalizeExamData(parsedJson);

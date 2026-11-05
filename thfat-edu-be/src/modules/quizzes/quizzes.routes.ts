@@ -1,6 +1,6 @@
 import { Elysia, t } from "elysia";
 
-import { parseExamWithNvidia } from "./exam-parser.service";
+import { parseExamFromPdf } from "./exam-parser.service";
 import {
   CreateQuizSchema,
   ImportPdfSchema,
@@ -53,7 +53,7 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
   .post(
     "/import-pdf",
     async ({ quizzesService, body }) => {
-      const parsedData = await parseExamWithNvidia([body.pdfBase64]);
+      const parsedData = await parseExamFromPdf(body.pdfBase64);
       if (body.title) {
         parsedData.title = body.title;
       }
