@@ -1,3 +1,4 @@
+import { BaseAvatar } from "@/components/base";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,7 +55,7 @@ export function SurfaceSection() {
         </div>
       </Demo>
 
-      <Demo label="Avatar">
+      <Demo label="Avatar (shadcn primitive)">
         <div className="flex items-center gap-4">
           <Avatar className="size-16">
             <AvatarImage src="https://github.com/shadcn.png" />
@@ -68,6 +69,15 @@ export function SurfaceSection() {
               +5
             </AvatarFallback>
           </Avatar>
+        </div>
+      </Demo>
+
+      <Demo label="BaseAvatar (Base Component)">
+        <div className="flex items-center gap-4">
+          <BaseAvatar name="Nguyễn Minh Anh" size="xl" />
+          <BaseAvatar name="Trần Gia Huy" size="lg" />
+          <BaseAvatar name="Lê Thảo Vy" size="default" />
+          <BaseAvatar name="Phạm Tuấn" size="sm" />
         </div>
       </Demo>
 

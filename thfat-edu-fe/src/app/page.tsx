@@ -1,20 +1,58 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+import { MainFooter, MainNavbar } from "@/components/layout";
+import {
+  AboutPreviewSection,
+  CtaSection,
+  ExamInfoSection,
+  FeaturesSection,
+  HeroSection,
+  LeaderboardPreviewSection,
+  StatsBar,
+} from "@/features/home/components";
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 text-center">
-      <div className="max-w-md space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">ThFat Edu</h1>
-        <p className="text-muted-foreground text-sm">
-          Cổng thi thử & kiểm tra trực tuyến chuyên sâu môn Hóa học (Computer-Based Testing).
-        </p>
-        <div className="pt-4">
-          <Button asChild>
-            <Link href="/design">Xem Design System</Link>
-          </Button>
-        </div>
-      </div>
-    </main>
+    <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
+      {/* Shared Navigation Header */}
+      <MainNavbar />
+
+      <main className="flex-1">
+        {/* Hero Banner with Teacher Visual & Molecular Effects */}
+        <HeroSection />
+
+        {/* Floating Metrics Bar with Giant Organic Wave Transition */}
+        <StatsBar />
+
+        {/* 4 Feature Highlights */}
+        <FeaturesSection />
+
+        {/* Detailed Sections Grid */}
+        <section className="bg-background pb-20 md:pb-24">
+          <div className="mx-auto max-w-7xl space-y-10 px-4 sm:px-6 lg:px-8">
+            {/* Row 1: About ThFat Edu & Leaderboard Preview */}
+            <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
+              <div className="flex flex-col lg:col-span-7">
+                <AboutPreviewSection />
+              </div>
+              <div className="flex flex-col lg:col-span-5">
+                <LeaderboardPreviewSection />
+              </div>
+            </div>
+
+            {/* Row 2: Exam Structure & Ready CTA Banner */}
+            <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
+              <div className="flex flex-col lg:col-span-7">
+                <ExamInfoSection />
+              </div>
+              <div className="flex flex-col lg:col-span-5">
+                <CtaSection />
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Shared Footer with Bottom Wave Transition */}
+      <MainFooter />
+    </div>
   );
 }

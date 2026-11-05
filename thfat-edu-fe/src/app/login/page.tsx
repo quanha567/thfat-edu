@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import { LoginCard } from "@/features/auth/components/login-card";
 import { LoginHero } from "@/features/auth/components/login-hero";
 import type { Metadata } from "next";
@@ -23,11 +24,11 @@ export default function LoginPage() {
         <div className="relative z-10 flex w-full justify-center">
           <Suspense
             fallback={
-              <div className="border-border bg-card flex h-96 w-full max-w-[440px] items-center justify-center rounded-2xl border shadow-xl">
+              <Card className="flex h-96 w-full max-w-[440px] items-center justify-center rounded-2xl shadow-xl">
                 <span className="text-caption text-muted-foreground animate-pulse">
                   Đang tải giao diện đăng nhập...
                 </span>
-              </div>
+              </Card>
             }
           >
             <LoginCard />

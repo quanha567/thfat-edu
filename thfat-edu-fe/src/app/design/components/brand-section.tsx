@@ -1,3 +1,4 @@
+import { Card } from "@/components/ui/card";
 import Image from "next/image";
 
 import { Section } from "./section-wrapper";
@@ -12,7 +13,7 @@ export function BrandSection() {
 
       <div className="grid gap-6 sm:grid-cols-3">
         {/* Card 1: Logo Icon */}
-        <div className="flex flex-col items-center justify-between rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-xs">
+        <Card className="flex flex-col items-center justify-between rounded-2xl border-neutral-200 bg-white p-6 text-center shadow-xs">
           <div className="relative mb-4 flex size-36 items-center justify-center overflow-hidden rounded-xl bg-neutral-50 p-3">
             <Image
               src="/brand/logo-icon.png"
@@ -27,10 +28,10 @@ export function BrandSection() {
             <p className="text-caption text-neutral-400">Biểu tượng lồng TF hình tròn</p>
             <p className="text-caption text-primary-700 mt-2 font-mono">/brand/logo-icon.png</p>
           </div>
-        </div>
+        </Card>
 
         {/* Card 2: Logo Full */}
-        <div className="flex flex-col items-center justify-between rounded-2xl border border-neutral-200 bg-white p-6 text-center shadow-xs">
+        <Card className="flex flex-col items-center justify-between rounded-2xl border-neutral-200 bg-white p-6 text-center shadow-xs">
           <div className="relative mb-4 flex size-36 items-center justify-center overflow-hidden rounded-xl bg-neutral-50 p-3">
             <Image
               src="/brand/logo-full.png"
@@ -45,10 +46,10 @@ export function BrandSection() {
             <p className="text-caption text-neutral-400">Emblem + Tên + Vạch vàng + Tagline</p>
             <p className="text-caption text-primary-700 mt-2 font-mono">/brand/logo-full.png</p>
           </div>
-        </div>
+        </Card>
 
         {/* Card 3: Logo White (Dark Mode) */}
-        <div className="border-primary-800 bg-primary-950 flex flex-col items-center justify-between rounded-2xl border p-6 text-center shadow-xs">
+        <Card className="border-primary-800 bg-primary-950 flex flex-col items-center justify-between rounded-2xl p-6 text-center shadow-xs">
           <div className="bg-primary-900/50 relative mb-4 flex size-36 items-center justify-center overflow-hidden rounded-xl p-3">
             <Image
               src="/brand/logo-white.png"
@@ -63,7 +64,7 @@ export function BrandSection() {
             <p className="text-caption text-primary-200">Trắng & Vàng kim trên nền Navy</p>
             <p className="text-caption text-primary-300 mt-2 font-mono">/brand/logo-white.png</p>
           </div>
-        </div>
+        </Card>
       </div>
     </Section>
   );
