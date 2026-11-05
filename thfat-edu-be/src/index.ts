@@ -6,6 +6,7 @@ import { env } from "./config/env";
 import { errorHandlerPlugin } from "./middlewares/error-handler";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health/health.routes";
+import { quizzesRoutes } from "./modules/quizzes";
 
 export const app = new Elysia()
   .use(corsPlugin)
@@ -14,7 +15,8 @@ export const app = new Elysia()
   .get("/", () => "Hello Elysia")
   .use(healthRoutes)
   .use(authRoutes)
-  .group("/api", (group) => group.use(healthRoutes).use(authRoutes));
+  .use(quizzesRoutes)
+  .group("/api", (group) => group.use(healthRoutes).use(authRoutes).use(quizzesRoutes));
 
 export type App = typeof app;
 

@@ -15,6 +15,9 @@ export const EnvSchema = t.Object({
   FIREBASE_PRIVATE_KEY: t.Optional(t.String()),
   FIREBASE_SERVICE_ACCOUNT_PATH: t.Optional(t.String()),
   VERCEL: t.Optional(t.String()),
+  NVIDIA_API_KEY: t.Optional(t.String()),
+  NVIDIA_MODEL: t.String({ default: "meta/llama-3.2-90b-vision-instruct" }),
+  NVIDIA_BASE_URL: t.String({ default: "https://integrate.api.nvidia.com/v1" }),
 });
 
 export type TEnv = Static<typeof EnvSchema>;
@@ -37,6 +40,9 @@ function loadEnv(): TEnv {
     FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
     FIREBASE_SERVICE_ACCOUNT_PATH: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
     VERCEL: process.env.VERCEL,
+    NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
+    NVIDIA_MODEL: process.env.NVIDIA_MODEL ?? "meta/llama-3.2-90b-vision-instruct",
+    NVIDIA_BASE_URL: process.env.NVIDIA_BASE_URL ?? "https://integrate.api.nvidia.com/v1",
   };
 
   if (!Value.Check(EnvSchema, rawEnv)) {

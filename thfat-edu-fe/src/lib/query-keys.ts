@@ -8,4 +8,9 @@ export const queryKeys = {
     me: () => [...queryKeys.auth.all, "me"] as const,
     sessions: () => [...queryKeys.auth.all, "sessions"] as const,
   },
+  exams: {
+    all: ["exams"] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.exams.all, "list", params] as const,
+    detail: (id: string) => [...queryKeys.exams.all, "detail", id] as const,
+  },
 } as const;

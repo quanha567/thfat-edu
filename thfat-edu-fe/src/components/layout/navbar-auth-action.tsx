@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { ArrowRight, ChevronDown, LogOut, User } from "lucide-react";
+import { ArrowRight, ChevronDown, LogOut, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 
 export function NavbarAuthAction() {
@@ -46,6 +46,14 @@ export function NavbarAuthAction() {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuSeparator className="bg-white/10" />
+          {user.role === "admin" && (
+            <DropdownMenuItem asChild className="cursor-pointer hover:bg-white/10">
+              <Link href="/admin" className="flex items-center gap-2">
+                <ShieldCheck className="text-primary-300 h-4 w-4" />
+                <span>Quản trị hệ thống</span>
+              </Link>
+            </DropdownMenuItem>
+          )}
           <DropdownMenuItem asChild className="cursor-pointer hover:bg-white/10">
             <Link href="/dashboard" className="flex items-center gap-2">
               <User className="text-primary-300 h-4 w-4" />
