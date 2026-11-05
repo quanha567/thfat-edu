@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from "@/lib/api";
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { queryKeys } from "@/lib/query-keys";
 import { useQuery } from "@tanstack/react-query";
@@ -14,7 +15,11 @@ export function useExams(params: TExamFilterParams = {}) {
       if (params.status) searchParams.set("status", params.status);
       if (params.search) searchParams.set("search", params.search);
 
-      const res = await fetch(`/api/quizzes?${searchParams.toString()}`);
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/quizzes?${searchParams.toString()}`, {
+        credentials: "include",
+      });
+
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
         throw new Error(extractApiErrorMessage(errorData, "Không thể tải danh sách đề thi."));

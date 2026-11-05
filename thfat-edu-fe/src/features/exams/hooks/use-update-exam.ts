@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from "@/lib/api";
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { queryKeys } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -9,9 +10,11 @@ export function useUpdateExam(id: string) {
 
   return useMutation<TQuizDetail, Error, TUpdateQuizInput>({
     mutationFn: async (input) => {
-      const res = await fetch(`/api/quizzes/${id}`, {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify(input),
       });
 

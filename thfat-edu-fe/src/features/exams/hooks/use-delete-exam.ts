@@ -1,3 +1,4 @@
+import { getApiBaseUrl } from "@/lib/api";
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { queryKeys } from "@/lib/query-keys";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -7,8 +8,10 @@ export function useDeleteExam() {
 
   return useMutation<{ success: boolean }, Error, string>({
     mutationFn: async (id) => {
-      const res = await fetch(`/api/quizzes/${id}`, {
+      const baseUrl = getApiBaseUrl();
+      const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
         method: "DELETE",
+        credentials: "include",
       });
 
       if (!res.ok) {
