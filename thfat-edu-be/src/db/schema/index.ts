@@ -8,6 +8,7 @@ export * from "./users";
 export * from "./profiles";
 export * from "./sessions";
 export * from "./quizzes";
+export * from "./attempts";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   studentProfile: one(studentProfiles, {

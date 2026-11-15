@@ -52,6 +52,14 @@ _Avoid_: sign-in screen, login view
 Màn hình phòng thi trực tuyến với đồng hồ đếm ngược, giao diện tập trung và danh sách câu hỏi trắc nghiệm, mô phỏng kỳ thi thử trên máy tính.
 _Avoid_: quiz screen, test page
 
+**Exam Management**:
+Khu vực quản trị danh sách đề thi thử, theo dõi số liệu làm bài, tạo mới và cấu hình trạng thái phát hành đề thi trong hệ thống ThFat Edu.
+_Avoid_: quiz management, test manager
+
+**Exam Code**:
+Định danh rút gọn duy nhất của đề thi (ví dụ `VSAT-0001`), hiển thị trong danh sách quản lý và hỗ trợ tìm kiếm nhanh.
+_Avoid_: exam id, quiz id, mã bài thi
+
 **User**:
 Học sinh, giáo viên hoặc quản trị viên tham gia vào nền tảng ThFat Edu.
 _Avoid_: Account, client, customer

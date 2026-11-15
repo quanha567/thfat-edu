@@ -25,6 +25,10 @@
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:logs": "docker compose logs -f postgres",
+    "db:migrate": "bun --filter thfat-edu-be db:migrate",
+    "db:push": "bun --filter thfat-edu-be db:push",
+    "db:seed": "bun --filter thfat-edu-be db:seed",
+    "db:studio": "bun --filter thfat-edu-be db:studio",
     "scan": "bun pm scan",
     "prepare": "husky"
   },

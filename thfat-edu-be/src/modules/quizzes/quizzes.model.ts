@@ -27,11 +27,13 @@ export const QuizSubItemInputSchema = t.Object({
   orderIndex: t.Number(),
   label: t.String(),
   content: t.String(),
-  options: t.Optional(t.Array(t.String())),
-  correctAnswer: t.Optional(t.String()),
-  acceptableAnswers: t.Optional(t.Array(t.String())),
+  options: t.Optional(t.Nullable(t.Array(t.String()))),
+  correctAnswer: t.Optional(t.Nullable(t.String())),
+  acceptableAnswers: t.Optional(t.Nullable(t.Array(t.String()))),
   points: t.String(),
-  explanation: t.Optional(t.String()),
+  explanation: t.Optional(t.Nullable(t.String())),
+  createdAt: t.Optional(t.Nullable(t.String())),
+  updatedAt: t.Optional(t.Nullable(t.String())),
 });
 
 export type TQuizSubItemInput = Static<typeof QuizSubItemInputSchema>;
@@ -40,8 +42,10 @@ export const QuizQuestionInputSchema = t.Object({
   id: t.Optional(t.String()),
   orderIndex: t.Number(),
   contextContent: t.String(),
-  imageUrl: t.Optional(t.String()),
+  imageUrl: t.Optional(t.Nullable(t.String())),
   subItems: t.Array(QuizSubItemInputSchema),
+  createdAt: t.Optional(t.Nullable(t.String())),
+  updatedAt: t.Optional(t.Nullable(t.String())),
 });
 
 export type TQuizQuestionInput = Static<typeof QuizQuestionInputSchema>;
@@ -52,17 +56,19 @@ export const QuizSectionInputSchema = t.Object({
   title: t.String(),
   orderIndex: t.Number(),
   questions: t.Array(QuizQuestionInputSchema),
+  createdAt: t.Optional(t.Nullable(t.String())),
+  updatedAt: t.Optional(t.Nullable(t.String())),
 });
 
 export type TQuizSectionInput = Static<typeof QuizSectionInputSchema>;
 
 export const CreateQuizSchema = t.Object({
   title: t.String({ minLength: 1, maxLength: 255 }),
-  description: t.Optional(t.String()),
+  description: t.Optional(t.Nullable(t.String())),
   durationMinutes: t.Optional(t.Number({ default: 50 })),
   totalPoints: t.Optional(t.String({ default: "150.00" })),
   status: t.Optional(QuizStatusSchema),
-  pdfUrl: t.Optional(t.String()),
+  pdfUrl: t.Optional(t.Nullable(t.String())),
   sections: t.Optional(t.Array(QuizSectionInputSchema)),
 });
 
@@ -70,23 +76,15 @@ export type TCreateQuizInput = Static<typeof CreateQuizSchema>;
 
 export const UpdateQuizSchema = t.Object({
   title: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
-  description: t.Optional(t.String()),
+  description: t.Optional(t.Nullable(t.String())),
   durationMinutes: t.Optional(t.Number()),
   totalPoints: t.Optional(t.String()),
   status: t.Optional(QuizStatusSchema),
-  pdfUrl: t.Optional(t.String()),
+  pdfUrl: t.Optional(t.Nullable(t.String())),
   sections: t.Optional(t.Array(QuizSectionInputSchema)),
 });
 
 export type TUpdateQuizInput = Static<typeof UpdateQuizSchema>;
-
-export const ImportPdfSchema = t.Object({
-  title: t.Optional(t.String()),
-  pdfBase64: t.String({ minLength: 1 }),
-  pdfUrl: t.Optional(t.String()),
-});
-
-export type TImportPdfInput = Static<typeof ImportPdfSchema>;
 
 export const QuizListItemSchema = t.Object({
   id: t.String(),

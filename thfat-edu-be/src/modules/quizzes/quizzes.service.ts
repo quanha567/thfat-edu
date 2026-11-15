@@ -9,7 +9,6 @@ import {
   type TQuiz,
 } from "../../db/schema/quizzes";
 import { NotFoundError } from "../../middlewares/error-handler";
-import { type TParsedExamData } from "./exam-parser.service";
 import {
   type TCreateQuizInput,
   type TQuizListQuery,
@@ -46,7 +45,7 @@ export class QuizzesService {
 
     const total = totalResult?.count ?? 0;
 
-    const items = await this.database
+    const quizList = await this.database
       .select({
         id: quizzes.id,
         title: quizzes.title,
@@ -64,47 +63,69 @@ export class QuizzesService {
       .limit(limit)
       .offset(offset);
 
-    const formattedItems = await Promise.all(
-      items.map(async (item) => {
-        const [qCount] = await this.database
-          .select({ count: sql<number>`count(*)::int` })
-          .from(quizQuestions)
-          .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
-          .where(eq(quizSections.quizId, item.id));
+    const items = await Promise.all(
+      quizList.map(async (quiz) => {
+        const sections = await this.database
+          .select({ id: quizSections.id })
+          .from(quizSections)
+          .where(eq(quizSections.quizId, quiz.id));
 
-        const [subCount] = await this.database
-          .select({ count: sql<number>`count(*)::int` })
-          .from(quizSubItems)
-          .innerJoin(quizQuestions, eq(quizSubItems.questionId, quizQuestions.id))
-          .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
-          .where(eq(quizSections.quizId, item.id));
+        const sectionIds = sections.map((s) => s.id);
+
+        let totalQuestions = 0;
+        let totalSubItems = 0;
+
+        if (sectionIds.length > 0) {
+          const questions = await this.database
+            .select({ id: quizQuestions.id })
+            .from(quizQuestions)
+            .where(sql`${quizQuestions.sectionId} IN ${sectionIds}`);
+
+          totalQuestions = questions.length;
+          const questionIds = questions.map((q) => q.id);
+
+          if (questionIds.length > 0) {
+            const [subItemsCount] = await this.database
+              .select({ count: sql<number>`count(*)::int` })
+              .from(quizSubItems)
+              .where(sql`${quizSubItems.questionId} IN ${questionIds}`);
+
+            totalSubItems = subItemsCount?.count ?? 0;
+          }
+        }
 
         return {
-          ...item,
-          totalQuestions: qCount?.count ?? 0,
-          totalSubItems: subCount?.count ?? 0,
-          createdAt: item.createdAt.toISOString(),
-          updatedAt: item.updatedAt.toISOString(),
+          id: quiz.id,
+          title: quiz.title,
+          description: quiz.description,
+          durationMinutes: quiz.durationMinutes,
+          totalPoints: quiz.totalPoints,
+          status: quiz.status,
+          pdfUrl: quiz.pdfUrl,
+          totalQuestions,
+          totalSubItems,
+          createdAt: quiz.createdAt.toISOString(),
+          updatedAt: quiz.updatedAt.toISOString(),
         };
       }),
     );
 
     return {
-      items: formattedItems,
+      items,
       total,
       page,
       limit,
     };
   }
 
-  public async getQuizById(id: string) {
+  public async getQuizById(id: string): Promise<TQuiz & { sections: unknown[] }> {
     const [quiz] = await this.database
       .select()
       .from(quizzes)
       .where(and(eq(quizzes.id, id), isNull(quizzes.deletedAt)));
 
     if (!quiz) {
-      throw new NotFoundError("Không tìm thấy đề thi yêu cầu.");
+      throw new NotFoundError("Không tìm thấy đề thi.");
     }
 
     const sections = await this.database
@@ -131,18 +152,13 @@ export class QuizzesService {
 
             return {
               ...q,
-              createdAt: q.createdAt.toISOString(),
-              subItems: subItems.map((s) => ({
-                ...s,
-                createdAt: s.createdAt.toISOString(),
-              })),
+              subItems,
             };
           }),
         );
 
         return {
           ...sec,
-          createdAt: sec.createdAt.toISOString(),
           questions: fullQuestions,
         };
       }),
@@ -150,8 +166,6 @@ export class QuizzesService {
 
     return {
       ...quiz,
-      createdAt: quiz.createdAt.toISOString(),
-      updatedAt: quiz.updatedAt.toISOString(),
       sections: fullSections,
     };
   }
@@ -162,7 +176,7 @@ export class QuizzesService {
       .values({
         title: input.title,
         description: input.description,
-        durationMinutes: input.durationMinutes ?? 50,
+        durationMinutes: input.durationMinutes,
         totalPoints: input.totalPoints ?? "150.00",
         status: input.status ?? "draft",
         pdfUrl: input.pdfUrl,
@@ -175,25 +189,6 @@ export class QuizzesService {
     }
 
     return quiz;
-  }
-
-  public async importParsedQuiz(
-    parsed: TParsedExamData,
-    userId?: string,
-    pdfUrl?: string,
-  ): Promise<TQuiz> {
-    return this.createQuiz(
-      {
-        title: parsed.title,
-        description: parsed.description,
-        durationMinutes: parsed.durationMinutes,
-        totalPoints: parsed.totalPoints,
-        status: "draft",
-        pdfUrl,
-        sections: parsed.sections,
-      },
-      userId,
-    );
   }
 
   public async updateQuiz(id: string, input: TUpdateQuizInput) {

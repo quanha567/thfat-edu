@@ -28,7 +28,8 @@ export const corsPlugin = new Elysia({ name: "app:cors" }).use(
   cors({
     origin: (request) => isOriginAllowed(request.headers.get("origin")),
     credentials: true,
-    allowedHeaders: ["Content-Type", "Authorization"],
+    allowedHeaders: ["Content-Type", "Authorization", "Accept", "Cache-Control"],
+    exposeHeaders: ["Content-Type"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
   }),
 );

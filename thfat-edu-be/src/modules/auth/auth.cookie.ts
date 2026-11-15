@@ -34,9 +34,16 @@ export function clearSessionCookie(cookie: Cookie<unknown>): void {
 
 export const authCookiePlugin = new Elysia({ name: "auth-cookie" }).derive(
   { as: "scoped" },
-  ({ cookie }) => {
+  ({ cookie, request }) => {
     const sessionCookie = cookie[SESSION_COOKIE_NAME];
-    const token = extractSessionToken(sessionCookie?.value);
+    let token = extractSessionToken(sessionCookie?.value);
+
+    if (!token) {
+      const authHeader = request.headers.get("authorization");
+      if (authHeader?.startsWith("Bearer ")) {
+        token = authHeader.slice(7).trim();
+      }
+    }
 
     return {
       sessionToken: token,

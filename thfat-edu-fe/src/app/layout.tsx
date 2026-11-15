@@ -38,7 +38,11 @@ type TRootLayoutProps = {
 
 export default function RootLayout({ children }: TRootLayoutProps) {
   return (
-    <html lang="vi" className={`${beVietnamPro.variable} ${geistMono.variable} h-full antialiased`}>
+    <html
+      lang="vi"
+      suppressHydrationWarning
+      className={`${beVietnamPro.variable} ${geistMono.variable} h-full antialiased`}
+    >
       <body className="bg-background text-foreground flex min-h-full flex-col">
         <Providers>{children}</Providers>
       </body>

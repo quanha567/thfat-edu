@@ -4,9 +4,11 @@ import { corsPlugin } from "./config/cors";
 import { scalarDocsPlugin } from "./config/docs";
 import { env } from "./config/env";
 import { errorHandlerPlugin } from "./middlewares/error-handler";
+import { attemptsRoutes } from "./modules/attempts";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health/health.routes";
 import { quizzesRoutes } from "./modules/quizzes";
+import { usersRoutes } from "./modules/users";
 
 export const app = new Elysia()
   .use(corsPlugin)
@@ -16,7 +18,11 @@ export const app = new Elysia()
   .use(healthRoutes)
   .use(authRoutes)
   .use(quizzesRoutes)
-  .group("/api", (group) => group.use(healthRoutes).use(authRoutes).use(quizzesRoutes));
+  .use(attemptsRoutes)
+  .use(usersRoutes)
+  .group("/api", (group) =>
+    group.use(healthRoutes).use(authRoutes).use(quizzesRoutes).use(attemptsRoutes).use(usersRoutes),
+  );
 
 export type App = typeof app;
 

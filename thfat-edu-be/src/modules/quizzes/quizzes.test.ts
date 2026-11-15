@@ -1,12 +1,28 @@
 import { describe, expect, it } from "bun:test";
 
-import { app } from "../../index";
+import { Elysia } from "elysia";
+
+import { errorHandlerPlugin } from "../../middlewares/error-handler";
+import { quizzesRoutes } from "./quizzes.routes";
+import { type QuizzesService } from "./quizzes.service";
 
 describe("quizzes.routes", () => {
-  it("GET /api/quizzes returns a paginated list structure", async () => {
-    const response = await app.handle(
-      new Request("http://localhost:3001/api/quizzes?page=1&limit=10"),
-    );
+  const mockQuizzesService = {
+    listQuizzes: async () => ({
+      items: [],
+      total: 0,
+      page: 1,
+      limit: 10,
+    }),
+  } as unknown as QuizzesService;
+
+  const testApp = new Elysia()
+    .use(errorHandlerPlugin)
+    .decorate("quizzesService", mockQuizzesService)
+    .use(quizzesRoutes);
+
+  it("GET /quizzes returns a paginated list structure", async () => {
+    const response = await testApp.handle(new Request("http://localhost/quizzes?page=1&limit=10"));
 
     expect(response.status).toBe(200);
     const body = (await response.json()) as {

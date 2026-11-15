@@ -86,3 +86,74 @@ export async function verifyFirebaseIdToken(idToken: string): Promise<TDecodedTo
     picture: decoded.picture,
   };
 }
+
+export type TCreateFirebaseUserOptions = {
+  email: string;
+  password?: string;
+  displayName?: string;
+  photoUrl?: string;
+};
+
+export async function createFirebaseUser({
+  email,
+  password,
+  displayName,
+  photoUrl,
+}: TCreateFirebaseUserOptions): Promise<{ uid: string }> {
+  const app = initializeFirebaseAdmin();
+  const auth = getAuth(app);
+
+  const userRecord = await auth.createUser({
+    email,
+    password: password || undefined,
+    displayName: displayName || undefined,
+    photoURL: photoUrl || undefined,
+  });
+
+  return { uid: userRecord.uid };
+}
+
+export type TUpdateFirebaseUserOptions = {
+  uid: string;
+  email?: string;
+  password?: string;
+  displayName?: string;
+  photoUrl?: string;
+  disabled?: boolean;
+};
+
+export async function updateFirebaseUser({
+  uid,
+  email,
+  password,
+  displayName,
+  photoUrl,
+  disabled,
+}: TUpdateFirebaseUserOptions): Promise<void> {
+  const app = initializeFirebaseAdmin();
+  const auth = getAuth(app);
+
+  await auth.updateUser(uid, {
+    ...(email ? { email } : {}),
+    ...(password ? { password } : {}),
+    ...(displayName ? { displayName } : {}),
+    ...(photoUrl !== undefined ? { photoURL: photoUrl } : {}),
+    ...(disabled !== undefined ? { disabled } : {}),
+  });
+}
+
+export async function generateFirebasePasswordResetLink(email: string): Promise<string> {
+  const app = initializeFirebaseAdmin();
+  const auth = getAuth(app);
+
+  const link = await auth.generatePasswordResetLink(email);
+
+  return link;
+}
+
+export async function revokeFirebaseUserSessions(uid: string): Promise<void> {
+  const app = initializeFirebaseAdmin();
+  const auth = getAuth(app);
+
+  await auth.revokeRefreshTokens(uid);
+}

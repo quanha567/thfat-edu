@@ -26,3 +26,31 @@ export function useDeleteExam() {
     },
   });
 }
+
+export function useBatchDeleteExams() {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ success: boolean }, Error, string[]>({
+    mutationFn: async (ids) => {
+      const baseUrl = getApiBaseUrl();
+      await Promise.all(
+        ids.map(async (id) => {
+          const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => null);
+            throw new Error(extractApiErrorMessage(errorData, "Không thể xóa đề thi."));
+          }
+        }),
+      );
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.exams.all });
+    },
+  });
+}

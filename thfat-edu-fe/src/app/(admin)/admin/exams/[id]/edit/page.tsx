@@ -1,16 +1,16 @@
-import { ExamEditContainer } from "@/features/exams/components/exam-edit-container";
+import { ExamEditorPageClient } from "@/features/exams/components/editor/exam-editor-page-client";
 
-export const metadata = {
-  title: "Soát & Biên tập đề thi | ThFat Edu Admin",
-  description: "Không gian đối chiếu đề gốc và biên tập câu hỏi 150 điểm",
+type TAdminExamEditPageProps = {
+  params: Promise<{ id: string }>;
 };
 
-export default async function AdminExamEditPage({ params }: { params: Promise<{ id: string }> }) {
+export const metadata = {
+  title: "Chỉnh sửa đề thi | ThFat Edu Admin",
+  description: "Trình biên tập đề thi V-SAT",
+};
+
+export default async function AdminExamEditPage({ params }: TAdminExamEditPageProps) {
   const { id } = await params;
 
-  return (
-    <div className="space-y-6">
-      <ExamEditContainer examId={id} />
-    </div>
-  );
+  return <ExamEditorPageClient examId={id} />;
 }

@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -8,19 +10,29 @@ import {
 import { type TNavigationItem } from "@/features/home/constants/home.data";
 import { ChevronDown } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 type TNavbarItemProps = {
   item: TNavigationItem;
 };
 
 export function NavbarItem({ item }: TNavbarItemProps) {
+  const pathname = usePathname();
+  const isActive = item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
+
   if (item.children && item.children.length > 0) {
+    const hasActiveChild = item.children.some((child) => pathname?.startsWith(child.href));
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="flex h-auto cursor-pointer items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium text-white/85 hover:bg-white/10 hover:text-white"
+            className={`flex h-auto cursor-pointer items-center gap-1 rounded-full px-3 py-1.5 text-sm font-medium transition-colors ${
+              hasActiveChild
+                ? "border-primary-400/40 border bg-white/15 font-semibold text-white shadow-inner"
+                : "text-white/85 hover:bg-white/10 hover:text-white"
+            }`}
           >
             <span>{item.label}</span>
             <ChevronDown className="h-3.5 w-3.5 opacity-70" />
@@ -46,7 +58,7 @@ export function NavbarItem({ item }: TNavbarItemProps) {
     );
   }
 
-  if (item.active) {
+  if (isActive) {
     return (
       <Link
         href={item.href}

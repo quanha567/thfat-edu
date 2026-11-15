@@ -15,11 +15,11 @@ export default async function AdminLayout({ children }: TAdminLayoutProps) {
   const defaultOpen = sidebarState === undefined ? true : sidebarState === "true";
 
   return (
-    <SidebarProvider defaultOpen={defaultOpen}>
+    <SidebarProvider defaultOpen={defaultOpen} className="h-svh overflow-hidden">
       <AdminSidebar />
-      <SidebarInset className="min-w-0 bg-neutral-50/50 dark:bg-neutral-950">
+      <SidebarInset className="bg-background flex h-full min-w-0 flex-col overflow-hidden">
         <AdminHeader />
-        <main className="flex flex-1 flex-col p-4 md:p-6 lg:p-8">{children}</main>
+        <main className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</main>
       </SidebarInset>
     </SidebarProvider>
   );

@@ -15,6 +15,13 @@
       "when": 1793893091855,
       "tag": "0001_organic_sway",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794493985863,
+      "tag": "0002_wakeful_sinister_six",
+      "breakpoints": true
     }
   ]
 }

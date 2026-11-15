@@ -13,4 +13,16 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => [...queryKeys.exams.all, "list", params] as const,
     detail: (id: string) => [...queryKeys.exams.all, "detail", id] as const,
   },
+  studentExams: {
+    all: ["student-exams"] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.studentExams.all, "list", params] as const,
+    room: (quizId: string) => [...queryKeys.studentExams.all, "room", quizId] as const,
+    result: (quizId: string) => [...queryKeys.studentExams.all, "result", quizId] as const,
+  },
+  users: {
+    all: ["users"] as const,
+    list: (params?: Record<string, unknown>) => [...queryKeys.users.all, "list", params] as const,
+    detail: (id: string) => [...queryKeys.users.all, "detail", id] as const,
+  },
 } as const;
