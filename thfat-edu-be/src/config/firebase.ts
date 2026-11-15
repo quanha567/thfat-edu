@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+
 import { applicationDefault, cert, getApps, initializeApp, type App } from "firebase-admin/app";
 import { getAuth } from "firebase-admin/auth";
 
@@ -30,7 +32,9 @@ export function initializeFirebaseAdmin(): App {
   }
 
   if (env.FIREBASE_SERVICE_ACCOUNT_PATH) {
-    const serviceAccount = require(env.FIREBASE_SERVICE_ACCOUNT_PATH);
+    const serviceAccount = JSON.parse(
+      readFileSync(env.FIREBASE_SERVICE_ACCOUNT_PATH, "utf-8"),
+    ) as Record<string, string>;
     firebaseApp = initializeApp({
       credential: cert(serviceAccount),
     });

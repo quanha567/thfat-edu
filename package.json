@@ -6,6 +6,7 @@
     "thfat-edu-be",
     "packages/*"
   ],
+  "type": "module",
   "scripts": {
     "dev:fe": "bun --filter thfat-edu-fe dev",
     "dev:be": "bun --filter thfat-edu-be dev",
