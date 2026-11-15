@@ -8,8 +8,10 @@ import {
   quizSections,
   quizSubItems,
   quizzes,
+  studentProfiles,
   type TAttemptStatus,
   type TExamAttempt,
+  users,
 } from "../../db/schema";
 import { BadRequestError, NotFoundError } from "../../middlewares/error-handler";
 import {
@@ -530,6 +532,16 @@ export class AttemptsService {
       .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
       .where(eq(quizSections.quizId, quiz.id));
 
+    const [userInfo] = await this.database
+      .select({
+        fullName: users.fullName,
+        studentCode: studentProfiles.studentCode,
+      })
+      .from(users)
+      .leftJoin(studentProfiles, eq(users.id, studentProfiles.userId))
+      .where(eq(users.id, attempt.userId))
+      .limit(1);
+
     const submittedTime = attempt.submittedAt ?? new Date();
     const timeSpentSeconds = Math.max(
       0,
@@ -540,6 +552,8 @@ export class AttemptsService {
       attemptId: attempt.id,
       quizId: quiz.id,
       quizTitle: quiz.title,
+      studentName: userInfo?.fullName ?? "Thí sinh",
+      studentCode: userInfo?.studentCode ?? null,
       score: attempt.score ?? "0.00",
       totalPoints: quiz.totalPoints,
       totalAnswered: attempt.totalAnswered,
