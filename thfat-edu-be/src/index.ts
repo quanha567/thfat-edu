@@ -1,49 +1,40 @@
-import { cors } from "@elysiajs/cors";
 import { Elysia } from "elysia";
 
-const routes = new Elysia()
-  .get("/", () => "Hello Elysia")
-  .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }));
+import { corsPlugin } from "./config/cors";
+import { scalarDocsPlugin } from "./config/docs";
+import { env } from "./config/env";
+import { errorHandlerPlugin } from "./middlewares/error-handler";
+import { attemptsRoutes } from "./modules/attempts";
+import { authRoutes } from "./modules/auth";
+import { healthRoutes } from "./modules/health/health.routes";
+import { quizzesRoutes } from "./modules/quizzes";
+import { usersRoutes } from "./modules/users";
 
 export const app = new Elysia()
-  .use(
-    cors({
-      origin: (request): boolean => {
-        const origin = request.headers.get("origin");
-        if (!origin) return true;
-
-        // Allow localhost development
-        if (origin.startsWith("http://localhost:") || origin.startsWith("http://127.0.0.1:")) {
-          return true;
-        }
-
-        // Allow Vercel preview and production deployments
-        if (origin.endsWith(".vercel.app")) {
-          return true;
-        }
-
-        // Allow custom frontend URL if configured in env
-        const allowedFrontend = process.env.FRONTEND_URL;
-        if (allowedFrontend && origin === allowedFrontend) {
-          return true;
-        }
-
-        return false;
-      },
-      credentials: true,
-      allowedHeaders: ["Content-Type", "Authorization"],
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-    }),
-  )
-  .use(routes)
-  .group("/api", (app) => app.use(routes));
+  .use(corsPlugin)
+  .use(errorHandlerPlugin)
+  .use(scalarDocsPlugin())
+  .get("/", () => "Hello Elysia")
+  .use(healthRoutes)
+  .use(authRoutes)
+  .use(quizzesRoutes)
+  .use(attemptsRoutes)
+  .use(usersRoutes)
+  .group("/api", (group) =>
+    group.use(healthRoutes).use(authRoutes).use(quizzesRoutes).use(attemptsRoutes).use(usersRoutes),
+  );
 
 export type App = typeof app;
 
-// Only start the standalone HTTP server when running outside Vercel (e.g. local dev, docker)
-if (!process.env.VERCEL && process.env.NODE_ENV !== "test") {
-  app.listen(3000);
-  console.log(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
+const port = Number(env.PORT) || 3001;
+
+if (
+  !process.env.VERCEL &&
+  process.env.NODE_ENV !== "test" &&
+  (import.meta as { main?: boolean }).main
+) {
+  app.listen(port);
+  console.info(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 }
 
 export default app;

@@ -110,6 +110,9 @@
   --accent: var(--primary-100);
   --accent-foreground: var(--primary-800);
 
+  --highlight: oklch(0.85 0.17 205);
+  --highlight-foreground: var(--primary-950);
+
   --destructive: var(--error-500);
   --destructive-foreground: oklch(0.985 0 0);
 
@@ -161,14 +164,14 @@
   --font-size-caption: 0.75rem;
   --font-weight-caption: 400;
   --line-height-caption: 1.4;
-  --sidebar: hsl(0 0% 98%);
-  --sidebar-foreground: hsl(240 5.3% 26.1%);
-  --sidebar-primary: hsl(240 5.9% 10%);
-  --sidebar-primary-foreground: hsl(0 0% 98%);
-  --sidebar-accent: hsl(240 4.8% 95.9%);
-  --sidebar-accent-foreground: hsl(240 5.9% 10%);
-  --sidebar-border: hsl(220 13% 91%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --sidebar: var(--neutral-50);
+  --sidebar-foreground: var(--neutral-700);
+  --sidebar-primary: var(--primary-700);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: var(--primary-50);
+  --sidebar-accent-foreground: var(--primary-800);
+  --sidebar-border: var(--neutral-200);
+  --sidebar-ring: var(--primary-500);
 }
 
 /* ============================================================
@@ -190,6 +193,8 @@
   --color-secondary-foreground: var(--secondary-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
+  --color-highlight: var(--highlight);
+  --color-highlight-foreground: var(--highlight-foreground);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-destructive: var(--destructive);
@@ -344,6 +349,16 @@
 /* ============================================================
    BASE STYLES
    ============================================================ */
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border);
+  }
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
@@ -358,12 +373,173 @@ body {
 }
 
 .dark {
-  --sidebar: hsl(240 5.9% 10%);
-  --sidebar-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-primary: hsl(224.3 76.3% 48%);
-  --sidebar-primary-foreground: hsl(0 0% 100%);
-  --sidebar-accent: hsl(240 3.7% 15.9%);
-  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
-  --sidebar-border: hsl(240 3.7% 15.9%);
-  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  --highlight: oklch(0.85 0.17 205);
+  --highlight-foreground: var(--primary-950);
+  --sidebar: var(--primary-950);
+  --sidebar-foreground: var(--neutral-200);
+  --sidebar-primary: var(--primary-400);
+  --sidebar-primary-foreground: var(--primary-950);
+  --sidebar-accent: var(--primary-900);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: var(--primary-900);
+  --sidebar-ring: var(--primary-400);
+}
+
+/* ============================================================
+   BROWSER AUTOFILL OVERRIDE
+   Disables native Chrome/Safari/Edge blue background on autofill
+   ============================================================ */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+textarea:-webkit-autofill:active,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus,
+select:-webkit-autofill:active {
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: var(--foreground) !important;
+  caret-color: var(--foreground) !important;
+  transition: background-color 5000000s ease-in-out 0s !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+}
+
+/* ============================================================
+   TIPTAP WYSIWYG EDITOR STYLES
+   ============================================================ */
+.tiptap {
+  outline: none;
+}
+
+.tiptap p {
+  margin-bottom: 0.5rem;
+}
+
+.tiptap p:last-child {
+  margin-bottom: 0;
+}
+
+.tiptap h1,
+.tiptap h2,
+.tiptap h3 {
+  font-weight: 700;
+  margin-top: 0.75rem;
+  margin-bottom: 0.25rem;
+}
+
+.tiptap h1 {
+  font-size: 1.125rem;
+}
+
+.tiptap h2 {
+  font-size: 1rem;
+}
+
+.tiptap h3 {
+  font-size: 0.875rem;
+}
+
+.tiptap ul {
+  list-style-type: disc;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap ol {
+  list-style-type: decimal;
+  padding-left: 1.25rem;
+  margin: 0.5rem 0;
+}
+
+.tiptap table {
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  width: 100%;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--border);
+}
+
+.tiptap table td,
+.tiptap table th {
+  min-width: 2em;
+  border: 1px solid var(--border);
+  padding: 0.375rem 0.625rem;
+  vertical-align: top;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.tiptap table th {
+  font-weight: 700;
+  text-align: left;
+  background-color: var(--muted);
+}
+
+.tiptap table .selectedCell:after {
+  z-index: 2;
+  position: absolute;
+  content: "";
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  background: rgba(200, 200, 255, 0.4);
+  pointer-events: none;
+}
+
+.tiptap sub {
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+.tiptap sup {
+  vertical-align: super;
+  font-size: 0.75em;
+}
+
+/* ============================================================
+   KATEX & CHEMISTRY FORMULA CLARITY ENHANCEMENTS
+   Fixes ionic charges (2+, 3+, +, -), superscripts, subscripts,
+   and removes mhchem ghost phantom artifacts.
+   ============================================================ */
+.katex {
+  color: var(--neutral-900);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Completely hide mhchem phantom measurement characters (like transparent X) so they leave no ghost box */
+.katex [style*="color:transparent"],
+.katex [style*="color: transparent"] {
+  color: transparent !important;
+  background: transparent !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  user-select: none !important;
+}
+
+/* Ensure superscripts (ion charges 2+, -, etc.) and subscripts are crisp, dark, and bold */
+.katex .msupsub {
+  font-weight: 600;
+}
+
+.katex .msupsub .mord,
+.katex .msupsub .mbin,
+.katex .msupsub .mrel,
+.katex .msupsub .mtight {
+  color: #09090b !important;
+  font-weight: 600 !important;
+  opacity: 1 !important;
+}
+
+/* Operators, arrows and relation symbols in chemical equations */
+.katex .mbin,
+.katex .mrel {
+  color: #09090b !important;
+  opacity: 1 !important;
 }
