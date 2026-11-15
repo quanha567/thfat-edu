@@ -13,16 +13,6 @@ export type TPdfExtractionResult = {
   images: Record<string, string>;
 };
 
-async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    const stat = await fs.stat(filePath);
-
-    return stat.isFile();
-  } catch {
-    return false;
-  }
-}
-
 async function testPythonExecutable(executable: string): Promise<boolean> {
   return new Promise<boolean>((resolve) => {
     try {
@@ -40,21 +30,12 @@ async function resolvePythonExecutable(): Promise<string> {
     return process.env.PYTHON_PATH;
   }
 
-  // 1. Try standard python3 in system PATH (Linux / Mac / Docker)
   if (await testPythonExecutable("python3")) {
     return "python3";
   }
 
-  // 2. Try standard python in system PATH (Windows / Linux)
   if (await testPythonExecutable("python")) {
     return "python";
-  }
-
-  // 3. Known Windows local installation path
-  const knownWindowsPath =
-    "C:\\Users\\quanh\\AppData\\Local\\Python\\pythoncore-3.14-64\\python.exe";
-  if (await fileExists(knownWindowsPath)) {
-    return knownWindowsPath;
   }
 
   // Fallback to python3

@@ -185,6 +185,8 @@ export type TAttemptResult = {
   attemptId: string;
   quizId: string;
   quizTitle: string;
+  studentName?: string;
+  studentCode?: string | null;
   score: string;
   totalPoints: string;
   totalAnswered: number;

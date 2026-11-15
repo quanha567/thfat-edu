@@ -23,6 +23,8 @@ export const AttemptResultSchema = t.Object({
   attemptId: t.String(),
   quizId: t.String(),
   quizTitle: t.String(),
+  studentName: t.String(),
+  studentCode: t.Nullable(t.String()),
   score: t.String(),
   totalPoints: t.String(),
   totalAnswered: t.Number(),

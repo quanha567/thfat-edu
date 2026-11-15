@@ -45,7 +45,7 @@ export function ExamResultContainer({ params }: TExamResultContainerProps) {
   }
 
   return (
-    <div className="min-h-screen bg-neutral-50 px-4 py-12 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-neutral-100/60 px-4 py-8 sm:px-6 sm:py-12 lg:px-8 print:min-h-0 print:bg-white print:p-0">
       <ExamResultSummary result={data} />
     </div>
   );
