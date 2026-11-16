@@ -17,6 +17,7 @@ import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
 import { ExamCardSkeleton, StudentExamCard } from "./student-exam-card";
+import { StudentExamEmptyState } from "./student-exam-empty-state";
 import { StudentExamListHero } from "./student-exam-list-hero";
 
 const PAGE_SIZE = 9;
@@ -40,6 +41,7 @@ function renderContent(options: {
   isLoading: boolean;
   exams: TStudentExamListItem[];
   hasActiveFilter: boolean;
+  onResetFilters: () => void;
 }) {
   if (options.isLoading) {
     return (
@@ -53,18 +55,10 @@ function renderContent(options: {
 
   if (options.exams.length === 0) {
     return (
-      <div className="rounded-xl border border-dashed border-neutral-300 bg-white p-12 text-center">
-        <p className="text-base font-medium text-neutral-600">
-          {options.hasActiveFilter
-            ? "Không có đề thi nào phù hợp với bộ lọc."
-            : "Hiện chưa có đề thi nào được xuất bản."}
-        </p>
-        <p className="mt-1 text-sm text-neutral-400">
-          {options.hasActiveFilter
-            ? "Thử chọn tab khác hoặc xóa từ khóa tìm kiếm."
-            : "Vui lòng quay lại sau khi giáo viên mở đề thi mới."}
-        </p>
-      </div>
+      <StudentExamEmptyState
+        hasActiveFilter={options.hasActiveFilter}
+        onResetFilters={options.onResetFilters}
+      />
     );
   }
 
@@ -106,6 +100,12 @@ export function StudentExamListContainer() {
     void setPage(null);
   }
 
+  function handleResetFilters() {
+    void setStatus(null);
+    void setSearch(null);
+    void setPage(null);
+  }
+
   function handlePageChange(newPage: number) {
     void setPage(newPage === 1 ? null : newPage);
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -143,6 +143,7 @@ export function StudentExamListContainer() {
           isLoading,
           exams: paginatedExams,
           hasActiveFilter: status !== "all" || !!search,
+          onResetFilters: handleResetFilters,
         })}
 
         {totalPages > 1 && (
