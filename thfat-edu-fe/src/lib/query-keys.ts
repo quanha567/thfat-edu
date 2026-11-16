@@ -39,4 +39,11 @@ export const queryKeys = {
       [...queryKeys.articles.all, "list", params] as const,
     detail: (idOrSlug: string) => [...queryKeys.articles.all, "detail", idOrSlug] as const,
   },
+  leaderboard: {
+    all: ["leaderboard"] as const,
+    global: (params?: Record<string, unknown>) =>
+      [...queryKeys.leaderboard.all, "global", params] as const,
+    quiz: (quizId: string, params?: Record<string, unknown>) =>
+      [...queryKeys.leaderboard.all, "quiz", quizId, params] as const,
+  },
 } as const;
