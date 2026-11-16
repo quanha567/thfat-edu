@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { BookOpen, CheckCircle2, Clock, Sparkles } from "lucide-react";
+import { BookOpen, CheckCircle2, Clock, Loader2 } from "lucide-react";
 
 import { type TCreateQuizInput } from "../../types";
 
@@ -24,43 +24,28 @@ export function ExamCreatePreviewCard({
 }: TExamCreatePreviewCardProps) {
   if (!parsedData && !isProcessing) {
     return (
-      <Card className="border-border bg-muted/10 flex h-full min-h-[420px] flex-col items-center justify-center p-8 text-center shadow-xs">
-        <div className="bg-primary/10 text-primary mb-3 flex size-14 items-center justify-center rounded-2xl">
-          <BookOpen className="size-7" />
+      <Card className="border-border bg-card flex h-full min-h-[420px] flex-col items-center justify-center p-8 text-center shadow-xs">
+        <div className="bg-muted text-muted-foreground mb-3 flex size-12 items-center justify-center rounded-lg border">
+          <BookOpen className="size-6" />
         </div>
-        <h3 className="text-foreground text-base font-bold">Chưa có đề thi được trích xuất</h3>
-        <p className="text-muted-foreground mt-1.5 max-w-md text-xs leading-relaxed">
-          Tải file PDF đề thi ở cột bên trái và bấm &ldquo;Bắt đầu bóc tách bằng AI&rdquo;. Hệ thống
-          sẽ tự động nhận diện 4 phần thi và hiển thị xem trước trực tiếp tại đây.
+        <h3 className="text-foreground text-sm font-bold">Chưa có dữ liệu xem trước</h3>
+        <p className="text-muted-foreground mt-1 max-w-sm text-xs leading-relaxed">
+          Tải lên tệp PDF đề thi ở cột bên trái và bấm &ldquo;Bắt đầu bóc tách câu hỏi&rdquo; để xem
+          nội dung được nhận diện tại đây.
         </p>
-
-        <div className="mt-6 grid max-w-sm grid-cols-2 gap-2 text-left">
-          <div className="border-border bg-card rounded-lg border p-2.5 text-xs">
-            <span className="text-foreground block font-bold">Chuẩn hóa KaTeX</span>
-            <span className="text-muted-foreground text-[11px]">
-              Tự động nhận diện công thức Hóa học
-            </span>
-          </div>
-          <div className="border-border bg-card rounded-lg border p-2.5 text-xs">
-            <span className="text-foreground block font-bold">Đầy đủ 4 phần thi</span>
-            <span className="text-muted-foreground text-[11px]">
-              Đúng/Sai, Trắc nghiệm, Ghép hợp, Tự luận
-            </span>
-          </div>
-        </div>
       </Card>
     );
   }
 
   if (isProcessing && !parsedData) {
     return (
-      <Card className="border-border bg-muted/10 flex h-full min-h-[420px] flex-col items-center justify-center p-8 text-center shadow-xs">
-        <div className="bg-primary/10 text-primary mb-3 flex size-12 animate-pulse items-center justify-center rounded-full">
-          <Sparkles className="size-6 animate-spin" />
+      <Card className="border-border bg-card flex h-full min-h-[420px] flex-col items-center justify-center p-8 text-center shadow-xs">
+        <div className="bg-muted text-muted-foreground mb-3 flex size-12 items-center justify-center rounded-lg border">
+          <Loader2 className="size-6 animate-spin" />
         </div>
-        <h3 className="text-foreground text-sm font-bold">AI đang đọc và chuẩn hóa đề thi...</h3>
+        <h3 className="text-foreground text-sm font-bold">Đang bóc tách và chuẩn hóa đề thi...</h3>
         <p className="text-muted-foreground mt-1 text-xs">
-          Nội dung xem trước sẽ xuất hiện ngay khi bóc tách hoàn tất.
+          Nội dung xem trước sẽ xuất hiện ngay khi quá trình hoàn tất.
         </p>
       </Card>
     );

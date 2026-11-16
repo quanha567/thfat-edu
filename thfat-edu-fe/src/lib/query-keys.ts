@@ -25,4 +25,18 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => [...queryKeys.users.all, "list", params] as const,
     detail: (id: string) => [...queryKeys.users.all, "detail", id] as const,
   },
+  settings: {
+    all: ["settings"] as const,
+    exam: () => [...queryKeys.settings.all, "exam"] as const,
+  },
+  categories: {
+    all: ["categories"] as const,
+    list: () => [...queryKeys.categories.all, "list"] as const,
+  },
+  articles: {
+    all: ["articles"] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.articles.all, "list", params] as const,
+    detail: (idOrSlug: string) => [...queryKeys.articles.all, "detail", idOrSlug] as const,
+  },
 } as const;

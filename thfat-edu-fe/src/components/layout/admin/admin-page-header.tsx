@@ -2,23 +2,23 @@ import type { ReactNode } from "react";
 
 export type TAdminPageHeaderProps = {
   title: string;
+  badge?: ReactNode;
   description?: string;
   actions?: ReactNode;
 };
 
-export function AdminPageHeader({ title, description, actions }: TAdminPageHeaderProps) {
+export function AdminPageHeader({ title, badge, description, actions }: TAdminPageHeaderProps) {
   return (
-    <div className="flex flex-col gap-4 border-b border-neutral-200/60 pb-5 sm:flex-row sm:items-center sm:justify-between dark:border-neutral-800/80">
+    <div className="border-border/70 flex flex-col gap-3 border-b pb-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="space-y-1">
-        <h1 className="text-2xl font-bold tracking-tight text-neutral-900 md:text-3xl dark:text-neutral-50">
-          {title}
-        </h1>
-        {description && (
-          <p className="text-body-sm text-neutral-500 dark:text-neutral-400">{description}</p>
-        )}
+        <div className="flex items-center gap-2.5">
+          <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
+          {badge}
+        </div>
+        {description && <p className="text-muted-foreground text-sm">{description}</p>}
       </div>
 
-      {actions && <div className="flex items-center gap-2.5">{actions}</div>}
+      {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>
   );
 }

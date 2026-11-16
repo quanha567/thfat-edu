@@ -11,19 +11,27 @@ import type { App } from "thfat-edu-be";
  * 4. Local development fallback: http://localhost:3000
  */
 export function getApiBaseUrl(): string {
+  let url = "";
+
   if (process.env.BACKEND_URL) {
-    return process.env.BACKEND_URL;
+    url = process.env.BACKEND_URL;
+  } else if (process.env.NEXT_PUBLIC_API_URL) {
+    url = process.env.NEXT_PUBLIC_API_URL;
+  } else if (typeof window !== "undefined") {
+    url = window.location.origin;
+  } else {
+    url = "http://localhost:3001";
   }
 
-  if (process.env.NEXT_PUBLIC_API_URL) {
-    return process.env.NEXT_PUBLIC_API_URL;
+  // Remove trailing slashes
+  url = url.replace(/\/+$/, "");
+
+  // Guarantee that the base API URL always ends with "/api"
+  if (!url.endsWith("/api")) {
+    url = `${url}/api`;
   }
 
-  if (typeof window !== "undefined") {
-    return `${window.location.origin}/api`;
-  }
-
-  return "http://localhost:3001";
+  return url;
 }
 
 /**

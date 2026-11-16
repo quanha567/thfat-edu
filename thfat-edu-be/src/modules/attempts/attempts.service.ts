@@ -14,6 +14,7 @@ import {
   users,
 } from "../../db/schema";
 import { BadRequestError, NotFoundError } from "../../middlewares/error-handler";
+import { type SettingsService, settingsService as defaultSettingsService } from "../settings";
 import {
   type TAttemptResult,
   type TStudentExamListItem,
@@ -168,7 +169,10 @@ export type TExamRoomData = {
 // ── Attempts Service ───────────────────────────────────────────────────
 
 export class AttemptsService {
-  constructor(private readonly database: Database = db) {}
+  constructor(
+    private readonly database: Database = db,
+    private readonly settingsService: SettingsService = defaultSettingsService,
+  ) {}
 
   public async listStudentExams(
     userId: string | null = null,
@@ -191,6 +195,8 @@ export class AttemptsService {
       .from(quizzes)
       .where(whereClause);
 
+    const globalSettings = await this.settingsService.getExamSettings();
+
     const quizRows = await this.database
       .select({
         id: quizzes.id,
@@ -198,6 +204,11 @@ export class AttemptsService {
         description: quizzes.description,
         durationMinutes: quizzes.durationMinutes,
         totalPoints: quizzes.totalPoints,
+        maxAttempts: quizzes.maxAttempts,
+        scorePolicy: quizzes.scorePolicy,
+        cooldownMinutes: quizzes.cooldownMinutes,
+        showScoreImmediately: quizzes.showScoreImmediately,
+        showExplanationPolicy: quizzes.showExplanationPolicy,
       })
       .from(quizzes)
       .where(whereClause)
@@ -208,18 +219,60 @@ export class AttemptsService {
     const items: TStudentExamListItem[] = [];
 
     for (const quiz of quizRows) {
-      let attempt = null;
+      let userAttempts: TExamAttempt[] = [];
 
       if (userId) {
-        const [foundAttempt] = await this.database
+        userAttempts = await this.database
           .select()
           .from(examAttempts)
           .where(and(eq(examAttempts.quizId, quiz.id), eq(examAttempts.userId, userId)))
-          .orderBy(desc(examAttempts.createdAt))
-          .limit(1);
-
-        attempt = foundAttempt ?? null;
+          .orderBy(desc(examAttempts.createdAt));
       }
+
+      const effectiveMaxAttempts = quiz.maxAttempts ?? globalSettings.maxAttempts;
+      const effectiveScorePolicy = quiz.scorePolicy ?? globalSettings.scorePolicy;
+      const effectiveCooldownMinutes = quiz.cooldownMinutes ?? globalSettings.cooldownMinutes;
+      const effectiveShowScoreImmediately =
+        quiz.showScoreImmediately ?? globalSettings.showScoreImmediately;
+
+      const inProgressAttempt = userAttempts.find((a) => a.status === "in_progress") ?? null;
+      const submittedAttempts = userAttempts.filter((a) => a.status === "submitted");
+      const attemptCount = submittedAttempts.length;
+
+      const cooldownRemainingSeconds = this.calculateCooldownRemainingSeconds(
+        submittedAttempts,
+        effectiveCooldownMinutes,
+      );
+
+      let canTakeExam = true;
+      if (inProgressAttempt) {
+        canTakeExam = true;
+      } else if (effectiveMaxAttempts > 0 && attemptCount >= effectiveMaxAttempts) {
+        canTakeExam = false;
+      } else if (cooldownRemainingSeconds > 0) {
+        canTakeExam = false;
+      }
+
+      let displayScore: string | null = null;
+      if (submittedAttempts.length > 0 && effectiveShowScoreImmediately) {
+        if (effectiveScorePolicy === "highest") {
+          const validScores = submittedAttempts
+            .map((a) => (a.score ? parseFloat(a.score) : 0))
+            .filter((s) => !isNaN(s));
+          displayScore = validScores.length > 0 ? Math.max(...validScores).toFixed(2) : null;
+        } else {
+          const sortedSubmitted = [...submittedAttempts].sort(
+            (a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0),
+          );
+          displayScore = sortedSubmitted[0]?.score ?? null;
+        }
+      }
+
+      const latestAttempt = userAttempts[0] ?? null;
+      const { attemptStatus, attemptId, score, submittedAt } = await this.resolveAttemptStatus(
+        latestAttempt,
+        quiz.durationMinutes,
+      );
 
       const [{ totalQuestions }] = await this.database
         .select({
@@ -238,11 +291,6 @@ export class AttemptsService {
         .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
         .where(eq(quizSections.quizId, quiz.id));
 
-      const { attemptStatus, attemptId, score, submittedAt } = await this.resolveAttemptStatus(
-        attempt,
-        quiz.durationMinutes,
-      );
-
       items.push({
         id: quiz.id,
         title: quiz.title,
@@ -253,8 +301,13 @@ export class AttemptsService {
         totalSubItems,
         attemptStatus,
         attemptId,
-        score,
+        score: effectiveShowScoreImmediately ? score : null,
         submittedAt,
+        maxAttempts: effectiveMaxAttempts > 0 ? effectiveMaxAttempts : null,
+        attemptCount,
+        canTakeExam,
+        cooldownRemainingSeconds,
+        displayScore,
       });
     }
 
@@ -277,18 +330,50 @@ export class AttemptsService {
       throw new NotFoundError("Đề thi không tồn tại hoặc chưa được phát hành.");
     }
 
-    let [attempt] = await this.database
+    const globalSettings = await this.settingsService.getExamSettings();
+    const effectiveMaxAttempts = quiz.maxAttempts ?? globalSettings.maxAttempts;
+    const effectiveCooldownMinutes = quiz.cooldownMinutes ?? globalSettings.cooldownMinutes;
+
+    const userAttempts = await this.database
       .select()
       .from(examAttempts)
       .where(and(eq(examAttempts.quizId, quizId), eq(examAttempts.userId, userId)))
-      .orderBy(desc(examAttempts.createdAt))
-      .limit(1);
+      .orderBy(desc(examAttempts.createdAt));
 
-    if (attempt && attempt.status === "submitted") {
-      throw new BadRequestError("Bạn đã hoàn thành bài thi này. Mỗi đề thi chỉ được làm 1 lần.");
+    let inProgressAttempt = userAttempts.find((a) => a.status === "in_progress") ?? null;
+
+    if (inProgressAttempt) {
+      const endTime = inProgressAttempt.startedAt.getTime() + quiz.durationMinutes * 60 * 1000;
+      if (Date.now() > endTime) {
+        await this.submitAndGradeAttempt(inProgressAttempt.id, userId);
+        inProgressAttempt = null;
+      }
     }
 
-    if (!attempt) {
+    let attempt: TExamAttempt;
+
+    if (inProgressAttempt) {
+      attempt = inProgressAttempt;
+    } else {
+      const submittedAttempts = userAttempts.filter((a) => a.status === "submitted");
+
+      if (effectiveMaxAttempts > 0 && submittedAttempts.length >= effectiveMaxAttempts) {
+        throw new BadRequestError(
+          `Bạn đã sử dụng hết số lần làm bài cho phép (tối đa ${effectiveMaxAttempts} lần).`,
+        );
+      }
+
+      const cooldownRemainingSeconds = this.calculateCooldownRemainingSeconds(
+        submittedAttempts,
+        effectiveCooldownMinutes,
+      );
+      if (cooldownRemainingSeconds > 0) {
+        const waitMinutes = Math.ceil(cooldownRemainingSeconds / 60);
+        throw new BadRequestError(
+          `Vui lòng đợi thêm ${waitMinutes} phút trước khi bắt đầu lượt thi tiếp theo.`,
+        );
+      }
+
       const [newAttempt] = await this.database
         .insert(examAttempts)
         .values({
@@ -300,12 +385,6 @@ export class AttemptsService {
         .returning();
 
       attempt = newAttempt;
-    } else if (attempt.status === "in_progress") {
-      const endTime = attempt.startedAt.getTime() + quiz.durationMinutes * 60 * 1000;
-      if (Date.now() > endTime) {
-        await this.submitAndGradeAttempt(attempt.id, userId);
-        throw new BadRequestError("Thời gian làm bài đã kết thúc. Bài thi đã được tự động nộp.");
-      }
     }
 
     const remainingSeconds = Math.max(
@@ -548,13 +627,17 @@ export class AttemptsService {
       Math.floor((submittedTime.getTime() - attempt.startedAt.getTime()) / 1000),
     );
 
+    const globalSettings = await this.settingsService.getExamSettings();
+    const effectiveShowScoreImmediately =
+      quiz.showScoreImmediately ?? globalSettings.showScoreImmediately;
+
     return {
       attemptId: attempt.id,
       quizId: quiz.id,
       quizTitle: quiz.title,
       studentName: userInfo?.fullName ?? "Thí sinh",
       studentCode: userInfo?.studentCode ?? null,
-      score: attempt.score ?? "0.00",
+      score: effectiveShowScoreImmediately ? (attempt.score ?? "0.00") : "---",
       totalPoints: quiz.totalPoints,
       totalAnswered: attempt.totalAnswered,
       totalSubItems,
@@ -562,7 +645,29 @@ export class AttemptsService {
       submittedAt: submittedTime.toISOString(),
       durationMinutes: quiz.durationMinutes,
       timeSpentSeconds,
+      showScoreImmediately: effectiveShowScoreImmediately,
     };
+  }
+
+  private calculateCooldownRemainingSeconds(
+    submittedAttempts: TExamAttempt[],
+    cooldownMinutes: number,
+  ): number {
+    if (submittedAttempts.length === 0 || cooldownMinutes <= 0) {
+      return 0;
+    }
+
+    const sortedSubmitted = [...submittedAttempts].sort(
+      (a, b) => (b.submittedAt?.getTime() ?? 0) - (a.submittedAt?.getTime() ?? 0),
+    );
+    const lastSubmitted = sortedSubmitted[0];
+    if (!lastSubmitted?.submittedAt) {
+      return 0;
+    }
+
+    const cooldownEnd = lastSubmitted.submittedAt.getTime() + cooldownMinutes * 60 * 1000;
+
+    return Math.max(0, Math.ceil((cooldownEnd - Date.now()) / 1000));
   }
 
   private async getAttemptById(attemptId: string): Promise<TExamAttempt | null> {

@@ -1,6 +1,7 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
 import {
   AboutPreviewSection,
+  ArticlesPreviewSection,
   CtaSection,
   ExamInfoSection,
   FeaturesSection,
@@ -24,6 +25,9 @@ export default function HomePage() {
 
         {/* 4 Feature Highlights */}
         <FeaturesSection />
+
+        {/* Latest Articles & News */}
+        <ArticlesPreviewSection />
 
         {/* Detailed Sections Grid */}
         <section className="bg-background pb-20 md:pb-24">

@@ -33,6 +33,7 @@ export const AttemptResultSchema = t.Object({
   submittedAt: t.String(),
   durationMinutes: t.Number(),
   timeSpentSeconds: t.Number(),
+  showScoreImmediately: t.Optional(t.Boolean()),
 });
 
 export const StudentExamListItemSchema = t.Object({
@@ -51,6 +52,11 @@ export const StudentExamListItemSchema = t.Object({
   attemptId: t.Nullable(t.String()),
   score: t.Nullable(t.String()),
   submittedAt: t.Nullable(t.String()),
+  maxAttempts: t.Nullable(t.Number()),
+  attemptCount: t.Number(),
+  canTakeExam: t.Boolean(),
+  cooldownRemainingSeconds: t.Number(),
+  displayScore: t.Nullable(t.String()),
 });
 
 export const StudentExamListResponseSchema = t.Object({

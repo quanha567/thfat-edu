@@ -9,12 +9,15 @@ import {
   type TQuiz,
 } from "../../db/schema/quizzes";
 import { NotFoundError } from "../../middlewares/error-handler";
+import { nvidiaNimService } from "../../services/ai/nvidia-nim.service";
 import {
   type TCreateQuizInput,
   type TQuizListQuery,
   type TQuizListResponse,
   type TQuizQuestionInput,
   type TQuizSectionInput,
+  type TSolveQuestionInput,
+  type TSolveQuestionResponse,
   type TUpdateQuizInput,
 } from "./quizzes.model";
 
@@ -285,5 +288,9 @@ export class QuizzesService {
         }
       }),
     );
+  }
+
+  public async solveQuestion(input: TSolveQuestionInput): Promise<TSolveQuestionResponse> {
+    return nvidiaNimService.solveExamQuestion(input);
   }
 }

@@ -1,5 +1,6 @@
 import { relations } from "drizzle-orm";
 
+import { articles } from "./articles";
 import { studentProfiles, teacherProfiles } from "./profiles";
 import { sessions } from "./sessions";
 import { users } from "./users";
@@ -9,6 +10,8 @@ export * from "./profiles";
 export * from "./sessions";
 export * from "./quizzes";
 export * from "./attempts";
+export * from "./settings";
+export * from "./articles";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   studentProfile: one(studentProfiles, {
@@ -20,6 +23,7 @@ export const usersRelations = relations(users, ({ one, many }) => ({
     references: [teacherProfiles.userId],
   }),
   sessions: many(sessions),
+  articles: many(articles),
 }));
 
 export const studentProfilesRelations = relations(studentProfiles, ({ one }) => ({

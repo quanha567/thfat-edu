@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Plus } from "lucide-react";
 
 import { createEmptySubItem } from "../../constants/exam-editor.constants";
@@ -15,6 +15,12 @@ export type TSectionEditorMcqProps = {
   questionNumber: number;
   canMoveUp: boolean;
   canMoveDown: boolean;
+  isCollapsed?: boolean;
+  isSolving?: boolean;
+  editorMode?: "edit" | "preview";
+  onToggleCollapse?: () => void;
+  onAutoSolve?: () => void;
+  onFocus?: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDuplicate: () => void;
@@ -27,6 +33,12 @@ export function SectionEditorMcq({
   questionNumber,
   canMoveUp,
   canMoveDown,
+  isCollapsed = false,
+  isSolving = false,
+  editorMode = "edit",
+  onToggleCollapse,
+  onAutoSolve,
+  onFocus,
   onMoveUp,
   onMoveDown,
   onDuplicate,
@@ -66,61 +78,89 @@ export function SectionEditorMcq({
     onUpdateQuestion({ ...question, subItems: updated });
   };
 
+  const hasContent = Boolean(question.contextContent?.trim());
+
   return (
-    <Card id={`question-card-1-${questionNumber - 1}`} className="border-border border shadow-xs">
-      <CardContent className="space-y-4 p-4">
-        <QuestionEditorCardHeader
-          questionNumber={questionNumber}
-          pointsLabel="MCQ Nhóm (1.5đ / tiểu mục)"
-          imageUrl={question.imageUrl}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-          onDuplicate={onDuplicate}
-          onDelete={onDelete}
-          onImageChange={handleImageChange}
-        />
+    <Card
+      id={`question-card-1-${questionNumber - 1}`}
+      onClick={onFocus}
+      onFocusCapture={onFocus}
+      className="border-border/70 rounded-xl border bg-card p-4 space-y-4 shadow-xs transition-shadow hover:shadow-sm"
+    >
+      <QuestionEditorCardHeader
+        questionNumber={questionNumber}
+        pointsLabel=""
+        imageUrl={question.imageUrl}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+        isCollapsed={isCollapsed}
+        isSolving={isSolving}
+        onToggleCollapse={onToggleCollapse}
+        onAutoSolve={onAutoSolve}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+        onImageChange={handleImageChange}
+      />
 
-        <ExamMarkdownEditor
-          label="Ngữ cảnh chung của nhóm câu hỏi (Context)"
-          value={question.contextContent}
-          onChange={handleContextChange}
-          placeholder="Nhập thông tin, bảng số liệu hoặc văn bản chung cho nhóm..."
-          rows={3}
-        />
+      {isCollapsed ? (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          className="text-muted-foreground hover:text-foreground flex w-full cursor-pointer items-center justify-between gap-3 text-left text-xs"
+        >
+          <p className="line-clamp-1 italic">
+            {hasContent ? question.contextContent : "Chưa có nội dung ngữ cảnh..."}
+          </p>
+          <span className="shrink-0 font-medium">{question.subItems.length} câu hỏi con</span>
+        </button>
+      ) : (
+        <div className="space-y-4">
+          <ExamMarkdownEditor
+            value={question.contextContent}
+            onChange={handleContextChange}
+            editorMode={editorMode}
+            placeholder="Nhập thông tin, bảng số liệu hoặc đề bài chung cho nhóm câu hỏi..."
+            rows={3}
+          />
 
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-foreground text-xs font-semibold">
-              Danh sách câu hỏi con ({question.subItems.length} câu):
-            </span>
-            <Button
-              type="button"
-              variant="outline"
-              size="xs"
-              onClick={handleAddSubItem}
-              className="h-7 gap-1 text-xs font-medium"
-            >
-              <Plus className="size-3" />
-              Thêm câu hỏi con
-            </Button>
-          </div>
+          <div className="border-t border-border/40 pt-3 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-foreground text-xs font-semibold">
+                Danh sách câu hỏi con ({question.subItems.length} câu):
+              </span>
+              {editorMode === "edit" && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="xs"
+                  onClick={handleAddSubItem}
+                  className="h-7 gap-1 text-xs font-semibold text-primary hover:bg-primary/10"
+                >
+                  <Plus className="size-3.5" />
+                  Thêm câu hỏi con
+                </Button>
+              )}
+            </div>
 
-          <div className="space-y-2.5">
-            {question.subItems.map((subItem, sIdx) => (
-              <SectionEditorMcqItem
-                key={subItem.id || sIdx}
-                subItem={subItem}
-                index={sIdx}
-                canRemove={question.subItems.length > 1}
-                onRemove={() => handleRemoveSubItem(sIdx)}
-                onChange={(patch) => handleSubItemChange(sIdx, patch)}
-              />
-            ))}
+            <div className="divide-y divide-border/25">
+              {question.subItems.map((subItem, sIdx) => (
+                <div key={subItem.id || sIdx} className="py-3 first:pt-0 last:pb-0">
+                  <SectionEditorMcqItem
+                    subItem={subItem}
+                    index={sIdx}
+                    canRemove={question.subItems.length > 1}
+                    editorMode={editorMode}
+                    onRemove={() => handleRemoveSubItem(sIdx)}
+                    onChange={(patch) => handleSubItemChange(sIdx, patch)}
+                  />
+                </div>
+              ))}
+            </div>
           </div>
         </div>
-      </CardContent>
+      )}
     </Card>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ChevronRight, Loader2, Save, Sparkles } from "lucide-react";
+import { ArrowLeft, ChevronRight, Loader2, Save } from "lucide-react";
 import Link from "next/link";
 
 export type TExamCreateHeaderProps = {
@@ -20,21 +20,15 @@ export function ExamCreateHeader({ isSaving, canSave, onSave }: TExamCreateHeade
             className="hover:text-foreground flex items-center gap-1 font-medium transition-colors"
           >
             <ArrowLeft className="size-3.5" />
-            <span>Quản lý đề thi</span>
+            <span>Đề thi</span>
           </Link>
           <ChevronRight className="size-3" />
-          <span className="text-foreground font-semibold">Tạo & Import đề thi</span>
+          <span className="text-foreground font-semibold">Tạo đề thi mới</span>
         </div>
 
-        <div className="flex items-center gap-2">
-          <h1 className="text-h2 text-foreground font-bold tracking-tight">
-            Import đề thi bằng AI
-          </h1>
-          <span className="bg-primary/10 text-primary inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold">
-            <Sparkles className="size-3" />
-            NVIDIA NIM
-          </span>
-        </div>
+        <h1 className="text-foreground text-xl font-bold tracking-tight sm:text-2xl">
+          Tạo đề thi từ tệp
+        </h1>
       </div>
 
       <div className="flex items-center gap-2">
@@ -56,7 +50,7 @@ export function ExamCreateHeader({ isSaving, canSave, onSave }: TExamCreateHeade
           ) : (
             <>
               <Save className="size-3.5" />
-              <span>Lưu vào Ngân hàng Đề</span>
+              <span>Lưu đề thi</span>
             </>
           )}
         </Button>

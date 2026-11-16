@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Clock } from "lucide-react";
+import { Clock, RotateCcw } from "lucide-react";
 import Link from "next/link";
 
 import { type TStudentExamListItem } from "../types";
@@ -19,20 +19,33 @@ type TBadgeConfig = {
   text: string;
 };
 
-function getBadgeConfig(isCompleted: boolean, isInProgress: boolean): TBadgeConfig {
-  if (isCompleted) {
-    return {
-      variant: "secondary",
-      className: "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
-      text: "Đã nộp bài",
-    };
-  }
-
+function getBadgeConfig(
+  isCompleted: boolean,
+  isInProgress: boolean,
+  canTakeExam: boolean,
+): TBadgeConfig {
   if (isInProgress) {
     return {
       variant: "default",
       className: "bg-amber-500 text-white hover:bg-amber-600",
       text: "Đang làm dở",
+    };
+  }
+
+  if (isCompleted) {
+    if (!canTakeExam) {
+      return {
+        variant: "secondary",
+        className: "bg-neutral-100 text-neutral-600 dark:bg-neutral-800 dark:text-neutral-300",
+        text: "Hết lượt thi",
+      };
+    }
+
+    return {
+      variant: "secondary",
+      className:
+        "bg-primary-50 text-primary-700 border-primary-200 dark:bg-primary-950 dark:text-primary-300 border",
+      text: "Đã nộp bài",
     };
   }
 
@@ -43,34 +56,59 @@ function getBadgeConfig(isCompleted: boolean, isInProgress: boolean): TBadgeConf
   };
 }
 
-function renderActionButton(examId: string, isCompleted: boolean, isInProgress: boolean) {
-  if (isCompleted) {
+function renderAttemptCountText(maxAttempts?: number | null, attemptCount = 0) {
+  if (maxAttempts) {
     return (
-      <Button asChild variant="outline" className="w-full">
-        <Link href={`/exams/${examId}/result`}>Xem điểm số</Link>
+      <span>
+        Lượt thi: <strong>{attemptCount}</strong>/{maxAttempts}
+      </span>
+    );
+  }
+
+  if (attemptCount > 0) {
+    return (
+      <span>
+        Đã thi: <strong>{attemptCount}</strong> lần
+      </span>
+    );
+  }
+
+  return null;
+}
+
+function renderSecondaryAction(canTakeExam: boolean, cooldownRemaining: number, examId: string) {
+  if (canTakeExam) {
+    return (
+      <Button asChild className="flex-1">
+        <Link href={`/exams/${examId}/room`} className="flex items-center gap-1">
+          <RotateCcw className="h-3.5 w-3.5" />
+          Thi lại
+        </Link>
       </Button>
     );
   }
 
-  if (isInProgress) {
+  if (cooldownRemaining > 0) {
     return (
-      <Button asChild className="w-full bg-amber-600 hover:bg-amber-700">
-        <Link href={`/exams/${examId}/room`}>Tiếp tục làm bài</Link>
+      <Button disabled variant="outline" className="flex-1 text-xs">
+        Chờ {Math.ceil(cooldownRemaining / 60)}p để thi lại
       </Button>
     );
   }
 
-  return (
-    <Button asChild className="w-full">
-      <Link href={`/exams/${examId}/room`}>Bắt đầu làm bài</Link>
-    </Button>
-  );
+  return null;
 }
 
 export function StudentExamCard({ exam }: TStudentExamCardProps) {
   const isCompleted = exam.attemptStatus === "submitted";
   const isInProgress = exam.attemptStatus === "in_progress";
-  const badgeConfig = getBadgeConfig(isCompleted, isInProgress);
+  const canTakeExam = exam.canTakeExam ?? !isCompleted;
+  const cooldownRemaining = exam.cooldownRemainingSeconds ?? 0;
+  const attemptCount = exam.attemptCount ?? (isCompleted ? 1 : 0);
+  const maxAttempts = exam.maxAttempts;
+  const displayScore = exam.displayScore ?? exam.score;
+
+  const badgeConfig = getBadgeConfig(isCompleted, isInProgress, canTakeExam);
 
   return (
     <Card className="flex flex-col justify-between border-neutral-200 transition-shadow hover:shadow-sm dark:border-neutral-800">
@@ -80,9 +118,9 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
             {badgeConfig.text}
           </Badge>
 
-          {isCompleted && exam.score !== null && (
+          {isCompleted && displayScore !== null && (
             <span className="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
-              {exam.score}
+              {displayScore}
               <span className="ml-0.5 text-xs font-normal text-neutral-400">
                 {" "}
                 / {exam.totalPoints}đ
@@ -96,14 +134,39 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="pt-0">
-        <div className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400">
-          <Clock className="h-3.5 w-3.5" />
-          <span>{exam.durationMinutes} phút</span>
+      <CardContent className="space-y-2 pt-0">
+        <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3.5 w-3.5" />
+            <span>{exam.durationMinutes} phút</span>
+          </div>
+
+          <div>{renderAttemptCountText(maxAttempts, attemptCount)}</div>
         </div>
       </CardContent>
 
-      <CardFooter>{renderActionButton(exam.id, isCompleted, isInProgress)}</CardFooter>
+      <CardFooter className="flex flex-col gap-2 pt-2">
+        {isInProgress && (
+          <Button asChild className="w-full bg-amber-600 hover:bg-amber-700">
+            <Link href={`/exams/${exam.id}/room`}>Tiếp tục làm bài</Link>
+          </Button>
+        )}
+
+        {!isInProgress && isCompleted && (
+          <div className="flex w-full gap-2">
+            <Button asChild variant="outline" className="flex-1">
+              <Link href={`/exams/${exam.id}/result`}>Xem kết quả</Link>
+            </Button>
+            {renderSecondaryAction(canTakeExam, cooldownRemaining, exam.id)}
+          </div>
+        )}
+
+        {!isInProgress && !isCompleted && (
+          <Button asChild className="w-full">
+            <Link href={`/exams/${exam.id}/room`}>Bắt đầu làm bài</Link>
+          </Button>
+        )}
+      </CardFooter>
     </Card>
   );
 }

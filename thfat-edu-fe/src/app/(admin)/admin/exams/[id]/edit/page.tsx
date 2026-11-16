@@ -6,7 +6,7 @@ type TAdminExamEditPageProps = {
 
 export const metadata = {
   title: "Chỉnh sửa đề thi | ThFat Edu Admin",
-  description: "Trình biên tập đề thi V-SAT",
+  description: "Biên tập nội dung câu hỏi và cấu hình đề thi",
 };
 
 export default async function AdminExamEditPage({ params }: TAdminExamEditPageProps) {

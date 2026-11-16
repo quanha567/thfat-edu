@@ -1,5 +1,5 @@
 import { nvidiaNimService } from "../../services/ai/nvidia-nim.service";
-import { extractPdfDocument } from "../../services/ai/pdf-render.service";
+import { extractPdfDocument } from "../../services/ai/pdf-extractor.service";
 import { type TCreateQuizInput, type TQuizSectionInput } from "./quizzes.model";
 
 export type TImportJobProgress = {

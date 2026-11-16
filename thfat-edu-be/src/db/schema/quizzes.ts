@@ -1,5 +1,6 @@
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import {
+  boolean,
   integer,
   jsonb,
   numeric,
@@ -30,6 +31,11 @@ export const quizzes = pgTable("quizzes", {
   totalPoints: numeric("total_points", { precision: 5, scale: 2 }).default("150.00").notNull(),
   status: quizStatusEnum("status").default("draft").notNull(),
   pdfUrl: text("pdf_url"),
+  maxAttempts: integer("max_attempts"),
+  scorePolicy: varchar("score_policy", { length: 32 }),
+  cooldownMinutes: integer("cooldown_minutes"),
+  showScoreImmediately: boolean("show_score_immediately"),
+  showExplanationPolicy: varchar("show_explanation_policy", { length: 32 }),
   createdBy: uuid("created_by").references(() => users.id, { onDelete: "set null" }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),

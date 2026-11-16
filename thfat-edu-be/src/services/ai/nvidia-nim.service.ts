@@ -62,6 +62,14 @@ async function readSseStream(
     }
   }
 
+  if (buffer.trim()) {
+    const token = extractTokenFromSseLine(buffer);
+    if (token) {
+      fullContent += token;
+      onToken?.(token);
+    }
+  }
+
   return fullContent;
 }
 
@@ -232,6 +240,151 @@ EXAM SECTION RULES:
     });
 
     return response;
+  }
+
+  public async solveExamQuestion(input: {
+    sectionType: "true_false" | "group_mcq" | "matching" | "short_answer";
+    question: {
+      contextContent: string;
+      imageUrl?: string | null;
+      subItems: Array<{
+        orderIndex: number;
+        label: string;
+        content: string;
+        options?: string[] | null;
+      }>;
+    };
+  }): Promise<{
+    subItems: Array<{
+      orderIndex: number;
+      label: string;
+      correctAnswer: string;
+      acceptableAnswers?: string[] | null;
+      explanation?: string | null;
+    }>;
+  }> {
+    const rawImageUrl = input.question.imageUrl?.trim();
+    const hasValidImage = Boolean(
+      rawImageUrl &&
+        (rawImageUrl.startsWith("http://") ||
+          rawImageUrl.startsWith("https://") ||
+          rawImageUrl.startsWith("data:image/")),
+    );
+
+    const model = hasValidImage
+      ? "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning"
+      : "nvidia/nemotron-3-ultra-550b-a55b";
+
+    const systemPrompt = `You are an expert exam solver and master teacher for Vietnamese High School Science exams (Chemistry, Math, Physics - CT GDPT 2018).
+Solve the provided question accurately and deduce the exact correct answer for each sub-item.
+
+Section Type Rules:
+1. "true_false":
+   - For EACH sub-item statement (a, b, c, d), determine whether it is scientifically TRUE or FALSE.
+   - "correctAnswer" MUST be strictly either "Đúng" or "Sai".
+2. "group_mcq":
+   - For EACH sub-item, choose the correct multiple-choice option.
+   - "correctAnswer" MUST be strictly one of: "A", "B", "C", "D".
+3. "matching":
+   - For EACH sub-item in Column A, match with the correct option letter in Column B.
+   - "correctAnswer" MUST be strictly one of: "A", "B", "C", "D", "E", "F".
+4. "short_answer":
+   - Compute or determine the exact numerical or text answer.
+   - "correctAnswer" must be the canonical answer (e.g. "0.25", "CO2", "4").
+   - "acceptableAnswers" must be an array of equivalent representations (e.g. ["1/4", "0,25"]).
+
+Output MUST be a strict JSON object with this format:
+{
+  "subItems": [
+    {
+      "orderIndex": 0,
+      "label": "a",
+      "correctAnswer": "Đúng",
+      "acceptableAnswers": null,
+      "explanation": "Giải thích ngắn gọn lý do đúng/sai hoặc công thức"
+    }
+  ]
+}
+Output ONLY valid JSON.`;
+
+    const userPromptText = `Phần thi: ${input.sectionType}
+Ngữ cảnh đề bài:
+${input.question.contextContent}
+
+Danh sách các ý / tiểu mục cần giải:
+${JSON.stringify(input.question.subItems, null, 2)}`;
+
+    const userContent: TNimMessage["content"] = hasValidImage && rawImageUrl
+      ? [
+          { type: "text", text: userPromptText },
+          { type: "image_url", image_url: { url: rawImageUrl } },
+        ]
+      : userPromptText;
+
+    let rawResponse: string;
+    try {
+      rawResponse = await this.chatCompletion({
+        model,
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userContent },
+        ],
+        temperature: 0.1,
+        max_tokens: 4096,
+        response_format: { type: "json_object" },
+      });
+    } catch (primaryErr) {
+      // Fallback to ultra 550b text-only if multimodal model fails
+      if (hasValidImage) {
+        rawResponse = await this.chatCompletion({
+          model: "nvidia/nemotron-3-ultra-550b-a55b",
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPromptText },
+          ],
+          temperature: 0.1,
+          max_tokens: 4096,
+          response_format: { type: "json_object" },
+        });
+      } else {
+        throw primaryErr;
+      }
+    }
+
+    try {
+      const cleaned = rawResponse
+        .replace(/^```(?:json)?\s*/i, "")
+        .replace(/\s*```$/i, "")
+        .trim();
+
+      const parsed = JSON.parse(cleaned) as {
+        subItems?: Array<{
+          orderIndex?: number;
+          label?: string;
+          correctAnswer?: string;
+          acceptableAnswers?: string[] | null;
+          explanation?: string | null;
+        }>;
+      };
+
+      if (!parsed.subItems || !Array.isArray(parsed.subItems)) {
+        throw new Error("AI did not return a valid subItems array.");
+      }
+
+      return {
+        subItems: parsed.subItems.map((item, idx) => ({
+          orderIndex: item.orderIndex ?? idx,
+          label: item.label ?? String(idx + 1),
+          correctAnswer: String(item.correctAnswer ?? "").trim(),
+          acceptableAnswers: Array.isArray(item.acceptableAnswers) ? item.acceptableAnswers : null,
+          explanation: item.explanation ?? null,
+        })),
+      };
+    } catch (parseError) {
+      throw new Error(`Không thể giải mã kết quả từ AI: ${(parseError as Error).message}`, {
+        cause: parseError,
+      });
+    }
   }
 }
 

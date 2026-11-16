@@ -40,6 +40,7 @@ export type TExamMetric = {
 
 export const HOME_NAV_LINKS: TNavigationItem[] = [
   { label: "Trang chủ", href: "/", active: true },
+  { label: "Bài viết", href: "/articles" },
   { label: "Giới thiệu", href: "/about" },
   { label: "Vinh danh", href: "/leaderboard" },
   { label: "Thi thử", href: "/exams" },

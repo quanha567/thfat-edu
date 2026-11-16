@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileText, Loader2, Sparkles, Upload, X } from "lucide-react";
+import { FileText, Loader2, RotateCcw, Upload, X } from "lucide-react";
 import { type ChangeEvent, type DragEvent, useState } from "react";
 
 export type TExamCreateUploadCardProps = {
@@ -134,14 +134,14 @@ export function ExamCreateUploadCard({
           )}
           {!isBusy && hasResult && (
             <>
-              <Sparkles className="size-4" />
-              <span>Bóc tách lại file này</span>
+              <RotateCcw className="size-4" />
+              <span>Bóc tách lại tệp này</span>
             </>
           )}
           {!isBusy && !hasResult && (
             <>
-              <Sparkles className="size-4" />
-              <span>Bắt đầu bóc tách bằng AI</span>
+              <FileText className="size-4" />
+              <span>Bắt đầu bóc tách câu hỏi</span>
             </>
           )}
         </Button>
