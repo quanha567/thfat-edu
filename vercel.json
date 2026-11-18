@@ -7,8 +7,7 @@
   "services": {
     "thfat-edu-be": {
       "root": "thfat-edu-be",
-      "framework": "elysia",
-      "bunVersion": "1.x"
+      "framework": "elysia"
     },
     "thfat-edu-fe": {
       "root": "thfat-edu-fe",
