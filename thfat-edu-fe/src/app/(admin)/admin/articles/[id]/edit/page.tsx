@@ -1,6 +1,6 @@
-import { Suspense } from "react";
 import { AdminPageHeader } from "@/components/layout/admin";
 import { Spinner } from "@/components/ui/spinner";
+import { Suspense } from "react";
 
 import { AdminEditArticleClient } from "./edit-client";
 
@@ -30,8 +30,8 @@ export default function AdminEditArticlePage({ params }: TAdminEditArticlePagePr
         <Suspense
           fallback={
             <div className="flex min-h-[50vh] flex-col items-center justify-center gap-3">
-              <Spinner className="h-8 w-8 text-primary" />
-              <p className="text-sm font-medium text-muted-foreground">Đang tải bài viết...</p>
+              <Spinner className="text-primary h-8 w-8" />
+              <p className="text-muted-foreground text-sm font-medium">Đang tải bài viết...</p>
             </div>
           }
         >

@@ -37,9 +37,9 @@ export function LeaderboardPagination({
   return (
     <div className="flex flex-col items-center justify-between gap-4 pt-4 text-sm sm:flex-row">
       <p className="text-muted-foreground text-xs sm:text-sm">
-        Hiển thị <span className="font-semibold text-foreground">{startItem}</span> –{" "}
-        <span className="font-semibold text-foreground">{endItem}</span> trong tổng số{" "}
-        <span className="font-semibold text-foreground">{total}</span> học viên
+        Hiển thị <span className="text-foreground font-semibold">{startItem}</span> –{" "}
+        <span className="text-foreground font-semibold">{endItem}</span> trong tổng số{" "}
+        <span className="text-foreground font-semibold">{total}</span> học viên
       </p>
 
       <div className="flex items-center gap-1.5">
@@ -47,7 +47,7 @@ export function LeaderboardPagination({
           type="button"
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-lg border-border text-muted-foreground hover:bg-muted disabled:opacity-40"
+          className="border-border text-muted-foreground hover:bg-muted h-8 w-8 rounded-lg disabled:opacity-40"
           disabled={page <= 1}
           onClick={() => onPageChange(page - 1)}
           aria-label="Trang trước"
@@ -66,7 +66,7 @@ export function LeaderboardPagination({
               size="sm"
               className={`h-8 min-w-8 rounded-lg px-2 text-xs font-semibold transition-all ${
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-xs hover:bg-primary-800"
+                  ? "bg-primary text-primary-foreground hover:bg-primary-800 shadow-xs"
                   : "border-border text-muted-foreground hover:bg-muted"
               }`}
               onClick={() => onPageChange(p)}
@@ -80,7 +80,7 @@ export function LeaderboardPagination({
           type="button"
           variant="outline"
           size="icon"
-          className="h-8 w-8 rounded-lg border-border text-muted-foreground hover:bg-muted disabled:opacity-40"
+          className="border-border text-muted-foreground hover:bg-muted h-8 w-8 rounded-lg disabled:opacity-40"
           disabled={page >= totalPages}
           onClick={() => onPageChange(page + 1)}
           aria-label="Trang kế tiếp"

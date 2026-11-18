@@ -59,7 +59,7 @@ export function QuestionEditorCardHeader({
 
   return (
     <TooltipProvider delayDuration={200}>
-      <div className={`space-y-2 ${isCollapsed ? "" : "border-b border-border/30 pb-2"}`}>
+      <div className={`space-y-2 ${isCollapsed ? "" : "border-border/30 border-b pb-2"}`}>
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {onToggleCollapse && (
@@ -71,11 +71,15 @@ export function QuestionEditorCardHeader({
                 className="text-muted-foreground hover:text-foreground"
                 aria-label={isCollapsed ? "Mở rộng câu hỏi" : "Thu gọn câu hỏi"}
               >
-                {isCollapsed ? <ChevronDown className="size-4" /> : <ChevronUp className="size-4" />}
+                {isCollapsed ? (
+                  <ChevronDown className="size-4" />
+                ) : (
+                  <ChevronUp className="size-4" />
+                )}
               </Button>
             )}
 
-            <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 px-2.5 py-0.5 text-xs font-bold transition-colors">
+            <Badge className="bg-primary/10 text-primary border-primary/20 hover:bg-primary/15 border px-2.5 py-0.5 text-xs font-bold transition-colors">
               {customBadge || `Câu ${questionNumber}`}
             </Badge>
           </div>
@@ -120,7 +124,7 @@ export function QuestionEditorCardHeader({
               <TooltipContent side="top">Đính kèm hoặc sửa ảnh minh họa</TooltipContent>
             </Tooltip>
 
-            <div className="mx-0.5 h-3.5 w-px bg-border/60" />
+            <div className="bg-border/60 mx-0.5 h-3.5 w-px" />
 
             <div className="flex items-center gap-0.5 opacity-60 transition-opacity group-hover:opacity-100 hover:opacity-100">
               <Tooltip>

@@ -20,11 +20,7 @@ type TAnimatedCounterProps = {
   className?: string;
 };
 
-function formatCounterNumber(
-  num: number,
-  decimals: number,
-  useDotSeparator: boolean
-): string {
+function formatCounterNumber(num: number, decimals: number, useDotSeparator: boolean): string {
   if (decimals > 0) {
     return num.toFixed(decimals);
   }

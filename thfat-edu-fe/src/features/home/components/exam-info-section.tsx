@@ -10,10 +10,10 @@ import { MetricCard } from "./metric-card";
 export function ExamInfoSection() {
   return (
     <FadeInView className="h-full">
-      <Card className="flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xs transition-all hover:shadow-md dark:border-white/10 dark:bg-neutral-900/80 sm:p-8 lg:p-10">
+      <Card className="flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xs transition-all hover:shadow-md sm:p-8 lg:p-10 dark:border-white/10 dark:bg-neutral-900/80">
         <div>
           {/* Pill Tag */}
-          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 py-1 text-xs font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950/50 dark:text-cyan-300">
+          <div className="border-primary-100 bg-primary-50 text-primary-700 dark:border-primary-900 dark:bg-primary-950/50 mb-4 inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1 text-xs font-semibold dark:text-cyan-300">
             <HelpCircle className="h-3.5 w-3.5" />
             <span>{HOME_EXAM_INFO_DATA.tagline}</span>
           </div>
@@ -34,7 +34,7 @@ export function ExamInfoSection() {
           <Button
             asChild
             variant="outline"
-            className="border-primary-600 text-primary-600 hover:bg-primary-50 hover:text-primary-700 dark:border-cyan-400 dark:text-cyan-400 dark:hover:bg-cyan-950/30 rounded-full px-6 font-semibold transition-colors"
+            className="border-primary-600 text-primary-600 hover:bg-primary-50 hover:text-primary-700 rounded-full px-6 font-semibold transition-colors dark:border-cyan-400 dark:text-cyan-400 dark:hover:bg-cyan-950/30"
           >
             <Link href={HOME_EXAM_INFO_DATA.ctaHref} className="flex items-center gap-2">
               <span>{HOME_EXAM_INFO_DATA.ctaText}</span>

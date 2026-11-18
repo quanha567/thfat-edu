@@ -23,7 +23,7 @@ export function FeatureCard({ feature, index }: TFeatureCardProps) {
 
   return (
     <FadeInView delay={index * 0.1} className="h-full">
-      <Card className="group relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-[0_4px_20px_rgba(0,40,120,0.04)] transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-[0_12px_32px_rgba(0,60,180,0.12)] dark:border-white/10 dark:bg-neutral-900/80">
+      <Card className="group hover:border-primary-200 relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-[0_4px_20px_rgba(0,40,120,0.04)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,60,180,0.12)] dark:border-white/10 dark:bg-neutral-900/80">
         <div>
           {/* 3D Glossy Icon matching design */}
           <div className="relative mb-6 h-16 w-16 transition-transform duration-300 group-hover:scale-110 sm:h-18 sm:w-18">
@@ -36,14 +36,14 @@ export function FeatureCard({ feature, index }: TFeatureCardProps) {
                 sizes="72px"
               />
             ) : (
-              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+              <div className="bg-primary-50 text-primary-600 flex h-12 w-12 items-center justify-center rounded-2xl">
                 <FallbackIcon className="h-6 w-6 stroke-[2]" />
               </div>
             )}
           </div>
 
           {/* Title */}
-          <h3 className="text-h3 mb-2 font-bold text-neutral-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-cyan-400">
+          <h3 className="text-h3 group-hover:text-primary-600 mb-2 font-bold text-neutral-900 transition-colors dark:text-white dark:group-hover:text-cyan-400">
             {feature.title}
           </h3>
 
@@ -57,7 +57,7 @@ export function FeatureCard({ feature, index }: TFeatureCardProps) {
         <div className="mt-6 pt-2">
           <Link
             href={feature.href}
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-all duration-200 hover:gap-2.5 hover:text-primary-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+            className="text-primary-600 hover:text-primary-700 inline-flex items-center gap-1.5 text-sm font-semibold transition-all duration-200 hover:gap-2.5 dark:text-cyan-400 dark:hover:text-cyan-300"
           >
             <span>Khám phá</span>
             <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />

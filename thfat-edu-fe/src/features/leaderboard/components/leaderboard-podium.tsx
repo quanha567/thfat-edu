@@ -121,7 +121,9 @@ export function LeaderboardPodium({ topItems }: TLeaderboardPodiumProps) {
                 )}
 
                 <div className="relative">
-                  <Avatar className={`${cfg.avatarSize} ${cfg.ringClass} ring-offset-2 ring-offset-[#09357a]`}>
+                  <Avatar
+                    className={`${cfg.avatarSize} ${cfg.ringClass} ring-offset-2 ring-offset-[#09357a]`}
+                  >
                     <AvatarImage src={item.avatarUrl ?? undefined} alt={item.fullName} />
                     <AvatarFallback
                       className={`bg-gradient-to-br ${getAvatarGradient(item.fullName)} font-black tracking-wider text-white shadow-inner ring-1 ring-white/30 select-none ${cfg.avatarTextSize}`}
@@ -132,7 +134,7 @@ export function LeaderboardPodium({ topItems }: TLeaderboardPodiumProps) {
 
                   {/* Rank Badge Tag */}
                   <span
-                    className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full px-2 py-0.5 text-[10px] sm:text-xs font-black shadow-sm ${cfg.badgeClass}`}
+                    className={`absolute -bottom-1.5 left-1/2 -translate-x-1/2 rounded-full px-2 py-0.5 text-[10px] font-black shadow-sm sm:text-xs ${cfg.badgeClass}`}
                   >
                     #{rank}
                   </span>
@@ -143,15 +145,13 @@ export function LeaderboardPodium({ topItems }: TLeaderboardPodiumProps) {
               <div
                 className={`relative z-10 ${cfg.cardWidth} ${cfg.cardPadding} rounded-2xl border bg-white/95 text-center backdrop-blur-md ${cfg.cardBorder}`}
               >
-                <p className={`truncate text-foreground ${cfg.nameSize}`}>
-                  {item.fullName}
-                </p>
-                <p className="mt-0.5 truncate text-[11px] text-muted-foreground sm:text-xs">
+                <p className={`text-foreground truncate ${cfg.nameSize}`}>{item.fullName}</p>
+                <p className="text-muted-foreground mt-0.5 truncate text-[11px] sm:text-xs">
                   {item.schoolName || "—"}
                 </p>
-                <p className={`mt-1 font-black text-primary ${cfg.scoreSize}`}>
+                <p className={`text-primary mt-1 font-black ${cfg.scoreSize}`}>
                   <span>{formatLeaderboardScore(item.totalScore)}</span>{" "}
-                  <span className="text-[11px] font-semibold sm:text-xs text-primary-500">
+                  <span className="text-primary-500 text-[11px] font-semibold sm:text-xs">
                     điểm
                   </span>
                 </p>

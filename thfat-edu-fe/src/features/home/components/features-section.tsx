@@ -3,11 +3,11 @@ import { FeatureCard } from "./feature-card";
 
 export function FeaturesSection() {
   return (
-    <section id="features" className="relative bg-background pt-8 pb-16 md:pt-12 md:pb-20">
+    <section id="features" className="bg-background relative pt-8 pb-16 md:pt-12 md:pb-20">
       {/* Subtle molecular background watermark */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-40">
         <svg
-          className="absolute top-10 left-6 h-64 w-64 text-primary-200/30"
+          className="text-primary-200/30 absolute top-10 left-6 h-64 w-64"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
@@ -27,11 +27,11 @@ export function FeaturesSection() {
         {/* Section Header with Accent Lines */}
         <div className="mx-auto mb-12 max-w-2xl text-center">
           <div className="mb-3 flex items-center justify-center gap-4">
-            <span className="h-0.5 w-12 rounded-full bg-primary-600 sm:w-16" />
+            <span className="bg-primary-600 h-0.5 w-12 rounded-full sm:w-16" />
             <h2 className="text-h2 sm:text-h1 font-bold tracking-tight text-neutral-900 dark:text-white">
               Tính năng nổi bật
             </h2>
-            <span className="h-0.5 w-12 rounded-full bg-primary-600 sm:w-16" />
+            <span className="bg-primary-600 h-0.5 w-12 rounded-full sm:w-16" />
           </div>
           <p className="text-body font-medium text-neutral-600 dark:text-neutral-300">
             Công cụ luyện thi toàn diện, giúp bạn tiến bộ vượt bậc

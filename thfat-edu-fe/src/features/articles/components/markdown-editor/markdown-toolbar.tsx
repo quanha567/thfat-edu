@@ -22,7 +22,7 @@ export type TMarkdownToolbarProps = {
 
 export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-1 border-b border-border bg-muted/30 p-2">
+    <div className="border-border bg-muted/30 flex flex-wrap items-center gap-1 border-b p-2">
       <Button
         type="button"
         variant="ghost"
@@ -47,7 +47,7 @@ export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbar
         <Heading3 className="size-4" />
       </Button>
 
-      <div className="mx-1 h-4 w-px bg-border" />
+      <div className="bg-border mx-1 h-4 w-px" />
 
       <Button
         type="button"
@@ -73,7 +73,7 @@ export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbar
         <Italic className="size-4" />
       </Button>
 
-      <div className="mx-1 h-4 w-px bg-border" />
+      <div className="bg-border mx-1 h-4 w-px" />
 
       <Button
         type="button"
@@ -82,7 +82,7 @@ export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbar
         disabled={disabled}
         onClick={() => onInsert("$", "$", "\\ce{H2SO4}")}
         title="Công thức KaTeX nội dòng"
-        className="h-8 gap-1 px-2 text-xs font-semibold text-primary"
+        className="text-primary h-8 gap-1 px-2 text-xs font-semibold"
       >
         <Sigma className="size-3.5" />
         <span>Inline</span>
@@ -95,13 +95,13 @@ export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbar
         disabled={disabled}
         onClick={() => onInsert("\n$$\n", "\n$$\n", "\\Delta = b^2 - 4ac")}
         title="Khối công thức KaTeX"
-        className="h-8 gap-1 px-2 text-xs font-semibold text-primary"
+        className="text-primary h-8 gap-1 px-2 text-xs font-semibold"
       >
         <Sigma className="size-3.5" />
         <span>Block</span>
       </Button>
 
-      <div className="mx-1 h-4 w-px bg-border" />
+      <div className="bg-border mx-1 h-4 w-px" />
 
       <Button
         type="button"
@@ -139,7 +139,7 @@ export function MarkdownToolbar({ onInsert, disabled = false }: TMarkdownToolbar
         <Quote className="size-4" />
       </Button>
 
-      <div className="mx-1 h-4 w-px bg-border" />
+      <div className="bg-border mx-1 h-4 w-px" />
 
       <Button
         type="button"

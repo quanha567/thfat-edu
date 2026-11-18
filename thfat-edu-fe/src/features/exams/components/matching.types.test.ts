@@ -47,10 +47,7 @@ describe("matching.types helpers", () => {
 
   describe("getMatchingOptions", () => {
     it("returns default options A-D if subItems have no options", () => {
-      const res = getMatchingOptions([
-        { options: null },
-        { options: [] },
-      ]);
+      const res = getMatchingOptions([{ options: null }, { options: [] }]);
       expect(res).toHaveLength(4);
       expect(res.map((r) => r.letter)).toEqual(["A", "B", "C", "D"]);
     });

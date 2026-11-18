@@ -26,7 +26,7 @@ function renderPreviewAction(maxAttempts: number, cooldownMinutes: number) {
       <Button
         size="sm"
         variant="outline"
-        className="flex-1 text-xs text-warning-700 dark:text-warning-400"
+        className="text-warning-700 dark:text-warning-400 flex-1 text-xs"
         disabled
       >
         Chờ {cooldownMinutes}p thi lại

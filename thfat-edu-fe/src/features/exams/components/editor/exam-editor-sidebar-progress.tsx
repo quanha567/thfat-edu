@@ -20,7 +20,7 @@ export function ExamEditorSidebarProgress({
   onExpandAll,
 }: TExamEditorSidebarProgressProps) {
   return (
-    <div className="border-border/40 flex items-center justify-between border-b px-3.5 py-2 shrink-0 text-xs bg-muted/10">
+    <div className="border-border/40 bg-muted/10 flex shrink-0 items-center justify-between border-b px-3.5 py-2 text-xs">
       <div className="flex items-center gap-2">
         <span
           className={cn(
@@ -28,12 +28,10 @@ export function ExamEditorSidebarProgress({
             hasErrors ? "bg-destructive animate-pulse" : "bg-success-500",
           )}
         />
-        <span className="font-semibold text-foreground text-xs">
+        <span className="text-foreground text-xs font-semibold">
           {hasErrors ? `${errorCount} câu cần kiểm tra` : "Đề thi hợp lệ"}
         </span>
-        <span className="text-muted-foreground text-[11px] font-mono">
-          ({percentComplete}%)
-        </span>
+        <span className="text-muted-foreground font-mono text-[11px]">({percentComplete}%)</span>
       </div>
 
       <div className="flex items-center gap-0.5">
@@ -42,7 +40,7 @@ export function ExamEditorSidebarProgress({
           variant="ghost"
           size="xs"
           onClick={onCollapseAll}
-          className="text-muted-foreground hover:text-foreground h-6.5 px-2 text-[11px] gap-1 rounded cursor-pointer"
+          className="text-muted-foreground hover:text-foreground h-6.5 cursor-pointer gap-1 rounded px-2 text-[11px]"
           title="Thu gọn tất cả câu hỏi"
         >
           <ChevronsDownUp className="size-3" />
@@ -53,7 +51,7 @@ export function ExamEditorSidebarProgress({
           variant="ghost"
           size="xs"
           onClick={onExpandAll}
-          className="text-muted-foreground hover:text-foreground h-6.5 px-2 text-[11px] gap-1 rounded cursor-pointer"
+          className="text-muted-foreground hover:text-foreground h-6.5 cursor-pointer gap-1 rounded px-2 text-[11px]"
           title="Mở rộng tất cả câu hỏi"
         >
           <ChevronsUpDown className="size-3" />

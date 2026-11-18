@@ -75,7 +75,7 @@ function renderRoleBadge(role: TUserRole): ReactNode {
   return (
     <Badge
       variant="outline"
-      className="border-muted bg-muted text-muted-foreground dark:border-border dark:bg-neutral-800 dark:text-neutral-300 text-[10px] font-semibold tracking-wide"
+      className="border-muted bg-muted text-muted-foreground dark:border-border text-[10px] font-semibold tracking-wide dark:bg-neutral-800 dark:text-neutral-300"
     >
       Học viên
     </Badge>
@@ -127,10 +127,10 @@ function renderTrigger(
           className="ring-1 ring-white/30"
         />
         <div className="flex flex-col justify-center text-left">
-          <span className="max-w-[120px] truncate text-xs font-bold leading-tight text-white">
+          <span className="max-w-[120px] truncate text-xs leading-tight font-bold text-white">
             {user.fullName || "Tài khoản"}
           </span>
-          <span className="text-[10px] font-medium leading-tight text-primary-200">
+          <span className="text-primary-200 text-[10px] leading-tight font-medium">
             {getRoleLabel(user.role)}
           </span>
         </div>

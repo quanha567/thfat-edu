@@ -33,7 +33,10 @@ export class SettingsService {
     const value = row.value as Partial<TExamSettings>;
 
     this.cachedExamSettings = {
-      maxAttempts: typeof value.maxAttempts === "number" ? value.maxAttempts : DEFAULT_EXAM_SETTINGS.maxAttempts,
+      maxAttempts:
+        typeof value.maxAttempts === "number"
+          ? value.maxAttempts
+          : DEFAULT_EXAM_SETTINGS.maxAttempts,
       scorePolicy: value.scorePolicy === "latest" ? "latest" : "highest",
       cooldownMinutes:
         typeof value.cooldownMinutes === "number"

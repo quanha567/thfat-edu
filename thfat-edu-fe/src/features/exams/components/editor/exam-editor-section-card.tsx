@@ -92,8 +92,7 @@ export function ExamEditorSectionCard({
             runningSubOffset += section.questions[i]?.subItems?.length || 1;
           }
           const currentGroupStartNum = startQuestionNumber + runningSubOffset;
-          const currentGroupEndNum =
-            currentGroupStartNum + (question.subItems?.length || 1) - 1;
+          const currentGroupEndNum = currentGroupStartNum + (question.subItems?.length || 1) - 1;
 
           const commonProps = {
             id: cardId,

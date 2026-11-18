@@ -63,7 +63,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("bold") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("bold") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleBold().run()}
         title="In đậm (Ctrl+B)"
       >
@@ -74,7 +74,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("italic") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("italic") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleItalic().run()}
         title="In nghiêng (Ctrl+I)"
       >
@@ -85,7 +85,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("strike") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("strike") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleStrike().run()}
         title="Gạch ngang"
       >
@@ -98,7 +98,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("heading", { level: 1 }) ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("heading", { level: 1 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
         title="Tiêu đề 1"
       >
@@ -109,7 +109,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("heading", { level: 2 }) ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("heading", { level: 2 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
         title="Tiêu đề 2"
       >
@@ -120,7 +120,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("heading", { level: 3 }) ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("heading", { level: 3 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
         title="Tiêu đề 3"
       >
@@ -133,7 +133,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("bulletList") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("bulletList") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
         title="Danh sách dấu chấm"
       >
@@ -144,7 +144,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("orderedList") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("orderedList") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
         title="Danh sách số"
       >
@@ -155,7 +155,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("blockquote") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("blockquote") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleBlockquote().run()}
         title="Trích dẫn"
       >
@@ -166,7 +166,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         type="button"
         variant="ghost"
         size="icon"
-        className={`size-8 ${editor.isActive("codeBlock") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+        className={`size-8 ${editor.isActive("codeBlock") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleCodeBlock().run()}
         title="Khối mã (Code block)"
       >
@@ -193,7 +193,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
             type="button"
             variant="ghost"
             size="icon"
-            className={`size-8 ${editor.isActive("link") ? "bg-muted font-bold text-foreground" : "text-muted-foreground"}`}
+            className={`size-8 ${editor.isActive("link") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
             title="Chèn liên kết"
           >
             <LinkIcon className="size-4" />

@@ -3,10 +3,7 @@ import { Elysia } from "elysia";
 import { ForbiddenError, UnauthorizedError } from "../../middlewares/error-handler";
 import { extractSessionToken, SESSION_COOKIE_NAME } from "../auth/auth.cookie";
 import { authService } from "../auth/auth.service";
-import {
-  ExamSettingsSchema,
-  UpdateExamSettingsSchema,
-} from "./settings.model";
+import { ExamSettingsSchema, UpdateExamSettingsSchema } from "./settings.model";
 import { SettingsService } from "./settings.service";
 
 export const settingsRoutes = new Elysia({ prefix: "/admin/settings" })

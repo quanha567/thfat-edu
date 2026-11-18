@@ -4,9 +4,9 @@ import { BaseAvatar } from "@/components/base";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { useArticles } from "@/features/articles/hooks/use-articles";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
-import { useArticles } from "@/features/articles/hooks/use-articles";
 import { HOME_NAV_LINKS } from "@/features/home/constants/home.data";
 import { ArrowRight, ChevronDown, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
@@ -103,11 +103,9 @@ export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
                     </button>
 
                     {resourcesExpanded && (
-                      <div className="ml-3 flex flex-col gap-1.5 border-l border-white/15 pl-3 pt-1">
+                      <div className="ml-3 flex flex-col gap-1.5 border-l border-white/15 pt-1 pl-3">
                         {latestArticles.length === 0 ? (
-                          <span className="py-1 text-xs text-white/50">
-                            Chưa có bài viết nào
-                          </span>
+                          <span className="py-1 text-xs text-white/50">Chưa có bài viết nào</span>
                         ) : (
                           latestArticles.slice(0, 5).map((article) => (
                             <Link
@@ -124,7 +122,7 @@ export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
                         <Link
                           href="/articles"
                           onClick={() => setOpen(false)}
-                          className="flex items-center gap-1 pt-1 text-xs font-semibold text-primary-300 hover:text-white"
+                          className="text-primary-300 flex items-center gap-1 pt-1 text-xs font-semibold hover:text-white"
                         >
                           <span>Xem tất cả bài viết</span>
                           <ArrowRight className="h-3 w-3" />

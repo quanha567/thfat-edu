@@ -82,7 +82,9 @@ function renderSectionContent({
             {isContentDifferent && (
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2 text-sm leading-relaxed font-medium text-neutral-900">
-                  {subLabel && <span className="shrink-0 font-bold text-neutral-800">{subLabel}</span>}
+                  {subLabel && (
+                    <span className="shrink-0 font-bold text-neutral-800">{subLabel}</span>
+                  )}
                   <ChemRenderer content={si.content} />
                 </div>
 

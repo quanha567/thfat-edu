@@ -1,11 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  getAvatarGradient,
-  getInitials,
-  type TSegmentedOption,
-  type TSelectOption,
-} from "./index";
+import { getAvatarGradient, getInitials, type TSegmentedOption, type TSelectOption } from "./index";
 
 describe("Base UI Components Types & Helpers", () => {
   it("computes initials correctly for various names", () => {

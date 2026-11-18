@@ -10,10 +10,7 @@ export type TLeaderboardFiltersProps = {
   onTimeframeChange: (val: TTimeframe) => void;
 };
 
-export function LeaderboardFilters({
-  timeframe,
-  onTimeframeChange,
-}: TLeaderboardFiltersProps) {
+export function LeaderboardFilters({ timeframe, onTimeframeChange }: TLeaderboardFiltersProps) {
   const options: TTimeframe[] = ["this_week", "this_month", "all_time"];
 
   return (

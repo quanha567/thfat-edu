@@ -50,7 +50,7 @@ export function StudentExamFilterBar({
         {/* Status Tabs */}
         <div className="overflow-x-auto pb-1 sm:pb-0">
           <Tabs value={status} onValueChange={onStatusChange}>
-            <TabsList className="bg-muted p-1 text-muted-foreground h-9">
+            <TabsList className="bg-muted text-muted-foreground h-9 p-1">
               {tabs.map((tab) => (
                 <TabsTrigger
                   key={tab.value}
@@ -58,11 +58,7 @@ export function StudentExamFilterBar({
                   className="gap-1.5 px-3 py-1 text-xs font-medium sm:text-sm"
                 >
                   <span>{tab.label}</span>
-                  {tab.count > 0 && (
-                    <span className="text-[11px] opacity-70">
-                      ({tab.count})
-                    </span>
-                  )}
+                  {tab.count > 0 && <span className="text-[11px] opacity-70">({tab.count})</span>}
                 </TabsTrigger>
               ))}
             </TabsList>
@@ -71,13 +67,13 @@ export function StudentExamFilterBar({
 
         {/* Search Input */}
         <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Search className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
           <Input
             type="text"
             placeholder="Tìm theo tên đề thi..."
             value={search}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="bg-background pl-9 pr-8 text-xs sm:text-sm"
+            className="bg-background pr-8 pl-9 text-xs sm:text-sm"
           />
           {search && (
             <button
@@ -94,9 +90,9 @@ export function StudentExamFilterBar({
 
       {/* Filter Summary */}
       {hasFilter && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-2 text-xs text-muted-foreground">
+        <div className="border-border text-muted-foreground flex flex-wrap items-center justify-between gap-2 border-t pt-2 text-xs">
           <div>
-            Hiển thị <span className="font-semibold text-foreground">{totalFiltered}</span>
+            Hiển thị <span className="text-foreground font-semibold">{totalFiltered}</span>
             {" / "}
             <span>{totalCount}</span> đề thi
           </div>

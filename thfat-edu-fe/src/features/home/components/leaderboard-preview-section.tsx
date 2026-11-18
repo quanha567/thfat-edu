@@ -10,7 +10,7 @@ import { StudentRow } from "./student-row";
 export function LeaderboardPreviewSection() {
   return (
     <FadeInView id="leaderboard" delay={0.15} className="h-full">
-      <Card className="flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-xs transition-all hover:shadow-md dark:border-white/10 dark:bg-neutral-900/80 sm:p-8">
+      <Card className="flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-xs transition-all hover:shadow-md sm:p-8 dark:border-white/10 dark:bg-neutral-900/80">
         <div>
           {/* Header matching design */}
           <div className="mb-1.5 flex items-center justify-between">
@@ -23,21 +23,21 @@ export function LeaderboardPreviewSection() {
                   className="object-contain"
                 />
               </div>
-              <h3 className="text-lg sm:text-xl font-bold text-neutral-900 dark:text-white">
+              <h3 className="text-lg font-bold text-neutral-900 sm:text-xl dark:text-white">
                 {HOME_LEADERBOARD_DATA.title}
               </h3>
             </div>
 
             <Link
               href={HOME_LEADERBOARD_DATA.viewAllHref}
-              className="inline-flex items-center gap-1 text-sm font-semibold text-primary-600 transition-colors hover:text-primary-700 dark:text-cyan-400 dark:hover:text-cyan-300"
+              className="text-primary-600 hover:text-primary-700 inline-flex items-center gap-1 text-sm font-semibold transition-colors dark:text-cyan-400 dark:hover:text-cyan-300"
             >
               <span>Xem tất cả</span>
               <ArrowRight className="h-3.5 w-3.5" />
             </Link>
           </div>
 
-          <p className="mb-4 text-xs sm:text-sm text-neutral-500 dark:text-neutral-400">
+          <p className="mb-4 text-xs text-neutral-500 sm:text-sm dark:text-neutral-400">
             {HOME_LEADERBOARD_DATA.subtitle}
           </p>
 

@@ -129,7 +129,9 @@ export default function AdminDashboardPage() {
             if (recentExams.length === 0) {
               return (
                 <div className="py-8 text-center">
-                  <p className="text-muted-foreground text-sm">Chưa có đề thi nào trong hệ thống.</p>
+                  <p className="text-muted-foreground text-sm">
+                    Chưa có đề thi nào trong hệ thống.
+                  </p>
                   <Button asChild variant="outline" size="sm" className="mt-3 text-xs">
                     <Link href="/admin/exams/create">Tạo đề thi đầu tiên</Link>
                   </Button>

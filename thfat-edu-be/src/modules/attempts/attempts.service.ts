@@ -894,8 +894,8 @@ export class AttemptsService {
       }
 
       let pointsValue = Number(subItem.points || defaultPoint);
-      if (sectionType === "matching" && pointsValue > 1.50) {
-        pointsValue = 1.50;
+      if (sectionType === "matching" && pointsValue > 1.5) {
+        pointsValue = 1.5;
       }
 
       const pointsEarned = isCorrect ? pointsValue : 0;

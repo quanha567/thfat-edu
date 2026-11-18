@@ -20,7 +20,7 @@ export function ArticleCard({ article }: TArticleCardProps) {
     <Card className="group border-border/80 bg-card hover:border-primary-500/50 flex flex-col overflow-hidden rounded-xl shadow-2xs transition-all hover:shadow-sm">
       <Link
         href={`/articles/${article.slug}`}
-        className="relative aspect-video w-full overflow-hidden bg-muted"
+        className="bg-muted relative aspect-video w-full overflow-hidden"
       >
         <Image
           src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
@@ -34,7 +34,7 @@ export function ArticleCard({ article }: TArticleCardProps) {
           <div className="absolute top-3 left-3">
             <Badge
               variant="secondary"
-              className="bg-background/90 text-foreground backdrop-blur-xs font-semibold text-[11px] shadow-2xs"
+              className="bg-background/90 text-foreground text-[11px] font-semibold shadow-2xs backdrop-blur-xs"
             >
               {article.category.name}
             </Badge>
@@ -45,19 +45,19 @@ export function ArticleCard({ article }: TArticleCardProps) {
       <CardContent className="flex flex-1 flex-col justify-between p-4 sm:p-5">
         <div className="space-y-2">
           <Link href={`/articles/${article.slug}`}>
-            <h3 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 font-bold text-base text-foreground transition-colors line-clamp-2">
+            <h3 className="group-hover:text-primary-600 dark:group-hover:text-primary-400 text-foreground line-clamp-2 text-base font-bold transition-colors">
               {article.title}
             </h3>
           </Link>
 
           {article.excerpt && (
-            <p className="text-muted-foreground line-clamp-2 text-xs sm:text-sm leading-relaxed">
+            <p className="text-muted-foreground line-clamp-2 text-xs leading-relaxed sm:text-sm">
               {article.excerpt}
             </p>
           )}
         </div>
 
-        <div className="mt-4 flex items-center justify-between border-t border-border/60 pt-3 text-muted-foreground text-xs">
+        <div className="border-border/60 text-muted-foreground mt-4 flex items-center justify-between border-t pt-3 text-xs">
           <span className="flex items-center gap-1.5">
             <Calendar className="size-3.5" />
             {publishedDate}

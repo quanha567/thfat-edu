@@ -1,6 +1,6 @@
+import { HOME_FOOTER_LINKS, HOME_NAV_LINKS } from "@/features/home/constants/home.data";
 import { describe, expect, it } from "vitest";
 
-import { HOME_FOOTER_LINKS, HOME_NAV_LINKS } from "@/features/home/constants/home.data";
 import { ResourcesDropdown } from "./resources-dropdown";
 
 describe("Navigation Configuration & ResourcesDropdown", () => {
@@ -17,7 +17,9 @@ describe("Navigation Configuration & ResourcesDropdown", () => {
   });
 
   it("removes 'Giới thiệu' from HOME_FOOTER_LINKS", () => {
-    const hasAbout = HOME_FOOTER_LINKS.some((item) => item.label.toLowerCase().includes("giới thiệu"));
+    const hasAbout = HOME_FOOTER_LINKS.some((item) =>
+      item.label.toLowerCase().includes("giới thiệu"),
+    );
     expect(hasAbout).toBe(false);
   });
 

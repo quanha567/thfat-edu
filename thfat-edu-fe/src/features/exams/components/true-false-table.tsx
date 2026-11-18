@@ -64,7 +64,7 @@ export function TrueFalseTable({
                     onClick={() => onAnswerChange(si.id, "true")}
                     className={`w-full rounded-md px-2 py-1.5 text-xs font-bold transition-all ${
                       selectedAnswer === "true"
-                        ? "bg-success-600 text-white shadow-xs ring-2 ring-success-600/30"
+                        ? "bg-success-600 ring-success-600/30 text-white shadow-xs ring-2"
                         : "border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100"
                     }`}
                   >
@@ -77,7 +77,7 @@ export function TrueFalseTable({
                     onClick={() => onAnswerChange(si.id, "false")}
                     className={`w-full rounded-md px-2 py-1.5 text-xs font-bold transition-all ${
                       selectedAnswer === "false"
-                        ? "bg-error-600 text-white shadow-xs ring-2 ring-error-600/30"
+                        ? "bg-error-600 ring-error-600/30 text-white shadow-xs ring-2"
                         : "border border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-100"
                     }`}
                   >
@@ -95,7 +95,9 @@ export function TrueFalseTable({
                         : "text-neutral-300 hover:bg-neutral-100 hover:text-neutral-500"
                     }`}
                   >
-                    <Flag className={`h-4 w-4 ${isFlagged ? "fill-current text-warning-500" : ""}`} />
+                    <Flag
+                      className={`h-4 w-4 ${isFlagged ? "text-warning-500 fill-current" : ""}`}
+                    />
                   </button>
                 </td>
               </tr>

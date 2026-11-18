@@ -63,7 +63,11 @@ function renderAttemptCountText(maxAttempts?: number | null, attemptCount = 0) {
   if (maxAttempts && maxAttempts > 0) {
     return (
       <span>
-        Lượt thi: <strong className="font-semibold text-neutral-800 dark:text-neutral-200">{attemptCount}</strong>/{maxAttempts}
+        Lượt thi:{" "}
+        <strong className="font-semibold text-neutral-800 dark:text-neutral-200">
+          {attemptCount}
+        </strong>
+        /{maxAttempts}
       </span>
     );
   }
@@ -71,7 +75,11 @@ function renderAttemptCountText(maxAttempts?: number | null, attemptCount = 0) {
   if (attemptCount > 0) {
     return (
       <span>
-        Đã thi: <strong className="font-semibold text-neutral-800 dark:text-neutral-200">{attemptCount}</strong> lần
+        Đã thi:{" "}
+        <strong className="font-semibold text-neutral-800 dark:text-neutral-200">
+          {attemptCount}
+        </strong>{" "}
+        lần
       </span>
     );
   }
@@ -85,7 +93,7 @@ function renderSecondaryAction(canTakeExam: boolean, cooldownRemaining: number, 
       <Button
         asChild
         size="lg"
-        className="flex-1 rounded-xl bg-primary-600 font-semibold text-white shadow-xs transition-colors hover:bg-primary-700"
+        className="bg-primary-600 hover:bg-primary-700 flex-1 rounded-xl font-semibold text-white shadow-xs transition-colors"
       >
         <Link href={`/exams/${examId}/room`} className="flex items-center justify-center gap-1.5">
           <RotateCcw className="h-4 w-4" />
@@ -97,7 +105,12 @@ function renderSecondaryAction(canTakeExam: boolean, cooldownRemaining: number, 
 
   if (cooldownRemaining > 0) {
     return (
-      <Button disabled variant="outline" size="lg" className="flex-1 rounded-xl text-xs font-medium">
+      <Button
+        disabled
+        variant="outline"
+        size="lg"
+        className="flex-1 rounded-xl text-xs font-medium"
+      >
         Chờ {Math.ceil(cooldownRemaining / 60)}p để thi lại
       </Button>
     );
@@ -123,14 +136,14 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
   const scorePercentage = Math.min(100, Math.max(0, Math.round((scoreNum / totalNum) * 100)));
 
   return (
-    <Card className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/90 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:border-primary-300 hover:shadow-md dark:border-neutral-800 dark:bg-neutral-900 dark:hover:border-primary-700 sm:p-6">
+    <Card className="group hover:border-primary-300 dark:hover:border-primary-700 relative flex flex-col justify-between overflow-hidden rounded-2xl border border-neutral-200/90 bg-white p-5 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
       {/* Top subtle ambient glow */}
-      <div className="pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-primary-500/5 blur-2xl transition-opacity duration-300 group-hover:bg-primary-500/10" />
+      <div className="bg-primary-500/5 group-hover:bg-primary-500/10 pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full blur-2xl transition-opacity duration-300" />
 
       {/* Top section: Code, Status & Title */}
       <div>
         <div className="flex items-center justify-between gap-2 pb-3">
-          <div className="inline-flex items-center gap-1.5 rounded-md border border-neutral-200/80 bg-neutral-50 px-2 py-0.5 font-mono text-2xs font-semibold tracking-wide text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/60 dark:text-neutral-300">
+          <div className="text-2xs inline-flex items-center gap-1.5 rounded-md border border-neutral-200/80 bg-neutral-50 px-2 py-0.5 font-mono font-semibold tracking-wide text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/60 dark:text-neutral-300">
             <GraduationCap className="text-primary-600 dark:text-primary-400 h-3 w-3" />
             <span>{examCode}</span>
           </div>
@@ -143,7 +156,7 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
           </div>
         </div>
 
-        <h3 className="line-clamp-2 text-base font-bold tracking-tight text-neutral-900 transition-colors group-hover:text-primary-600 sm:text-lg dark:text-neutral-100 dark:group-hover:text-cyan-400">
+        <h3 className="group-hover:text-primary-600 line-clamp-2 text-base font-bold tracking-tight text-neutral-900 transition-colors sm:text-lg dark:text-neutral-100 dark:group-hover:text-cyan-400">
           {exam.title}
         </h3>
 
@@ -158,20 +171,20 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
       <div className="mt-5 space-y-3">
         {/* Score banner when completed */}
         {isCompleted && displayScore !== null && (
-          <div className="rounded-xl border border-success-100 bg-success-50/50 p-2.5 dark:border-success-950 dark:bg-success-950/20">
+          <div className="border-success-100 bg-success-50/50 dark:border-success-950 dark:bg-success-950/20 rounded-xl border p-2.5">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-success-800 dark:text-success-300">
+              <div className="text-success-800 dark:text-success-300 flex items-center gap-1.5 text-xs font-semibold">
                 <Trophy className="text-success-600 h-3.5 w-3.5" />
                 <span>Điểm đạt được:</span>
               </div>
-              <div className="text-xs font-bold text-success-900 dark:text-success-200">
-                <span className="text-success-700 text-sm font-extrabold dark:text-success-400">
+              <div className="text-success-900 dark:text-success-200 text-xs font-bold">
+                <span className="text-success-700 dark:text-success-400 text-sm font-extrabold">
                   {displayScore}
                 </span>
                 <span className="text-neutral-400"> / {exam.totalPoints}đ</span>
               </div>
             </div>
-            <div className="mt-1.5 h-1.5 w-full overflow-hidden rounded-full bg-success-200/60 dark:bg-success-900/40">
+            <div className="bg-success-200/60 dark:bg-success-900/40 mt-1.5 h-1.5 w-full overflow-hidden rounded-full">
               <div
                 className="bg-success-600 h-full rounded-full transition-all duration-500"
                 style={{ width: `${scorePercentage}%` }}
@@ -190,7 +203,9 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
           <div className="flex items-center gap-1.5 rounded-lg border border-neutral-100 bg-neutral-50/80 px-2.5 py-2 dark:border-neutral-800 dark:bg-neutral-800/40">
             <FileText className="text-primary-500 h-3.5 w-3.5 shrink-0" />
             <span className="font-medium">
-              {exam.totalQuestions > 0 ? `${exam.totalQuestions} câu hỏi` : `${exam.totalPoints} điểm`}
+              {exam.totalQuestions > 0
+                ? `${exam.totalQuestions} câu hỏi`
+                : `${exam.totalPoints} điểm`}
             </span>
           </div>
         </div>
@@ -198,9 +213,7 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
         {/* Attempt count details */}
         <div className="flex items-center justify-between px-0.5 text-xs text-neutral-500 dark:text-neutral-400">
           <span>{renderAttemptCountText(maxAttempts, attemptCount)}</span>
-          <span className="text-2xs font-mono text-neutral-400">
-            {exam.totalPoints}đ tối đa
-          </span>
+          <span className="text-2xs font-mono text-neutral-400">{exam.totalPoints}đ tối đa</span>
         </div>
       </div>
 
@@ -210,9 +223,12 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
           <Button
             asChild
             size="lg"
-            className="group/btn w-full rounded-xl bg-warning-500 font-semibold text-white shadow-xs transition-all duration-200 hover:bg-warning-600 hover:shadow-md"
+            className="group/btn bg-warning-500 hover:bg-warning-600 w-full rounded-xl font-semibold text-white shadow-xs transition-all duration-200 hover:shadow-md"
           >
-            <Link href={`/exams/${exam.id}/room`} className="flex items-center justify-center gap-2">
+            <Link
+              href={`/exams/${exam.id}/room`}
+              className="flex items-center justify-center gap-2"
+            >
               <Play className="h-4 w-4 fill-current transition-transform duration-200 group-hover/btn:scale-110" />
               <span>Tiếp tục làm bài</span>
               <ArrowRight className="ml-auto h-4 w-4 opacity-70 transition-transform duration-200 group-hover/btn:translate-x-1" />
@@ -228,7 +244,10 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
               size="lg"
               className="flex-1 rounded-xl border-neutral-200 font-semibold text-neutral-700 transition-colors hover:bg-neutral-50 dark:border-neutral-700 dark:text-neutral-200 dark:hover:bg-neutral-800"
             >
-              <Link href={`/exams/${exam.id}/result`} className="flex items-center justify-center gap-1.5">
+              <Link
+                href={`/exams/${exam.id}/result`}
+                className="flex items-center justify-center gap-1.5"
+              >
                 <FileText className="h-4 w-4 text-neutral-500" />
                 <span>Xem kết quả</span>
               </Link>
@@ -243,7 +262,10 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
             size="lg"
             className="group/btn bg-primary-600 hover:bg-primary-700 w-full rounded-xl font-semibold text-white shadow-xs transition-all duration-200 hover:shadow-md"
           >
-            <Link href={`/exams/${exam.id}/room`} className="flex items-center justify-center gap-2">
+            <Link
+              href={`/exams/${exam.id}/room`}
+              className="flex items-center justify-center gap-2"
+            >
               <Play className="h-4 w-4 fill-current transition-transform duration-200 group-hover/btn:scale-110" />
               <span>Bắt đầu làm bài</span>
               <ArrowRight className="ml-auto h-4 w-4 opacity-70 transition-transform duration-200 group-hover/btn:translate-x-1" />
@@ -257,7 +279,7 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
 
 export function ExamCardSkeleton() {
   return (
-    <div className="shadow-2xs flex flex-col justify-between rounded-2xl border border-neutral-200 bg-white p-5 dark:border-neutral-800 dark:bg-neutral-900 sm:p-6">
+    <div className="flex flex-col justify-between rounded-2xl border border-neutral-200 bg-white p-5 shadow-2xs sm:p-6 dark:border-neutral-800 dark:bg-neutral-900">
       <div>
         <div className="flex items-center justify-between pb-3">
           <Skeleton className="h-5 w-20 rounded-md" />

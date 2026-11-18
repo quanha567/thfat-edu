@@ -29,9 +29,7 @@ describe("LeaderboardTable", () => {
   ];
 
   it("renders rank, student name, school and score with 2 decimals", () => {
-    const html = renderToStaticMarkup(
-      <LeaderboardTable items={mockItems} timeframe="this_week" />,
-    );
+    const html = renderToStaticMarkup(<LeaderboardTable items={mockItems} timeframe="this_week" />);
     expect(html).toContain("Nguyễn Văn A");
     expect(html).toContain("THPT Chuyên Lý Tự Trọng");
     expect(html).toContain("149.25");

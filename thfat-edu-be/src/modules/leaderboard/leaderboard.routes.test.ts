@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+
 import { Elysia } from "elysia";
 
 import { errorHandlerPlugin } from "../../middlewares/error-handler";
@@ -79,9 +80,7 @@ describe("leaderboard.routes", () => {
 
   it("GET /leaderboard/quizzes/:quizId returns quiz-specific leaderboard", async () => {
     const quizId = "22222222-2222-4222-a222-222222222222";
-    const res = await testApp.handle(
-      new Request(`http://localhost/leaderboard/quizzes/${quizId}`),
-    );
+    const res = await testApp.handle(new Request(`http://localhost/leaderboard/quizzes/${quizId}`));
     expect(res.status).toBe(200);
 
     const data = (await res.json()) as { total: number };

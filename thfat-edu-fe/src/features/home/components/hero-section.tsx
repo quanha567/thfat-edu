@@ -79,7 +79,7 @@ export function HeroSection() {
             </h1>
 
             {/* Subtitle */}
-            <p className="text-body sm:text-body-lg max-w-xl leading-relaxed text-primary-100/90">
+            <p className="text-body sm:text-body-lg text-primary-100/90 max-w-xl leading-relaxed">
               Đề thi bám sát cấu trúc V-SAT kèm lời giải chi tiết từng bước, giúp bạn xác định đúng
               điểm yếu và cải thiện điểm số mỗi ngày.
             </p>

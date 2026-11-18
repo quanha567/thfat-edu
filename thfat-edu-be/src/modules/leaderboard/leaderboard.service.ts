@@ -30,7 +30,12 @@ type TExecuteRankOptions = {
 
 function extractRows<TRow>(result: unknown): TRow[] {
   if (Array.isArray(result)) return result as TRow[];
-  if (result && typeof result === "object" && "rows" in result && Array.isArray((result as { rows: unknown }).rows)) {
+  if (
+    result &&
+    typeof result === "object" &&
+    "rows" in result &&
+    Array.isArray((result as { rows: unknown }).rows)
+  ) {
     return (result as { rows: TRow[] }).rows;
   }
 
@@ -112,7 +117,9 @@ export class LeaderboardService {
     const offset = (page - 1) * limit;
     const cutoff = this.getCutoffDate(timeframe);
 
-    const timeFilter = cutoff ? sql`AND ea.submitted_at >= ${cutoff.toISOString()}::timestamptz` : sql``;
+    const timeFilter = cutoff
+      ? sql`AND ea.submitted_at >= ${cutoff.toISOString()}::timestamptz`
+      : sql``;
 
     const baseRankQuery = sql`
       WITH user_best_per_quiz AS (
@@ -161,7 +168,9 @@ export class LeaderboardService {
     const offset = (page - 1) * limit;
     const cutoff = this.getCutoffDate(timeframe);
 
-    const timeFilter = cutoff ? sql`AND ea.submitted_at >= ${cutoff.toISOString()}::timestamptz` : sql``;
+    const timeFilter = cutoff
+      ? sql`AND ea.submitted_at >= ${cutoff.toISOString()}::timestamptz`
+      : sql``;
 
     const baseQuizRankQuery = sql`
       WITH user_best_attempt AS (

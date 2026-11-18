@@ -27,8 +27,8 @@ export function AdminEditArticleClient({ id }: TAdminEditArticleClientProps) {
 
   if (error || !article) {
     return (
-      <div className="border-destructive/20 bg-destructive/10 rounded-xl border p-6 text-center text-destructive">
-        <p className="font-semibold text-sm">
+      <div className="border-destructive/20 bg-destructive/10 text-destructive rounded-xl border p-6 text-center">
+        <p className="text-sm font-semibold">
           Không thể tải thông tin bài viết này hoặc bài viết không tồn tại.
         </p>
       </div>
