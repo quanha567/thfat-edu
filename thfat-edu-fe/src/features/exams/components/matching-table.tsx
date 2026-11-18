@@ -125,15 +125,15 @@ export function MatchingTable({
                         <button
                           type="button"
                           onClick={() => onToggleFlag(si.id)}
-                          title={isFlagged ? "Bỏ cắm cờ" : "Cắm cờ ý này"}
+                          title={isFlagged ? "Bỏ đánh dấu" : "Đánh dấu ý này"}
                           className={`rounded-md p-1.5 transition-colors ${
                             isFlagged
-                              ? "bg-amber-100 text-amber-600 hover:bg-amber-200"
+                              ? "bg-warning-100 text-warning-700 hover:bg-warning-200"
                               : "text-neutral-300 hover:bg-neutral-100 hover:text-neutral-500"
                           }`}
                         >
                           <Flag
-                            className={`h-4 w-4 ${isFlagged ? "fill-current text-amber-500" : ""}`}
+                            className={`h-4 w-4 ${isFlagged ? "fill-current text-warning-500" : ""}`}
                           />
                         </button>
                       </td>

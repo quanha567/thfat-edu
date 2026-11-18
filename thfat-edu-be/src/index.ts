@@ -5,9 +5,12 @@ import { scalarDocsPlugin } from "./config/docs";
 import { env } from "./config/env";
 import { errorHandlerPlugin } from "./middlewares/error-handler";
 import { attemptsRoutes } from "./modules/attempts";
+import { articlesRoutes } from "./modules/articles";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health/health.routes";
+import { leaderboardRoutes } from "./modules/leaderboard";
 import { quizzesRoutes } from "./modules/quizzes";
+import { settingsRoutes } from "./modules/settings";
 import { usersRoutes } from "./modules/users";
 
 export const app = new Elysia()
@@ -20,8 +23,19 @@ export const app = new Elysia()
   .use(quizzesRoutes)
   .use(attemptsRoutes)
   .use(usersRoutes)
+  .use(settingsRoutes)
+  .use(articlesRoutes)
+  .use(leaderboardRoutes)
   .group("/api", (group) =>
-    group.use(healthRoutes).use(authRoutes).use(quizzesRoutes).use(attemptsRoutes).use(usersRoutes),
+    group
+      .use(healthRoutes)
+      .use(authRoutes)
+      .use(quizzesRoutes)
+      .use(attemptsRoutes)
+      .use(usersRoutes)
+      .use(settingsRoutes)
+      .use(articlesRoutes)
+      .use(leaderboardRoutes),
   );
 
 export type App = typeof app;

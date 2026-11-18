@@ -135,7 +135,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
             </div>
 
             <div className="flex items-center gap-2.5 rounded-lg border border-neutral-200/50 bg-white p-3">
-              <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-600" />
+              <CheckCircle2 className="text-success-600 h-4 w-4 shrink-0" />
               <div>
                 <p className="text-[11px] text-neutral-500">Số câu đã trả lời</p>
                 <p className="font-semibold text-neutral-800">
@@ -160,11 +160,11 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
           </div>
 
           {/* Official Verification Badge */}
-          <div className="flex items-center gap-2 rounded-lg border border-emerald-100 bg-emerald-50/60 px-3.5 py-2 text-xs text-emerald-800">
-            <ShieldCheck className="h-4 w-4 text-emerald-600" />
+          <div className="border-success-100 bg-success-50/60 text-success-800 flex items-center gap-2 rounded-lg border px-3.5 py-2 text-xs">
+            <ShieldCheck className="text-success-600 h-4 w-4" />
             <div>
               <p className="font-semibold">Đã xác thực bởi Hội đồng Khảo thí</p>
-              <p className="text-[10px] text-emerald-700/80">Kết quả được ghi nhận vào hệ thống</p>
+              <p className="text-success-700/80 text-[10px]">Kết quả được ghi nhận vào hệ thống</p>
             </div>
           </div>
         </div>

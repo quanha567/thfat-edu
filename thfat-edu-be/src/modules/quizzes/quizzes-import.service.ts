@@ -1,5 +1,5 @@
 import { nvidiaNimService } from "../../services/ai/nvidia-nim.service";
-import { extractPdfDocument } from "../../services/ai/pdf-render.service";
+import { extractPdfDocument } from "../../services/ai/pdf-extractor.service";
 import { type TCreateQuizInput, type TQuizSectionInput } from "./quizzes.model";
 
 export type TImportJobProgress = {
@@ -288,36 +288,70 @@ function extractPartMarkdown(content: string, startHeader: string, endHeader: st
   return content.slice(startIdx, endIdx);
 }
 
+export function cleanMathBackslashes(text: string): string {
+  if (!text) return "";
+
+  return text.replace(/\\{2,}([a-zA-Z$%_&#{}])/g, (_, char) => `\\${char}`);
+}
+
 export function normalizeQuestionMarkdown(raw: string): string {
   if (!raw) return "";
 
   // 1. Remove raw [HÌNH_ẢNH: ...] tags if left in text
   let res = raw.replace(/\[HÌNH_ẢNH:\s*[^\]]+\]/gi, "").trim();
 
-  // 2. Protect existing math blocks ($...$ and $$...$$) from mutation
+  // 2. Normalize standard LaTeX delimiters \( ... \) and \[ ... \] into $ ... $ and $$ ... $$
+  res = res
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner.trim()}$$`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner.trim()}$`);
+
+  // 3. Normalize redundant/escaped backslashes before LaTeX commands or symbols
+  // (e.g. \\\ce -> \ce, \\ce -> \ce, \\rightarrow -> \rightarrow, \\Delta -> \Delta)
+  res = cleanMathBackslashes(res);
+
+  // 4. Protect existing math blocks ($...$ and $$...$$) from mutation
   const mathBlocks: string[] = [];
   res = res.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g, (match) => {
+    let math = match;
+
+    if (!math.startsWith("$$") && !math.includes("\\begin{")) {
+      const inner = math.slice(1, -1);
+      const cleanedInner = inner
+        .replace(/^\\{2,}\s*/, "")
+        .replace(/\s*\\{2,}$/, "")
+        .replace(/\\{2,}(?=\s|$)/g, " ")
+        .trim();
+
+      math = `$${cleanedInner}$`;
+    }
+
     const idx = mathBlocks.length;
-    mathBlocks.push(match);
+    mathBlocks.push(math);
 
     return `___MATH_PROTECTED_${idx}___`;
   });
 
-  // 3. Auto-wrap bare \ce{...} outside of $ into $\ce{...}$
+  // 5. Auto-wrap bare \ce{...}, \frac{...}{...}, and \sqrt{...} outside of $
   res = res.replace(/\\ce\{((?:[^{}]|\{[^{}]*\})*)\}/g, (_m, inner) => `$\\ce{${inner}}$`);
-
-  // 4. Auto-wrap bare arrows and math symbols: \rightarrow, \rightleftharpoons, \uparrow, \downarrow, \Delta, \approx, \le, \ge, \times, \cdot
   res = res.replace(
-    /\\(rightarrow|rightleftharpoons|leftarrow|uparrow|downarrow|Delta|approx|le|ge|times|div|cdot)\b/g,
+    /\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}/g,
+    (_m, num, den) => `$\\frac{${num}}{${den}}$`,
+  );
+  res = res.replace(/\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}/g, (_m, inner) => `$\\sqrt{${inner}}$`);
+
+  // 6. Auto-wrap bare arrows and math symbols: \rightarrow, \rightleftharpoons, \uparrow, \downarrow, \Delta, \approx, \le, \ge, \times, \cdot, \pm
+  res = res.replace(
+    /\\(rightarrow|rightleftharpoons|leftarrow|uparrow|downarrow|Delta|approx|le|ge|times|div|cdot|pm)\b/g,
     (_m, sym) => `$\\${sym}$`,
   );
 
-  // 5. Restore protected math blocks
+  // 7. Restore protected math blocks
   for (let i = 0; i < mathBlocks.length; i++) {
-    res = res.replace(`___MATH_PROTECTED_${i}___`, mathBlocks[i] ?? "");
+    const block = mathBlocks[i] ?? "";
+    res = res.replace(`___MATH_PROTECTED_${i}___`, () => block);
   }
 
-  // 6. Clean up multiple blank lines (keep max 1 blank line = \n\n)
+  // 8. Clean up multiple blank lines (keep max 1 blank line = \n\n)
   res = res.replace(/\n{3,}/g, "\n\n");
 
   return res;
@@ -358,6 +392,12 @@ function resolveQuestionImage(options: TResolveQuestionImageOptions): string | n
   return null;
 }
 
+export function stripOptionPrefix(text: string): string {
+  if (!text) return "";
+
+  return text.replace(/^[A-D]\.\s*/i, "").trim();
+}
+
 export function sanitizeQuestionContext(
   rawContext: string,
   sectionType?: string,
@@ -384,9 +424,23 @@ export function sanitizeQuestionContext(
       // Remove trailing options block if present in context (e.g. A. 1\nB. 2...)
       text = text.replace(/\n\s*[A-F]\.\s+[^\n]+(?:\n\s*[A-F]\.\s+[^\n]+)*/gi, "");
     }
+
+    // For group_mcq: remove trailing child question statement or options leaked into context
+    if (sectionType === "group_mcq") {
+      text = text.replace(/(?:\n|^)\s*(?:CÂU|Câu|Bài)\s*\d+[.:-][\s\S]*$/i, "");
+      text = text.replace(/(?:\n|^)\s*[A-D]\.\s+[^\n]+(?:\n\s*[A-D]\.\s+[^\n]+)*/gi, "");
+    }
   }
 
   return text.trim();
+}
+
+export function resolveStandardSubItemPoints(sectionType?: string): string {
+  if (sectionType === "group_mcq" || sectionType === "short_answer") {
+    return "6.00";
+  }
+
+  return "1.50";
 }
 
 export function repairTruncatedJson(str: string): string {
@@ -461,6 +515,124 @@ export function repairTruncatedJson(str: string): string {
   return cleaned;
 }
 
+export type TGroupMcqSubItem = {
+  orderIndex: number;
+  label: string;
+  content: string;
+  options: string[] | null;
+  correctAnswer: string | null;
+  points: string;
+  explanation: string | null;
+};
+
+export type TGroupMcqQuestion = {
+  orderIndex: number;
+  contextContent: string;
+  imageUrl: string | null;
+  subItems: TGroupMcqSubItem[];
+};
+
+export function groupMcqFlatRawItems(rawList: unknown[]): TGroupMcqQuestion[] {
+  const hasValidSubItems = rawList.some((item) => {
+    const rawSub = (item as Record<string, unknown>)?.subItems;
+
+    return Array.isArray(rawSub) && rawSub.length > 1;
+  });
+
+  if (hasValidSubItems) {
+    return rawList as TGroupMcqQuestion[];
+  }
+
+  const groups: TGroupMcqQuestion[] = [];
+  let currentGroup: TGroupMcqQuestion | null = null;
+
+  for (let i = 0; i < rawList.length; i++) {
+    const item = rawList[i] as Record<string, unknown>;
+    const rawSubList = Array.isArray(item.subItems)
+      ? (item.subItems as Record<string, unknown>[])
+      : [];
+    const firstSub = rawSubList[0];
+
+    const rawContext = String(item.contextContent || "");
+    const rawContent = String(item.content || firstSub?.content || "");
+    const combined = `${rawContext}\n${rawContent}`.trim();
+    const explicitImg = (item.imageUrl as string | null) ?? null;
+
+    const qMatch = combined.match(
+      /([\s\S]*?)(?:(?:\n+|^)\s*(?:CÂU|Câu|Bài)\s*(\d+)[.:-]\s*)([\s\S]*)/i,
+    );
+
+    let passage = "";
+    let qLabel = String(firstSub?.label || `Câu ${i + 1}`);
+    let qContent = combined;
+
+    if (qMatch) {
+      passage = qMatch[1]?.trim() ?? "";
+      qLabel = `Câu ${qMatch[2]}`;
+      qContent = qMatch[3]?.trim() ?? "";
+    } else if (rawContext && rawContent && rawContext !== rawContent) {
+      passage = rawContext.trim();
+      qContent = rawContent.replace(passage, "").trim();
+    } else {
+      passage = rawContext.trim();
+      qContent = rawContent.trim() || rawContext.trim();
+    }
+
+    let rawOpts: string[] | null = null;
+    if (Array.isArray(item.options)) {
+      rawOpts = item.options.map((o) => stripOptionPrefix(String(o)));
+    } else if (
+      Array.isArray(item.subItems) &&
+      (item.subItems[0] as Record<string, unknown>)?.options
+    ) {
+      const firstSubOpts = (item.subItems[0] as Record<string, unknown>).options;
+      if (Array.isArray(firstSubOpts)) {
+        rawOpts = firstSubOpts.map((o) => stripOptionPrefix(String(o)));
+      }
+    }
+
+    // Strip trailing options block from question content if present
+    qContent = qContent
+      .replace(/(?:\n|^)\s*[A-D]\.\s+[^\n]+(?:\n\s*[A-D]\.\s+[^\n]+)*/gi, "")
+      .trim();
+
+    const normP = (s: string) => s.replace(/\s+/g, " ").trim().toLowerCase();
+    const canJoinCurrent =
+      currentGroup !== null &&
+      passage.length > 20 &&
+      (normP(currentGroup.contextContent).includes(normP(passage).slice(0, 50)) ||
+        normP(passage).includes(normP(currentGroup.contextContent).slice(0, 50)));
+
+    const subItem: TGroupMcqSubItem = {
+      orderIndex: (currentGroup?.subItems.length ?? 0) + 1,
+      label: qLabel,
+      content: qContent,
+      options: rawOpts,
+      correctAnswer: item.correctAnswer ? String(item.correctAnswer) : null,
+      points: "6.00",
+      explanation: item.explanation ? String(item.explanation) : null,
+    };
+
+    if (canJoinCurrent && currentGroup) {
+      subItem.orderIndex = currentGroup.subItems.length + 1;
+      currentGroup.subItems.push(subItem);
+      if (!currentGroup.imageUrl && explicitImg) {
+        currentGroup.imageUrl = explicitImg;
+      }
+    } else {
+      currentGroup = {
+        orderIndex: groups.length + 1,
+        contextContent: passage || rawContext || "",
+        imageUrl: explicitImg,
+        subItems: [subItem],
+      };
+      groups.push(currentGroup);
+    }
+  }
+
+  return groups;
+}
+
 export function safeParseQuestions(
   rawResponse: string,
   imagesMap: Record<string, string> = {},
@@ -485,6 +657,10 @@ export function safeParseQuestions(
       rawList = parsed.questions;
     }
 
+    if (sectionType === "group_mcq" && rawList.length > 0) {
+      rawList = groupMcqFlatRawItems(rawList);
+    }
+
     return rawList.map((rawItem: unknown, qIdx: number) => {
       const item = rawItem as Record<string, unknown>;
       const rawSubItems = item.subItems;
@@ -499,9 +675,25 @@ export function safeParseQuestions(
         imagesMap,
       });
 
-      const questionOptions = Array.isArray(item.options)
+      let questionOptions = Array.isArray(item.options)
         ? (item.options as string[]).map((opt) => normalizeQuestionMarkdown(String(opt)))
         : null;
+
+      if (sectionType === "group_mcq" && questionOptions) {
+        questionOptions = questionOptions.map(stripOptionPrefix);
+      }
+
+      // Fallback: If sectionType === "matching" and no options found in item.options,
+      // extract options from rawContext or rawContent before context sanitization.
+      if (sectionType === "matching" && (!questionOptions || questionOptions.length === 0)) {
+        const textToScan = `${rawContext}\n${rawContent}`;
+        const optionMatches = textToScan.match(/(?:^|\n|\|)\s*([A-F]\.\s+[^|\n]+)/gi);
+        if (optionMatches && optionMatches.length >= 2) {
+          questionOptions = optionMatches.map((m) =>
+            normalizeQuestionMarkdown(m.replace(/^[|\s]+/, "").trim()),
+          );
+        }
+      }
 
       // Nếu model trả về flat question không có subItems
       if (!rawSubItems || !Array.isArray(rawSubItems) || rawSubItems.length === 0) {
@@ -521,7 +713,7 @@ export function safeParseQuestions(
               options: questionOptions,
               correctAnswer: item.correctAnswer ? String(item.correctAnswer) : null,
               acceptableAnswers: null,
-              points: String(item.points || "1.50"),
+              points: resolveStandardSubItemPoints(sectionType),
               explanation: item.explanation
                 ? normalizeQuestionMarkdown(String(item.explanation))
                 : null,
@@ -544,11 +736,25 @@ export function safeParseQuestions(
         imageUrl: resolvedImageUrl,
         subItems: rawSubItems.map((rawSub: unknown, sIdx: number) => {
           const sub = rawSub as Record<string, unknown>;
-          const subContent = normalizeQuestionMarkdown(String(sub.content || ""));
-          const subOptions =
+          let subContent = normalizeQuestionMarkdown(String(sub.content || ""));
+
+          if (sectionType === "group_mcq") {
+            if (normalizedContext && subContent.startsWith(normalizedContext)) {
+              subContent = subContent.slice(normalizedContext.length).trim();
+            } else if (normalizedContext && subContent === normalizedContext) {
+              subContent = "";
+            }
+            subContent = subContent.replace(/^(?:CÂU|Câu|Bài)\s*\d+[.:-]\s*/i, "").trim();
+          }
+
+          let subOptions =
             Array.isArray(sub.options) && sub.options.length > 0
               ? (sub.options as string[]).map((opt) => normalizeQuestionMarkdown(String(opt)))
               : questionOptions;
+
+          if (sectionType === "group_mcq" && subOptions) {
+            subOptions = subOptions.map(stripOptionPrefix);
+          }
 
           return {
             orderIndex: Number(sub.orderIndex) || sIdx + 1,
@@ -557,7 +763,7 @@ export function safeParseQuestions(
             options: subOptions,
             correctAnswer: sub.correctAnswer ? String(sub.correctAnswer) : null,
             acceptableAnswers: null,
-            points: String(sub.points || "1.50"),
+            points: resolveStandardSubItemPoints(sectionType),
             explanation: sub.explanation
               ? normalizeQuestionMarkdown(String(sub.explanation))
               : null,

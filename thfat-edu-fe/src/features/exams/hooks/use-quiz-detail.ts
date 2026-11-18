@@ -14,7 +14,7 @@ export function useQuizDetail(id: string) {
       }
 
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
+      const res = await fetch(`${baseUrl}/quizzes/${id}`, {
         credentials: "include",
       });
 

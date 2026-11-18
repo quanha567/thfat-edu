@@ -16,7 +16,7 @@ export function useExams(params: TExamFilterParams = {}) {
       if (params.search) searchParams.set("search", params.search);
 
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/quizzes?${searchParams.toString()}`, {
+      const res = await fetch(`${baseUrl}/quizzes?${searchParams.toString()}`, {
         credentials: "include",
       });
 

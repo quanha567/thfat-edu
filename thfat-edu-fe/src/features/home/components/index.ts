@@ -1,4 +1,6 @@
 export { AboutPreviewSection } from "./about-preview-section";
+export { AnimatedCounter } from "./animated-counter";
+export { ArticlesPreviewSection } from "./articles-preview-section";
 export { CtaSection } from "./cta-section";
 export { ExamInfoSection } from "./exam-info-section";
 export { FeatureCard } from "./feature-card";

@@ -94,17 +94,18 @@ export function LoginForm({ onSuccess, disabled }: TLoginFormProps) {
         leadingIcon={<Lock className="size-4" />}
       />
 
-      <div className="flex items-center justify-between pt-1">
+      <div className="flex items-center justify-between gap-2 pt-1">
         <BaseCheckbox
           fieldId="rememberMe"
-          label="Ghi nhớ đăng nhập trên thiết bị này"
+          label="Ghi nhớ đăng nhập"
+          className="w-auto"
           disabled={disabled || isLoading}
         />
         <Button
           type="button"
           variant="link"
           onClick={handleForgotPassword}
-          className="text-caption text-primary hover:text-primary/90 h-auto p-0 font-medium"
+          className="text-caption text-primary hover:text-primary/90 h-auto shrink-0 p-0 font-medium whitespace-nowrap"
         >
           Quên mật khẩu?
         </Button>

@@ -3,7 +3,12 @@ import crypto from "node:crypto";
 import { Elysia, t } from "elysia";
 
 import { examImportJobManager, processExamPdfImport } from "./quizzes-import.service";
-import { CreateQuizSchema, QuizListQuerySchema, UpdateQuizSchema } from "./quizzes.model";
+import {
+  CreateQuizSchema,
+  QuizListQuerySchema,
+  SolveQuestionInputSchema,
+  UpdateQuizSchema,
+} from "./quizzes.model";
 import { QuizzesService } from "./quizzes.service";
 
 export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
@@ -18,6 +23,19 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       detail: {
         tags: ["Quizzes"],
         summary: "Lấy danh sách đề thi (Ngân hàng đề)",
+      },
+    },
+  )
+  .post(
+    "/ai/solve-question",
+    async ({ quizzesService, body }) => {
+      return quizzesService.solveQuestion(body);
+    },
+    {
+      body: SolveQuestionInputSchema,
+      detail: {
+        tags: ["Quizzes"],
+        summary: "AI tự động giải câu hỏi và suy luận đáp án chuẩn theo phân loại phần thi",
       },
     },
   )

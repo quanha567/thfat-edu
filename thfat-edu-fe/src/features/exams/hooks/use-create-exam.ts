@@ -11,7 +11,7 @@ export function useCreateExam() {
   return useMutation<TQuizDetail, Error, TCreateQuizInput>({
     mutationFn: async (input) => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/quizzes`, {
+      const res = await fetch(`${baseUrl}/quizzes`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

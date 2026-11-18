@@ -26,6 +26,25 @@ export function parseMatchingOption(opt: string, index: number): TMatchingOption
   return { letter: defaultLetter, content: trimmed, raw: opt };
 }
 
+export function formatMatchingOption(letter: string, content: string): string {
+  const trimmed = content.trim();
+  const cleanContent = trimmed.replace(new RegExp(`^${letter}[.:\\-)]\\s*`, "i"), "").trim();
+
+  return cleanContent ? `${letter}. ${cleanContent}` : letter;
+}
+
+export function getMatchingOptions(
+  subItems: Array<{ options?: string[] | null }>,
+): TMatchingOption[] {
+  const firstWithOptions = subItems.find((s) => s.options && s.options.length > 0);
+  const rawList =
+    firstWithOptions?.options && firstWithOptions.options.length > 0
+      ? firstWithOptions.options
+      : ["A", "B", "C", "D"];
+
+  return rawList.map((opt, idx) => parseMatchingOption(opt, idx));
+}
+
 export function extractMatchingHeaders(contextContent?: string): TMatchingHeaders {
   const fallback = {
     col1Title: "Nội dung vế ghép (Cột 1)",

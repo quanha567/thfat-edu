@@ -6,50 +6,58 @@ import Link from "next/link";
 
 export function MainFooter() {
   return (
-    <footer className="bg-primary-950 relative text-white">
-      {/* Top Wave Transition Curve (Nét uốn lượn chân trang) */}
-      <div className="pointer-events-none relative -mt-1 w-full overflow-hidden leading-none">
+    <footer className="relative border-t border-neutral-200/80 bg-white text-neutral-900 dark:border-white/10 dark:bg-neutral-950 dark:text-white">
+      {/* Decorative subtle molecular background watermarks */}
+      <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-30">
         <svg
-          viewBox="0 0 1440 90"
+          className="absolute -bottom-8 left-4 h-48 w-48 text-primary-300"
+          viewBox="0 0 100 100"
           fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="block h-14 w-full sm:h-20 md:h-24"
-          preserveAspectRatio="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
         >
-          {/* Wave body in footer navy fill */}
-          <path d="M0 0C360 70 1080 70 1440 0V90H0V0Z" fill="var(--primary-950)" />
-          {/* Subtle primary glow line along the wave crest */}
-          <path
-            d="M0 0C360 70 1080 70 1440 0"
-            stroke="var(--color-primary-400)"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            opacity="0.3"
-          />
+          <polygon points="50,15 80,32 80,68 50,85 20,68 20,32" />
+          <circle cx="50" cy="15" r="3" fill="currentColor" />
+          <circle cx="80" cy="32" r="3" fill="currentColor" />
+          <circle cx="80" cy="68" r="3" fill="currentColor" />
+          <circle cx="50" cy="85" r="3" fill="currentColor" />
+          <circle cx="20" cy="68" r="3" fill="currentColor" />
+          <circle cx="20" cy="32" r="3" fill="currentColor" />
+        </svg>
+
+        <svg
+          className="absolute -bottom-10 right-8 h-56 w-56 text-primary-200"
+          viewBox="0 0 100 100"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1"
+        >
+          <circle cx="50" cy="50" r="28" strokeDasharray="3 3" />
+          <circle cx="50" cy="22" r="3.5" fill="currentColor" />
+          <circle cx="75" cy="65" r="3.5" fill="currentColor" />
+          <circle cx="25" cy="65" r="3.5" fill="currentColor" />
         </svg>
       </div>
 
-      {/* Decorative molecular background lines */}
-      <div
-        className="pointer-events-none absolute inset-0 bg-[radial-gradient(var(--primary-400)_1px,transparent_1px)] [background-size:24px_24px] opacity-10"
-        aria-hidden="true"
-      />
-
-      <div className="relative mx-auto max-w-7xl px-4 pt-6 pb-12 sm:px-6 lg:px-8">
-        <div className="flex flex-col items-center justify-between gap-8 md:flex-row">
-          {/* Brand with Official Asset */}
-          <BrandLogo />
+      <div className="relative z-10 mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 lg:px-8">
+        <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
+          {/* Brand with Light Theme */}
+          <BrandLogo theme="light" showSlogan={true} />
 
           {/* Navigation Links */}
-          <nav className="text-body-sm text-primary-100/75 flex flex-wrap items-center justify-center gap-6">
-            {HOME_FOOTER_LINKS.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="transition-colors hover:text-white"
-              >
-                {link.label}
-              </Link>
+          <nav className="text-body-sm flex flex-wrap items-center justify-center gap-4 text-neutral-600 sm:gap-6 dark:text-neutral-300">
+            {HOME_FOOTER_LINKS.map((link, idx) => (
+              <div key={link.label} className="flex items-center gap-4 sm:gap-6">
+                <Link
+                  href={link.href}
+                  className="font-medium transition-colors hover:text-primary-600 dark:hover:text-cyan-400"
+                >
+                  {link.label}
+                </Link>
+                {idx < HOME_FOOTER_LINKS.length - 1 && (
+                  <span className="text-neutral-300 select-none dark:text-neutral-700">|</span>
+                )}
+              </div>
             ))}
           </nav>
 
@@ -59,7 +67,7 @@ export function MainFooter() {
               asChild
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-full border-white/10 bg-white/5 text-white/80 transition-all hover:scale-105 hover:bg-white/15 hover:text-white"
+              className="h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 hover:text-primary-600 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
             >
               <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -67,11 +75,12 @@ export function MainFooter() {
                 </svg>
               </a>
             </Button>
+
             <Button
               asChild
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-full border-white/10 bg-white/5 text-white/80 transition-all hover:scale-105 hover:bg-white/15 hover:text-white"
+              className="h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 hover:text-primary-600 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
             >
               <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -83,9 +92,9 @@ export function MainFooter() {
         </div>
 
         {/* Divider & Copyright */}
-        <Separator className="mt-8 bg-white/10" />
-        <div className="pt-8 text-center">
-          <p className="text-caption text-primary-200/60">
+        <Separator className="mt-8 bg-neutral-200 dark:bg-white/10" />
+        <div className="pt-6 text-center">
+          <p className="text-caption text-neutral-500 dark:text-neutral-400">
             © 2026 ThFat Edu. Mọi quyền được bảo lưu.
           </p>
         </div>

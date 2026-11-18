@@ -1,19 +1,27 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { ChemRenderer } from "@/components/chemistry/chem-renderer";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 import { type TQuizQuestion, type TQuizSubItem } from "../../types";
 import { ExamMarkdownEditor } from "./exam-markdown-editor";
 import { QuestionEditorCardHeader } from "./question-editor-card-header";
+import { TrueFalseBinarySwitch } from "./true-false-binary-switch";
 
 export type TSectionEditorTrueFalseProps = {
+  id?: string;
   question: TQuizQuestion;
   questionNumber: number;
   canMoveUp: boolean;
   canMoveDown: boolean;
+  isCollapsed?: boolean;
+  isSolving?: boolean;
+  editorMode?: "edit" | "preview";
+  onToggleCollapse?: () => void;
+  onAutoSolve?: () => void;
+  onFocus?: () => void;
   onMoveUp: () => void;
   onMoveDown: () => void;
   onDuplicate: () => void;
@@ -22,119 +30,169 @@ export type TSectionEditorTrueFalseProps = {
 };
 
 export function SectionEditorTrueFalse({
+  id,
   question,
   questionNumber,
   canMoveUp,
   canMoveDown,
+  isCollapsed = false,
+  isSolving = false,
+  editorMode = "edit",
+  onToggleCollapse,
+  onAutoSolve,
+  onFocus,
   onMoveUp,
   onMoveDown,
   onDuplicate,
   onDelete,
   onUpdateQuestion,
 }: TSectionEditorTrueFalseProps) {
-  const handleContextChange = (val: string) => {
+  const hasContent = Boolean(question.contextContent?.trim());
+  const handleContextChange = (val: string) =>
     onUpdateQuestion({ ...question, contextContent: val });
-  };
-
-  const handleImageChange = (url: string | null) => {
+  const handleImageChange = (url: string | null) =>
     onUpdateQuestion({ ...question, imageUrl: url });
-  };
-
   const handleSubItemChange = (index: number, patch: Partial<TQuizSubItem>) => {
     const updated = [...question.subItems];
-    const target = updated[index];
-    if (target) {
-      updated[index] = { ...target, ...patch };
+    if (updated[index]) {
+      updated[index] = { ...updated[index], ...patch };
       onUpdateQuestion({ ...question, subItems: updated });
     }
   };
 
   return (
-    <Card id={`question-card-0-${questionNumber - 1}`} className="border-border border shadow-xs">
-      <CardContent className="space-y-4 p-4">
-        <QuestionEditorCardHeader
-          questionNumber={questionNumber}
-          pointsLabel="Barem Đúng/Sai V-SAT (Tối đa 6đ)"
-          imageUrl={question.imageUrl}
-          canMoveUp={canMoveUp}
-          canMoveDown={canMoveDown}
-          onMoveUp={onMoveUp}
-          onMoveDown={onMoveDown}
-          onDuplicate={onDuplicate}
-          onDelete={onDelete}
-          onImageChange={handleImageChange}
-        />
+    <Card
+      id={id ?? `question-card-0-${questionNumber - 1}`}
+      onClick={onFocus}
+      onFocusCapture={onFocus}
+      className="group border-border/70 bg-card space-y-2.5 rounded-xl border p-3.5 shadow-xs transition-shadow hover:shadow-sm sm:p-4"
+    >
+      <QuestionEditorCardHeader
+        questionNumber={questionNumber}
+        imageUrl={question.imageUrl}
+        canMoveUp={canMoveUp}
+        canMoveDown={canMoveDown}
+        isCollapsed={isCollapsed}
+        isSolving={isSolving}
+        onToggleCollapse={onToggleCollapse}
+        onAutoSolve={onAutoSolve}
+        onMoveUp={onMoveUp}
+        onMoveDown={onMoveDown}
+        onDuplicate={onDuplicate}
+        onDelete={onDelete}
+        onImageChange={handleImageChange}
+      />
 
-        <ExamMarkdownEditor
-          label="Nội dung ngữ cảnh câu hỏi"
-          value={question.contextContent}
-          onChange={handleContextChange}
-          placeholder="Nhập thông tin đề bài hoặc thí nghiệm..."
-          rows={3}
-        />
-
+      {isCollapsed ? (
+        <button
+          type="button"
+          onClick={onToggleCollapse}
+          className="text-muted-foreground hover:text-foreground flex w-full cursor-pointer items-center justify-between gap-3 text-left text-xs"
+        >
+          <p className="line-clamp-1 italic">
+            {hasContent ? question.contextContent : "Chưa có nội dung ngữ cảnh..."}
+          </p>
+          <span className="shrink-0 font-medium">{question.subItems.length} ý phát biểu</span>
+        </button>
+      ) : (
         <div className="space-y-2.5">
-          <Label className="text-foreground text-xs font-semibold">
-            Các ý phát biểu (a, b, c, d):
-          </Label>
+          <ExamMarkdownEditor
+            label="Nội dung / Ngữ cảnh đề bài"
+            value={question.contextContent}
+            onChange={handleContextChange}
+            editorMode={editorMode}
+            placeholder="Nhập nội dung đề bài, ngữ cảnh thí nghiệm..."
+            rows={3}
+          />
 
-          <div className="space-y-2">
-            {question.subItems.map((subItem, sIdx) => {
-              const isTrue = subItem.correctAnswer === "Đúng" || subItem.correctAnswer === "true";
+          <div className="border-border/40 space-y-2 border-t pt-2">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-foreground text-xs font-semibold">Các ý phát biểu:</span>
+              <span className="text-muted-foreground text-[11px] font-medium">
+                {question.subItems.length} ý phát biểu
+              </span>
+            </div>
 
-              return (
-                <div
-                  key={subItem.id || sIdx}
-                  className="bg-muted/20 border-border flex flex-col items-start gap-2 rounded-lg border p-2 text-xs sm:flex-row sm:items-center"
-                >
-                  <span className="bg-background text-primary border-border shrink-0 rounded-md border px-2.5 py-1 font-bold shadow-2xs">
-                    {subItem.label || String.fromCharCode(97 + sIdx)})
-                  </span>
+            {editorMode === "preview" ? (
+              <div className="space-y-1.5">
+                {question.subItems.map((subItem, sIdx) => {
+                  const isTrue =
+                    subItem.correctAnswer === "Đúng" || subItem.correctAnswer === "true";
 
-                  <div className="w-full flex-1">
-                    <Input
-                      value={subItem.content}
-                      onChange={(e) => handleSubItemChange(sIdx, { content: e.target.value })}
-                      placeholder="Nội dung phát biểu..."
-                      className="bg-background h-8 text-xs font-medium"
-                    />
-                  </div>
-
-                  <div className="flex shrink-0 items-center gap-1.5">
-                    <Button
-                      type="button"
-                      size="xs"
-                      variant={isTrue ? "default" : "outline"}
-                      className={`h-7 px-3 text-xs font-bold transition-all ${
-                        isTrue
-                          ? "bg-emerald-600 text-white shadow-xs hover:bg-emerald-700"
-                          : "text-muted-foreground hover:bg-emerald-500/10 hover:text-emerald-700"
-                      }`}
-                      onClick={() => handleSubItemChange(sIdx, { correctAnswer: "Đúng" })}
+                  return (
+                    <div
+                      key={subItem.id || sIdx}
+                      className="border-border/40 bg-muted/10 flex items-start justify-between gap-3 rounded-lg border p-2 sm:px-2.5"
                     >
-                      Đúng
-                    </Button>
+                      <div className="flex min-w-0 flex-1 items-start gap-2.5">
+                        <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold shadow-2xs">
+                          {subItem.label || sIdx + 1}
+                        </span>
+                        <div className="text-foreground mt-0.5 text-xs leading-relaxed sm:text-sm">
+                          {subItem.content.trim() ? (
+                            <ChemRenderer content={subItem.content} />
+                          ) : (
+                            <span className="text-muted-foreground text-xs italic">
+                              Chưa có nội dung phát biểu...
+                            </span>
+                          )}
+                        </div>
+                      </div>
 
-                    <Button
-                      type="button"
-                      size="xs"
-                      variant={!isTrue ? "destructive" : "outline"}
-                      className={`h-7 px-3 text-xs font-bold transition-all ${
-                        !isTrue
-                          ? "bg-rose-600 text-white shadow-xs hover:bg-rose-700"
-                          : "text-muted-foreground hover:bg-rose-500/10 hover:text-rose-700"
-                      }`}
-                      onClick={() => handleSubItemChange(sIdx, { correctAnswer: "Sai" })}
+                      <Badge
+                        variant={isTrue ? "default" : "destructive"}
+                        className={cn(
+                          "shrink-0 px-2 py-0.5 text-xs font-semibold",
+                          isTrue
+                            ? "bg-success-500/15 text-success-700 dark:text-success-400"
+                            : "bg-error-500/15 text-error-700 dark:text-error-400",
+                        )}
+                      >
+                        {isTrue ? "Đúng" : "Sai"}
+                      </Badge>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              <div className="space-y-1.5">
+                {question.subItems.map((subItem, sIdx) => {
+                  const isTrue =
+                    subItem.correctAnswer === "Đúng" || subItem.correctAnswer === "true";
+
+                  return (
+                    <div
+                      key={subItem.id || sIdx}
+                      className="border-border/40 bg-muted/10 hover:border-border hover:bg-muted/20 flex items-start gap-2.5 rounded-lg border p-1.5 transition-all sm:px-2.5"
                     >
-                      Sai
-                    </Button>
-                  </div>
-                </div>
-              );
-            })}
+                      <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold shadow-2xs">
+                        {subItem.label || sIdx + 1}
+                      </span>
+
+                      <div className="w-full min-w-0 flex-1">
+                        <ExamMarkdownEditor
+                          value={subItem.content}
+                          onChange={(val) => handleSubItemChange(sIdx, { content: val })}
+                          placeholder={`Nhập ý phát biểu ${sIdx + 1}...`}
+                          rows={1}
+                          compact
+                        />
+                      </div>
+
+                      <div className="mt-0.5">
+                        <TrueFalseBinarySwitch
+                          isTrue={isTrue}
+                          onChange={(val) => handleSubItemChange(sIdx, { correctAnswer: val })}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         </div>
-      </CardContent>
+      )}
     </Card>
   );
 }

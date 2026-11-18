@@ -27,14 +27,17 @@ export function ExamQuestionList({
           </div>
 
           {section.questions.map((question) => {
-            questionCounter++;
+            const currentQNum = questionCounter + 1;
+            const subCount =
+              section.sectionType === "group_mcq" ? question.subItems?.length || 1 : 1;
+            questionCounter += subCount;
 
             return (
               <ExamQuestionViewer
                 key={question.id}
                 question={question}
                 sectionType={section.sectionType}
-                questionNumber={questionCounter}
+                questionNumber={currentQNum}
                 answersMap={answersMap}
                 onAnswerChange={onAnswerChange}
                 onToggleFlag={onToggleFlag}

@@ -16,7 +16,7 @@ export function useStartExam() {
   return useMutation<TExamRoomData, Error, string>({
     mutationFn: async (quizId: string) => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/student-exams/${quizId}/start`, {
+      const res = await fetch(`${baseUrl}/student-exams/${quizId}/start`, {
         method: "POST",
         credentials: "include",
       });
@@ -39,7 +39,7 @@ export function useSyncAnswers() {
   return useMutation<{ syncedCount: number }, Error, TSyncAnswersVariables>({
     mutationFn: async ({ attemptId, answers }) => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/student-exams/${attemptId}/sync`, {
+      const res = await fetch(`${baseUrl}/student-exams/${attemptId}/sync`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",
@@ -62,7 +62,7 @@ export function useSubmitExam() {
   return useMutation<TSubmitAttemptResponse, Error, string>({
     mutationFn: async (attemptId: string) => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/student-exams/${attemptId}/submit`, {
+      const res = await fetch(`${baseUrl}/student-exams/${attemptId}/submit`, {
         method: "POST",
         credentials: "include",
       });

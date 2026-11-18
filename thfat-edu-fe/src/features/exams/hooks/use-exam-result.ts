@@ -10,7 +10,7 @@ export function useExamResult(quizId: string) {
     queryKey: queryKeys.studentExams.result(quizId),
     queryFn: async () => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/student-exams/${quizId}/result`, {
+      const res = await fetch(`${baseUrl}/student-exams/${quizId}/result`, {
         credentials: "include",
       });
 

@@ -14,6 +14,17 @@ describe("quizzes.routes", () => {
       page: 1,
       limit: 10,
     }),
+    solveQuestion: async () => ({
+      subItems: [
+        {
+          orderIndex: 0,
+          label: "a",
+          correctAnswer: "Đúng",
+          acceptableAnswers: null,
+          explanation: "Phát biểu chính xác.",
+        },
+      ],
+    }),
   } as unknown as QuizzesService;
 
   const testApp = new Elysia()
@@ -37,5 +48,45 @@ describe("quizzes.routes", () => {
     expect(typeof body.total).toBe("number");
     expect(body.page).toBe(1);
     expect(body.limit).toBe(10);
+  });
+
+  it("POST /quizzes/ai/solve-question returns solved subItems", async () => {
+    const payload = {
+      sectionType: "true_false",
+      question: {
+        orderIndex: 0,
+        contextContent: "Cho các phát biểu sau về hợp chất X:",
+        imageUrl: null,
+        subItems: [
+          {
+            orderIndex: 0,
+            label: "a",
+            content: "Hợp chất X có tính oxi hóa mạnh.",
+            points: "1.50",
+          },
+        ],
+      },
+    };
+
+    const response = await testApp.handle(
+      new Request("http://localhost/quizzes/ai/solve-question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as {
+      subItems: Array<{
+        orderIndex: number;
+        label: string;
+        correctAnswer: string;
+      }>;
+    };
+
+    expect(body).toBeDefined();
+    expect(Array.isArray(body.subItems)).toBe(true);
+    expect(body.subItems[0]?.correctAnswer).toBe("Đúng");
   });
 });

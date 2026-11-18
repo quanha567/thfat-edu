@@ -9,7 +9,7 @@ export function useDeleteExam() {
   return useMutation<{ success: boolean }, Error, string>({
     mutationFn: async (id) => {
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
+      const res = await fetch(`${baseUrl}/quizzes/${id}`, {
         method: "DELETE",
         credentials: "include",
       });
@@ -35,7 +35,7 @@ export function useBatchDeleteExams() {
       const baseUrl = getApiBaseUrl();
       await Promise.all(
         ids.map(async (id) => {
-          const res = await fetch(`${baseUrl}/api/quizzes/${id}`, {
+          const res = await fetch(`${baseUrl}/quizzes/${id}`, {
             method: "DELETE",
             credentials: "include",
           });

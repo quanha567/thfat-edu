@@ -32,18 +32,18 @@ export const EXAM_STATUS_CONFIG: Record<
 > = {
   published: {
     label: "Đang hoạt động",
-    dotClass: "bg-success-600",
-    badgeClass: "text-success-700",
+    dotClass: "bg-success-500",
+    badgeClass: "text-foreground",
   },
   archived: {
     label: "Tạm dừng",
     dotClass: "bg-neutral-400",
-    badgeClass: "text-neutral-500",
+    badgeClass: "text-muted-foreground",
   },
   draft: {
     label: "Bản nháp",
     dotClass: "bg-warning-500",
-    badgeClass: "text-warning-700",
+    badgeClass: "text-foreground",
   },
 };
 

@@ -2,7 +2,7 @@
 
 import { DataTableRowActions, getDataTableSelectColumn } from "@/components/data-table";
 import { type ColumnDef } from "@tanstack/react-table";
-import { ExternalLink, Pencil, Trash2 } from "lucide-react";
+import { ExternalLink, PauseCircle, Pencil, PlayCircle, Trash2 } from "lucide-react";
 
 import { formatExamCode, getExamAttempts, getExamDifficulty } from "../constants/exam.constants";
 import { type TQuizListItem } from "../types";
@@ -27,7 +27,7 @@ export function createExamColumns({
         const code = formatExamCode(row.original.id, row.index);
 
         return (
-          <span className="bg-primary/10 text-primary inline-flex items-center rounded-full px-2.5 py-0.5 font-mono text-xs font-semibold">
+          <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 font-mono text-xs">
             {code}
           </span>
         );
@@ -77,17 +77,14 @@ export function createExamColumns({
     {
       accessorKey: "status",
       header: "Trạng thái",
-      cell: ({ row }) => {
-        const exam = row.original;
-
-        return <ExamStatusBadge status={exam.status} onToggleStatus={() => onToggleStatus(exam)} />;
-      },
+      cell: ({ row }) => <ExamStatusBadge status={row.original.status} />,
     },
     {
       id: "actions",
       header: () => <div className="text-right">Thao tác</div>,
       cell: ({ row }) => {
         const exam = row.original;
+        const isArchived = exam.status === "archived";
 
         const actions = [
           {
@@ -97,6 +94,16 @@ export function createExamColumns({
             onClick: () => {
               window.location.href = `/admin/exams/${exam.id}/edit`;
             },
+          },
+          {
+            id: "toggle-status",
+            label: isArchived ? "Kích hoạt" : "Tạm dừng",
+            icon: isArchived ? (
+              <PlayCircle className="size-4" />
+            ) : (
+              <PauseCircle className="size-4" />
+            ),
+            onClick: () => onToggleStatus(exam),
           },
           {
             id: "view",

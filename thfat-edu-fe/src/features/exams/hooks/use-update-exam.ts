@@ -19,7 +19,7 @@ export function useUpdateExam(defaultId: string = "") {
 
       const { id: _, ...payload } = input;
       const baseUrl = getApiBaseUrl();
-      const res = await fetch(`${baseUrl}/api/quizzes/${targetId}`, {
+      const res = await fetch(`${baseUrl}/quizzes/${targetId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         credentials: "include",

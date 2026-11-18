@@ -6,8 +6,9 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
+import { useArticles } from "@/features/articles/hooks/use-articles";
 import { HOME_NAV_LINKS } from "@/features/home/constants/home.data";
-import { LogOut, ShieldCheck } from "lucide-react";
+import { ArrowRight, ChevronDown, LogOut, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useImperativeHandle, useState, type Ref } from "react";
@@ -26,8 +27,15 @@ type TMobileNavSheetProps = {
 export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [resourcesExpanded, setResourcesExpanded] = useState(false);
   const { data: user } = useAuthUser();
   const logoutMutation = useLogout();
+
+  const { data: articlesData } = useArticles({
+    query: { page: 1, limit: 5 },
+    isAdmin: false,
+  });
+  const latestArticles = articlesData?.items ?? [];
 
   useImperativeHandle(ref, () => ({
     open: () => setOpen(true),
@@ -73,6 +81,59 @@ export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
             {HOME_NAV_LINKS.map((item) => {
               const isActive =
                 item.href === "/" ? pathname === "/" : pathname?.startsWith(item.href);
+
+              if (item.href === "/articles" || item.isResourceDropdown) {
+                return (
+                  <div key={item.label} className="flex flex-col gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setResourcesExpanded((prev) => !prev)}
+                      className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+                        isActive
+                          ? "bg-white/15 font-semibold text-white"
+                          : "text-white/80 hover:bg-white/10 hover:text-white"
+                      }`}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform duration-200 ${
+                          resourcesExpanded ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {resourcesExpanded && (
+                      <div className="ml-3 flex flex-col gap-1.5 border-l border-white/15 pl-3 pt-1">
+                        {latestArticles.length === 0 ? (
+                          <span className="py-1 text-xs text-white/50">
+                            Chưa có bài viết nào
+                          </span>
+                        ) : (
+                          latestArticles.slice(0, 5).map((article) => (
+                            <Link
+                              key={article.id}
+                              href={`/articles/${article.slug}`}
+                              onClick={() => setOpen(false)}
+                              className="line-clamp-1 py-1 text-xs text-white/80 transition-colors hover:text-white"
+                            >
+                              {article.title}
+                            </Link>
+                          ))
+                        )}
+
+                        <Link
+                          href="/articles"
+                          onClick={() => setOpen(false)}
+                          className="flex items-center gap-1 pt-1 text-xs font-semibold text-primary-300 hover:text-white"
+                        >
+                          <span>Xem tất cả bài viết</span>
+                          <ArrowRight className="h-3 w-3" />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                );
+              }
 
               return (
                 <Link

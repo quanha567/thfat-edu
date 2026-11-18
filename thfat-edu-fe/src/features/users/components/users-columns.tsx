@@ -44,7 +44,7 @@ export function createUserColumns({
           <div className="flex items-center gap-3">
             <Avatar className="h-9 w-9">
               <AvatarImage src={user.avatarUrl ?? undefined} alt={user.fullName} />
-              <AvatarFallback className="bg-primary/10 text-primary text-xs font-semibold">
+              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-semibold">
                 {initials || "U"}
               </AvatarFallback>
             </Avatar>
@@ -158,7 +158,7 @@ export function createUserColumns({
             ? {
                 id: "restore",
                 label: "Khôi phục tài khoản",
-                icon: <RotateCcw className="size-4 text-emerald-600" />,
+                icon: <RotateCcw className="text-success-600 size-4" />,
                 onClick: () => onRestore(user),
               }
             : {

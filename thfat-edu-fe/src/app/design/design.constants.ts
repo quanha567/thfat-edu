@@ -22,7 +22,8 @@ export type TColorScale = {
 };
 
 export const COLOR_SCALES: TColorScale[] = [
-  { name: "Primary", key: "primary", desc: "Brand navy blue — #1C3480" },
+  { name: "Primary", key: "primary", desc: "Brand royal cobalt blue — Electric Royal Blue" },
+  { name: "Gold", key: "gold", desc: "Brand radiant gold — Star, orbit & highlight accents" },
   { name: "Neutral", key: "neutral", desc: "Gray scale — text, borders, backgrounds" },
   { name: "Success", key: "success", desc: "Correct answers & success states" },
   { name: "Warning", key: "warning", desc: "Warnings & caution states" },

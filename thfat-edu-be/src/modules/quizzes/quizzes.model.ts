@@ -74,6 +74,27 @@ export const CreateQuizSchema = t.Object({
 
 export type TCreateQuizInput = Static<typeof CreateQuizSchema>;
 
+export const SolveQuestionInputSchema = t.Object({
+  sectionType: SectionTypeSchema,
+  question: QuizQuestionInputSchema,
+});
+
+export type TSolveQuestionInput = Static<typeof SolveQuestionInputSchema>;
+
+export const SolvedSubItemSchema = t.Object({
+  orderIndex: t.Number(),
+  label: t.String(),
+  correctAnswer: t.String(),
+  acceptableAnswers: t.Optional(t.Nullable(t.Array(t.String()))),
+  explanation: t.Optional(t.Nullable(t.String())),
+});
+
+export const SolveQuestionResponseSchema = t.Object({
+  subItems: t.Array(SolvedSubItemSchema),
+});
+
+export type TSolveQuestionResponse = Static<typeof SolveQuestionResponseSchema>;
+
 export const UpdateQuizSchema = t.Object({
   title: t.Optional(t.String({ minLength: 1, maxLength: 255 })),
   description: t.Optional(t.Nullable(t.String())),

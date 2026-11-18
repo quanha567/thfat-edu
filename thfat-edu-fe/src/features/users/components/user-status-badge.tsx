@@ -1,43 +1,49 @@
-import { Badge } from "@/components/ui/badge";
-import { CheckCircle2, Lock, Trash2 } from "lucide-react";
+import { cn } from "cn";
 
 export type TUserStatusBadgeProps = {
   isActive: boolean;
   deletedAt: string | null;
+  className?: string;
 };
 
-export function UserStatusBadge({ isActive, deletedAt }: TUserStatusBadgeProps) {
+export function UserStatusBadge({ isActive, deletedAt, className }: TUserStatusBadgeProps) {
   if (deletedAt) {
     return (
-      <Badge
-        variant="outline"
-        className="border-red-200 bg-red-50 text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300"
+      <div
+        className={cn(
+          "border-border bg-muted/40 text-muted-foreground inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium",
+          className,
+        )}
       >
-        <Trash2 className="mr-1 h-3 w-3 text-red-600 dark:text-red-400" />
-        Đã xóa mềm
-      </Badge>
+        <span className="size-1.5 shrink-0 rounded-full bg-neutral-400" />
+        <span>Đã xóa</span>
+      </div>
     );
   }
 
   if (!isActive) {
     return (
-      <Badge
-        variant="outline"
-        className="border-neutral-300 bg-neutral-100 text-neutral-700 dark:border-neutral-700 dark:bg-neutral-800 dark:text-neutral-300"
+      <div
+        className={cn(
+          "border-border bg-muted/40 inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium text-error-600 dark:text-error-400",
+          className,
+        )}
       >
-        <Lock className="mr-1 h-3 w-3 text-neutral-500" />
-        Đã bị khóa
-      </Badge>
+        <span className="size-1.5 shrink-0 rounded-full bg-error-500" />
+        <span>Đã khóa</span>
+      </div>
     );
   }
 
   return (
-    <Badge
-      variant="outline"
-      className="border-emerald-200 bg-emerald-50 text-emerald-700 dark:border-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300"
+    <div
+      className={cn(
+        "border-border bg-muted/40 text-foreground inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium",
+        className,
+      )}
     >
-      <CheckCircle2 className="mr-1 h-3 w-3 text-emerald-600 dark:text-emerald-400" />
-      Hoạt động
-    </Badge>
+      <span className="size-1.5 shrink-0 rounded-full bg-success-500" />
+      <span>Hoạt động</span>
+    </div>
   );
 }

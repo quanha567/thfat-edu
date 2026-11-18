@@ -92,6 +92,23 @@ export type TCreateQuizInput = {
 
 export type TUpdateQuizInput = Partial<TCreateQuizInput>;
 
+export type TSolveQuestionInput = {
+  sectionType: TSectionType;
+  question: TQuizQuestion;
+};
+
+export type TSolvedSubItem = {
+  orderIndex: number;
+  label: string;
+  correctAnswer: string;
+  acceptableAnswers?: string[] | null;
+  explanation?: string | null;
+};
+
+export type TSolveQuestionResponse = {
+  subItems: TSolvedSubItem[];
+};
+
 // ── Student Exam Taking Types ──────────────────────────────────────────
 
 export type TStudentExamStatus = "not_started" | "in_progress" | "submitted";
@@ -108,6 +125,11 @@ export type TStudentExamListItem = {
   attemptId: string | null;
   score: string | null;
   submittedAt: string | null;
+  maxAttempts?: number | null;
+  attemptCount?: number;
+  canTakeExam?: boolean;
+  cooldownRemainingSeconds?: number;
+  displayScore?: string | null;
 };
 
 export type TStudentExamListResponse = {

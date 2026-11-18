@@ -73,7 +73,7 @@ export function useExamImport(): TUseExamImportReturn {
         const formData = new FormData();
         formData.append("file", file);
 
-        const res = await fetch(`${baseUrl}/api/quizzes/import/jobs`, {
+        const res = await fetch(`${baseUrl}/quizzes/import/jobs`, {
           method: "POST",
           credentials: "include",
           body: formData,
@@ -90,7 +90,7 @@ export function useExamImport(): TUseExamImportReturn {
         setIsProcessing(true);
         addLog("Khởi tạo kết nối trực tiếp với server xử lý AI...", "info");
 
-        const streamUrl = `${baseUrl}/api/quizzes/import/jobs/${jobId}/stream`;
+        const streamUrl = `${baseUrl}/quizzes/import/jobs/${jobId}/stream`;
         const es = new EventSource(streamUrl, { withCredentials: true });
         eventSourceRef.current = es;
 
