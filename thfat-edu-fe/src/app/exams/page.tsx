@@ -1,11 +1,15 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
 import { StudentExamListContainer } from "@/features/exams/components/student-exam-list-container";
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Thi Thử Hóa Học | ThFat Edu",
-  description: "Luyện đề thi thử trực tuyến mô phỏng kỳ thi tốt nghiệp THPT chuẩn Bộ GD&ĐT",
+  title: "Thư Viện Đề Thi & Khảo Thí Hóa Học",
+  description:
+    "Luyện thi trắc nghiệm Hóa học với ngân hàng đề thi chuẩn cấu trúc, chấm điểm tự động và lời giải chi tiết.",
+  alternates: {
+    canonical: "/exams",
+  },
 };
 
 export default function StudentExamsPage() {

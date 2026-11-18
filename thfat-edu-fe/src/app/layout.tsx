@@ -1,4 +1,5 @@
 import { Providers } from "@/components/providers";
+import { siteConfig } from "@/config/site.config";
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro, Geist_Mono } from "next/font/google";
 import type { ReactNode } from "react";
@@ -20,9 +21,52 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TH FAT EDU - Nền Tảng Học Hóa Học Trực Tuyến",
-  description:
-    "Nắm vững kiến thức - Chinh phục mọi kỳ thi. Hệ thống học tập, luyện thi trắc nghiệm và tra cứu Hóa học hiện đại.",
+  metadataBase: new URL(siteConfig.url),
+  title: {
+    default: siteConfig.defaultTitle,
+    template: siteConfig.titleTemplate,
+  },
+  description: siteConfig.description,
+  keywords: [...siteConfig.keywords],
+  authors: [{ name: siteConfig.author.name, url: siteConfig.author.url }],
+  creator: siteConfig.author.name,
+  publisher: siteConfig.name,
+  alternates: {
+    canonical: "./",
+  },
+  openGraph: {
+    type: "website",
+    locale: "vi_VN",
+    url: siteConfig.url,
+    siteName: siteConfig.name,
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    images: [
+      {
+        url: siteConfig.ogImage,
+        width: 1200,
+        height: 630,
+        alt: siteConfig.name,
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: siteConfig.defaultTitle,
+    description: siteConfig.description,
+    images: [siteConfig.ogImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

@@ -1,11 +1,15 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
 import { PublicArticlesContainer } from "@/features/articles";
-import { type Metadata } from "next";
+import type { Metadata } from "next";
 import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: "Tin Tức & Cẩm Nang Ôn Thi | ThFat Edu",
-  description: "Cập nhật tin tức khảo thí, quy chế thi, đề cương và cẩm nang học tập mới nhất từ ThFat Edu",
+  title: "Bài Viết & Tài Liệu Hóa Học",
+  description:
+    "Tổng hợp các bài viết chuyên đề Hóa học, phương pháp giải nhanh và kiến thức trọng tâm ôn thi THPT Quốc gia.",
+  alternates: {
+    canonical: "/articles",
+  },
 };
 
 export default function ArticlesPage() {
