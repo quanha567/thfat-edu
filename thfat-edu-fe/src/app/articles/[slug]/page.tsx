@@ -92,7 +92,7 @@ export async function generateMetadata({ params }: TArticlePageProps): Promise<M
   };
 }
 
-export default async function ArticlePage({ params }: TArticlePageProps) {
+async function ArticleDetailLoader({ params }: TArticlePageProps) {
   const { slug } = await params;
   const article = await fetchArticleServer(slug);
 
@@ -167,15 +167,34 @@ export default async function ArticlePage({ params }: TArticlePageProps) {
   };
 
   return (
-    <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
+    <>
       <JsonLd data={articleSchemas} />
+      <ArticleDetailClient params={params} initialData={article} />
+    </>
+  );
+}
 
+export default function ArticlePage({ params }: TArticlePageProps) {
+  return (
+    <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
       <Suspense fallback={<div className="h-16" />}>
         <MainNavbar />
       </Suspense>
       <main className="flex-1 bg-neutral-50/60 pt-16 dark:bg-neutral-950/60">
-        <Suspense>
-          <ArticleDetailClient params={params} initialData={article} />
+        <Suspense
+          fallback={
+            <div className="mx-auto max-w-4xl px-4 py-8">
+              <div className="h-8 w-2/3 animate-pulse rounded bg-muted" />
+              <div className="mt-4 h-4 w-1/3 animate-pulse rounded bg-muted" />
+              <div className="mt-8 space-y-3">
+                <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                <div className="h-4 w-full animate-pulse rounded bg-muted" />
+                <div className="h-4 w-4/5 animate-pulse rounded bg-muted" />
+              </div>
+            </div>
+          }
+        >
+          <ArticleDetailLoader params={params} />
         </Suspense>
       </main>
       <MainFooter />

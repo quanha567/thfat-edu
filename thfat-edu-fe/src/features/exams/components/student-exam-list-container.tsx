@@ -61,7 +61,7 @@ export function StudentExamListContainer() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 
   const { data, isLoading } = useStudentExams({ search: search || undefined, limit: 100 });
-  const allItems = data?.items ?? [];
+  const allItems = useMemo(() => data?.items ?? [], [data?.items]);
 
   const counts: TExamFilterCounts = useMemo(
     () => ({

@@ -24,6 +24,18 @@ type TRenderSectionContentOptions = Omit<TExamQuestionViewerProps, "questionNumb
   isSingleSubItem: boolean;
 };
 
+function formatSubLabel(label?: string | null): string {
+  if (!label) {
+    return "";
+  }
+
+  if (label.toLowerCase().includes("câu")) {
+    return `${label}.`;
+  }
+
+  return `Câu ${label}.`;
+}
+
 function renderSectionContent({
   question,
   sectionType,
@@ -63,9 +75,7 @@ function renderSectionContent({
         const isFlagged = state?.isFlagged ?? false;
         const isContentDifferent =
           si.content.trim() !== question.contextContent?.trim() && !isSingleSubItem;
-        const subLabel = si.label
-          ? si.label.toLowerCase().includes("câu") ? `${si.label}.` : `Câu ${si.label}.`
-          : "";
+        const subLabel = formatSubLabel(si.label);
 
         return (
           <div key={si.id} id={`subitem-${si.id}`} className="scroll-mt-24 space-y-3">

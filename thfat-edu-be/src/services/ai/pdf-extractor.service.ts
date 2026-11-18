@@ -31,7 +31,7 @@ type TImageRawData = {
 };
 
 const HEADER_OR_LIST_PATTERN =
-  /^(PHẦN\s+[IVXLCDM]+|CÂU\s+\d+|Câu\s+\d+|[A-D]\.|\d+\.|\-|\*|\[HÌNH_ẢNH:|BÀI\s+THI|ĐỀ\s+|KỲ\s+THI|MÔN\s*:|GV\s*:|Giáo\s+viên|Thời\s+gian|NĂM\s+HỌC|Cho\s+biết|MÃ\s+ĐỀ|Mã\s+đề|Họ\s+và\s+tên|Số\s+báo\s+danh)/i;
+  /^(PHẦN\s+[IVXLCDM]+|CÂU\s+\d+|Câu\s+\d+|[A-D]\.|\d+\.|-|\*|\[HÌNH_ẢNH:|BÀI\s+THI|ĐỀ\s+|KỲ\s+THI|MÔN\s*:|GV\s*:|Giáo\s+viên|Thời\s+gian|NĂM\s+HỌC|Cho\s+biết|MÃ\s+ĐỀ|Mã\s+đề|Họ\s+và\s+tên|Số\s+báo\s+danh)/i;
 
 const ENDING_PUNCTUATION_PATTERN = /[:.?!]$|===$/;
 
@@ -117,12 +117,41 @@ async function convertRawImageToBase64(imgData: TImageRawData): Promise<string |
   }
 }
 
-async function extractPageImages(
-  page: pdfjs.PDFPageProxy,
-  viewportHeight: number,
-  pageNum: number,
-  allImagesMap: Record<string, string>,
-): Promise<TContentItem[]> {
+async function fetchPageImageBase64(page: pdfjs.PDFPageProxy, imgName: string): Promise<string | null> {
+  try {
+    const rawImg = await new Promise<TImageRawData | null>((resolve) => {
+      page.objs.get(imgName, (obj: unknown) => {
+        if (obj && typeof obj === "object" && "data" in obj && "width" in obj && "height" in obj) {
+          resolve(obj as TImageRawData);
+        } else {
+          resolve(null);
+        }
+      });
+    });
+
+    if (!rawImg?.data) {
+      return null;
+    }
+
+    return await convertRawImageToBase64(rawImg);
+  } catch {
+    return null;
+  }
+}
+
+type TExtractPageImagesOptions = {
+  page: pdfjs.PDFPageProxy;
+  viewportHeight: number;
+  pageNum: number;
+  allImagesMap: Record<string, string>;
+};
+
+async function extractPageImages({
+  page,
+  viewportHeight,
+  pageNum,
+  allImagesMap,
+}: TExtractPageImagesOptions): Promise<TContentItem[]> {
   const imageItems: TContentItem[] = [];
   const ops = await page.getOperatorList();
   let currentMatrix = [1, 0, 0, 1, 0, 0];
@@ -134,61 +163,95 @@ async function extractPageImages(
 
     if (fn === pdfjs.OPS.save) {
       matrixStack.push([...currentMatrix]);
-    } else if (fn === pdfjs.OPS.restore) {
+      continue;
+    }
+
+    if (fn === pdfjs.OPS.restore) {
       currentMatrix = matrixStack.pop() ?? [1, 0, 0, 1, 0, 0];
-    } else if (fn === pdfjs.OPS.transform) {
+      continue;
+    }
+
+    if (fn === pdfjs.OPS.transform) {
       const transformArgs = ops.argsArray[i] as number[];
       currentMatrix = multiplyTransform(currentMatrix, transformArgs);
-    } else if (fn === pdfjs.OPS.paintImageXObject) {
-      const imgName = ops.argsArray[i][0] as string;
-      const width = Math.abs(currentMatrix[0]);
-      const height = Math.abs(currentMatrix[3]);
-
-      if (width < 30 || height < 30) {
-        continue;
-      }
-
-      const x0 = currentMatrix[4];
-      const y0 = Math.max(0, viewportHeight - (currentMatrix[5] + height));
-
-      try {
-        const rawImg = await new Promise<TImageRawData | null>((resolve) => {
-          page.objs.get(imgName, (obj: unknown) => {
-            if (obj && typeof obj === "object" && "data" in obj && "width" in obj && "height" in obj) {
-              resolve(obj as TImageRawData);
-            } else {
-              resolve(null);
-            }
-          });
-        });
-
-        if (!rawImg || !rawImg.data) {
-          continue;
-        }
-
-        const b64Uri = await convertRawImageToBase64(rawImg);
-        if (!b64Uri) {
-          continue;
-        }
-
-        const imgId = `IMAGE_PAGE_${pageNum}_${imgIndex}`;
-        allImagesMap[imgId] = b64Uri;
-
-        imageItems.push({
-          type: "image",
-          y0,
-          x0,
-          text: `\n\n[HÌNH_ẢNH: ${imgId}]\n\n`,
-        });
-
-        imgIndex += 1;
-      } catch {
-        // Skip corrupted image without breaking document extraction
-      }
+      continue;
     }
+
+    if (fn !== pdfjs.OPS.paintImageXObject) {
+      continue;
+    }
+
+    const imgName = ops.argsArray[i][0] as string;
+    const width = Math.abs(currentMatrix[0]);
+    const height = Math.abs(currentMatrix[3]);
+
+    if (width < 30 || height < 30) {
+      continue;
+    }
+
+    const x0 = currentMatrix[4];
+    const y0 = Math.max(0, viewportHeight - (currentMatrix[5] + height));
+
+    const b64Uri = await fetchPageImageBase64(page, imgName);
+    if (!b64Uri) {
+      continue;
+    }
+
+    const imgId = `IMAGE_PAGE_${pageNum}_${imgIndex}`;
+    allImagesMap[imgId] = b64Uri;
+
+    imageItems.push({
+      type: "image",
+      y0,
+      x0,
+      text: `\n\n[HÌNH_ẢNH: ${imgId}]\n\n`,
+    });
+
+    imgIndex += 1;
   }
 
   return imageItems;
+}
+
+function groupTextItemsIntoLines(textItemsWithCoords: TTextItemWithCoords[]): TContentItem[] {
+  const contentItems: TContentItem[] = [];
+  let currentLine: TTextItemWithCoords[] = [];
+
+  for (const item of textItemsWithCoords) {
+    if (currentLine.length === 0) {
+      currentLine.push(item);
+      continue;
+    }
+
+    const last = currentLine[currentLine.length - 1];
+    if (Math.abs(item.y - last.y) <= 4) {
+      currentLine.push(item);
+      continue;
+    }
+
+    currentLine.sort((a, b) => a.x - b.x);
+    const lineStr = currentLine.map((c) => c.str).join(" ");
+    contentItems.push({
+      type: "text",
+      y0: currentLine[0].y,
+      x0: currentLine[0].x,
+      text: lineStr,
+    });
+    currentLine = [item];
+  }
+
+  if (currentLine.length > 0) {
+    currentLine.sort((a, b) => a.x - b.x);
+    const lineStr = currentLine.map((c) => c.str).join(" ");
+    contentItems.push({
+      type: "text",
+      y0: currentLine[0].y,
+      x0: currentLine[0].x,
+      text: lineStr,
+    });
+  }
+
+  return contentItems;
 }
 
 export async function extractPdfDocument(pdfBuffer: Buffer): Promise<TPdfExtractionResult> {
@@ -223,43 +286,15 @@ export async function extractPdfDocument(pdfBuffer: Buffer): Promise<TPdfExtract
     // Group text items into lines (items within 4px vertically)
     textItemsWithCoords.sort((a, b) => (Math.abs(a.y - b.y) > 4 ? a.y - b.y : a.x - b.x));
 
-    const contentItems: TContentItem[] = [];
-    let currentLine: TTextItemWithCoords[] = [];
-
-    for (const item of textItemsWithCoords) {
-      if (currentLine.length === 0) {
-        currentLine.push(item);
-      } else {
-        const last = currentLine[currentLine.length - 1];
-        if (Math.abs(item.y - last.y) <= 4) {
-          currentLine.push(item);
-        } else {
-          currentLine.sort((a, b) => a.x - b.x);
-          const lineStr = currentLine.map((c) => c.str).join(" ");
-          contentItems.push({
-            type: "text",
-            y0: currentLine[0].y,
-            x0: currentLine[0].x,
-            text: lineStr,
-          });
-          currentLine = [item];
-        }
-      }
-    }
-
-    if (currentLine.length > 0) {
-      currentLine.sort((a, b) => a.x - b.x);
-      const lineStr = currentLine.map((c) => c.str).join(" ");
-      contentItems.push({
-        type: "text",
-        y0: currentLine[0].y,
-        x0: currentLine[0].x,
-        text: lineStr,
-      });
-    }
+    const contentItems = groupTextItemsIntoLines(textItemsWithCoords);
 
     // Extract images for this page
-    const imageItems = await extractPageImages(page, viewport.height, pageNum, allImagesMap);
+    const imageItems = await extractPageImages({
+      page,
+      viewportHeight: viewport.height,
+      pageNum,
+      allImagesMap,
+    });
     contentItems.push(...imageItems);
 
     // Sort items vertically (top-to-bottom, left-to-right)

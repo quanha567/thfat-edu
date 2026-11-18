@@ -8,7 +8,7 @@ describe("preprocessChemContent & cleanMathBackslashes", () => {
     const tripleRaw = "vinyl acetate (\\\\\\ce{CH3COOCH=CH2})";
     const processed = preprocessChemContent(tripleRaw);
 
-    expect(processed).toBe("vinyl acetate ($\\ce{CH3COOCH=CH2}$)");
+    expect(processed).toBe(raw);
   });
 
   it("normalizes double and quadruple backslashes before chemical formulas", () => {

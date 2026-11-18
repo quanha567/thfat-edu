@@ -30,6 +30,26 @@ export type TSectionEditorMcqProps = {
   onUpdateQuestion: (updated: TQuizQuestion) => void;
 };
 
+function getBadgeLabel(
+  groupRange: { start: number; end: number } | undefined,
+  subItemsLength: number,
+  questionNumber: number
+): string {
+  if (groupRange) {
+    if (groupRange.start === groupRange.end) {
+      return `Câu ${groupRange.start}`;
+    }
+
+    return `Chùm câu hỏi (Câu ${groupRange.start} – ${groupRange.end})`;
+  }
+
+  if (subItemsLength > 1) {
+    return `Chùm câu hỏi (Câu ${questionNumber} – ${questionNumber + subItemsLength - 1})`;
+  }
+
+  return `Câu ${questionNumber}`;
+}
+
 export function SectionEditorMcq({
   id,
   question,
@@ -49,13 +69,7 @@ export function SectionEditorMcq({
   onDelete,
   onUpdateQuestion,
 }: TSectionEditorMcqProps) {
-  const badgeLabel = groupRange
-    ? groupRange.start === groupRange.end
-      ? `Câu ${groupRange.start}`
-      : `Chùm câu hỏi (Câu ${groupRange.start} – ${groupRange.end})`
-    : question.subItems.length > 1
-      ? `Chùm câu hỏi (Câu ${questionNumber} – ${questionNumber + question.subItems.length - 1})`
-      : `Câu ${questionNumber}`;
+  const badgeLabel = getBadgeLabel(groupRange, question.subItems.length, questionNumber);
 
   const handleContextChange = (val: string) => {
     onUpdateQuestion({ ...question, contextContent: val });

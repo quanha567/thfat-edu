@@ -20,6 +20,23 @@ type TAnimatedCounterProps = {
   className?: string;
 };
 
+function formatCounterNumber(
+  num: number,
+  decimals: number,
+  useDotSeparator: boolean
+): string {
+  if (decimals > 0) {
+    return num.toFixed(decimals);
+  }
+
+  const intVal = Math.round(num);
+  if (useDotSeparator) {
+    return intVal.toLocaleString("vi-VN").replace(/,/g, ".");
+  }
+
+  return String(intVal);
+}
+
 export function AnimatedCounter({
   value,
   countUp,
@@ -66,44 +83,28 @@ export function AnimatedCounter({
 
       if (progress < 1) {
         const currentVal = start + (end - start) * easeProgress;
-        let formatted: string;
-
-        if (decimals > 0) {
-          formatted = currentVal.toFixed(decimals);
-        } else {
-          const intVal = Math.round(currentVal);
-          if (useDotSeparator) {
-            formatted = intVal.toLocaleString("vi-VN").replace(/,/g, ".");
-          } else {
-            formatted = String(intVal);
-          }
-        }
+        const formatted = formatCounterNumber(currentVal, decimals, useDotSeparator);
 
         setDisplayValue(`${prefix}${formatted}${suffix}`);
         animationFrameId = requestAnimationFrame(step);
-      } else {
-        if (finalText) {
-          setDisplayValue(finalText);
-        } else {
-          let formatted: string;
-          if (decimals > 0) {
-            formatted = end.toFixed(decimals);
-          } else {
-            if (useDotSeparator) {
-              formatted = end.toLocaleString("vi-VN").replace(/,/g, ".");
-            } else {
-              formatted = String(end);
-            }
-          }
-          setDisplayValue(`${prefix}${formatted}${suffix}`);
-        }
+
+        return;
       }
+
+      if (finalText) {
+        setDisplayValue(finalText);
+
+        return;
+      }
+
+      const formatted = formatCounterNumber(end, decimals, useDotSeparator);
+      setDisplayValue(`${prefix}${formatted}${suffix}`);
     };
 
     animationFrameId = requestAnimationFrame(step);
 
     return () => cancelAnimationFrame(animationFrameId);
-  }, [isInView, countUp, duration, value]);
+  }, [isInView, countUp, duration]);
 
   return (
     <span ref={containerRef} className={className}>
