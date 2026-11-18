@@ -1,4 +1,5 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
+import { JsonLd } from "@/components/seo/json-ld";
 import { siteConfig } from "@/config/site.config";
 import type { TArticleDetail } from "@/features/articles";
 import { getApiBaseUrl } from "@/lib/api";
@@ -99,8 +100,76 @@ export default async function ArticlePage({ params }: TArticlePageProps) {
     notFound();
   }
 
+  const rawArticle = article as unknown as {
+    summary?: string;
+    author?: { name?: string };
+  };
+
+  const articleDescription =
+    rawArticle.summary ||
+    article.excerpt ||
+    article.content
+      .slice(0, 160)
+      .replace(/[#*`_~]/g, "")
+      .trim();
+
+  const articleSchemas = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Article",
+        headline: article.title,
+        description: articleDescription,
+        image: [article.thumbnailUrl || `${siteConfig.url}${siteConfig.ogImage}`],
+        datePublished: article.createdAt,
+        dateModified: article.updatedAt || article.createdAt,
+        author: {
+          "@type": "Person",
+          name: rawArticle.author?.name || article.author?.fullName || siteConfig.author.name,
+        },
+        publisher: {
+          "@type": "Organization",
+          name: siteConfig.name,
+          logo: {
+            "@type": "ImageObject",
+            url: `${siteConfig.url}/brand/logo-full.png`,
+          },
+        },
+        mainEntityOfPage: {
+          "@type": "WebPage",
+          "@id": `${siteConfig.url}/articles/${slug}`,
+        },
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            name: "Trang chủ",
+            item: siteConfig.url,
+          },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: "Bài viết",
+            item: `${siteConfig.url}/articles`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: article.title,
+            item: `${siteConfig.url}/articles/${slug}`,
+          },
+        ],
+      },
+    ],
+  };
+
   return (
     <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
+      <JsonLd data={articleSchemas} />
+
       <Suspense fallback={<div className="h-16" />}>
         <MainNavbar />
       </Suspense>

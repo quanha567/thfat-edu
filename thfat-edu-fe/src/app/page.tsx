@@ -1,4 +1,6 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
+import { JsonLd } from "@/components/seo/json-ld";
+import { siteConfig } from "@/config/site.config";
 import {
   AboutPreviewSection,
   ArticlesPreviewSection,
@@ -9,9 +11,34 @@ import {
   StatsBar,
 } from "@/features/home/components";
 
+const homeSchemas = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "EducationalOrganization",
+      name: siteConfig.name,
+      url: siteConfig.url,
+      logo: `${siteConfig.url}/brand/logo-full.png`,
+      description: siteConfig.description,
+    },
+    {
+      "@type": "WebSite",
+      name: siteConfig.name,
+      url: siteConfig.url,
+      potentialAction: {
+        "@type": "SearchAction",
+        target: `${siteConfig.url}/articles?search={search_term_string}`,
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export default function HomePage() {
   return (
-    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary-600 selection:text-white">
+    <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
+      <JsonLd data={homeSchemas} />
+
       {/* Shared Navigation Header */}
       <MainNavbar />
 
