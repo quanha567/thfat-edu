@@ -77,8 +77,8 @@ export function ExamSettingsForm() {
           <div className="border-border/80 bg-card flex items-center justify-between rounded-xl border p-4 shadow-2xs">
             <div>
               {isDirty ? (
-                <span className="flex items-center gap-1.5 text-xs font-semibold text-amber-600 dark:text-amber-400">
-                  <span className="inline-block size-2 animate-pulse rounded-full bg-amber-500" />
+                <span className="flex items-center gap-1.5 text-xs font-semibold text-warning-600 dark:text-warning-400">
+                  <span className="inline-block size-2 animate-pulse rounded-full bg-warning-500" />
                   Có thay đổi chưa lưu
                 </span>
               ) : (

@@ -4,6 +4,7 @@ import { Calendar, Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { DEFAULT_ARTICLE_THUMBNAIL } from "../constants";
 import type { TArticleItem } from "../types/article.types";
 
 export type TArticleCardProps = {
@@ -21,19 +22,13 @@ export function ArticleCard({ article }: TArticleCardProps) {
         href={`/articles/${article.slug}`}
         className="relative aspect-video w-full overflow-hidden bg-muted"
       >
-        {article.thumbnailUrl ? (
-          <Image
-            src={article.thumbnailUrl}
-            alt={article.title}
-            fill
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            className="object-cover transition-transform duration-300 group-hover:scale-105"
-          />
-        ) : (
-          <div className="from-primary-500/10 to-primary-700/20 flex size-full items-center justify-center bg-gradient-to-br text-muted-foreground/60">
-            <span className="font-bold text-sm tracking-wide">ThFat Edu</span>
-          </div>
-        )}
+        <Image
+          src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
+          alt={article.title}
+          fill
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="object-cover transition-transform duration-300 group-hover:scale-105"
+        />
 
         {article.category && (
           <div className="absolute top-3 left-3">

@@ -163,7 +163,7 @@ export function ResetPasswordModal({ user, isOpen, onClose }: TResetPasswordModa
                     className="shrink-0"
                   >
                     {hasCopied ? (
-                      <Check className="h-4 w-4 text-emerald-600" />
+                      <Check className="text-success-600 h-4 w-4" />
                     ) : (
                       <Copy className="h-4 w-4" />
                     )}

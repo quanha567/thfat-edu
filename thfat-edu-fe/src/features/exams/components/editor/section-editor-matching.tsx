@@ -1,25 +1,17 @@
 "use client";
 
-import { ChemRenderer } from "@/components/chemistry/chem-renderer";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import { ArrowRight, Plus, Trash2 } from "lucide-react";
 
 import { createEmptySubItem } from "../../constants/exam-editor.constants";
 import { type TQuizQuestion, type TQuizSubItem } from "../../types";
+import { extractMatchingHeaders, getMatchingOptions, parseMatchingOption } from "../matching.types";
 import { ExamMarkdownEditor } from "./exam-markdown-editor";
 import { QuestionEditorCardHeader } from "./question-editor-card-header";
+import { SectionEditorMatchingOptions } from "./section-editor-matching-options";
+import { SectionEditorMatchingPairs } from "./section-editor-matching-pairs";
 
 export type TSectionEditorMatchingProps = {
+  id?: string;
   question: TQuizQuestion;
   questionNumber: number;
   canMoveUp: boolean;
@@ -37,9 +29,8 @@ export type TSectionEditorMatchingProps = {
   onUpdateQuestion: (updated: TQuizQuestion) => void;
 };
 
-const MATCHING_TARGETS = ["A", "B", "C", "D", "E", "F"] as const;
-
 export function SectionEditorMatching({
+  id,
   question,
   questionNumber,
   canMoveUp,
@@ -56,6 +47,9 @@ export function SectionEditorMatching({
   onDelete,
   onUpdateQuestion,
 }: TSectionEditorMatchingProps) {
+  const options = getMatchingOptions(question.subItems);
+  const { col1Title, col2Title } = extractMatchingHeaders(question.contextContent);
+
   const handleContextChange = (val: string) => {
     onUpdateQuestion({ ...question, contextContent: val });
   };
@@ -75,11 +69,15 @@ export function SectionEditorMatching({
 
   const handleAddPair = () => {
     const nextIdx = question.subItems.length;
-    const newItem = createEmptySubItem({
-      sectionType: "matching",
-      orderIndex: nextIdx,
-      label: `Vế ${nextIdx + 1}`,
-    });
+    const newItem: TQuizSubItem = {
+      ...createEmptySubItem({
+        sectionType: "matching",
+        orderIndex: nextIdx,
+        label: `${nextIdx + 1}`,
+      }),
+      options: options.map((opt) => opt.raw),
+      correctAnswer: options[0]?.letter ?? "A",
+    };
     onUpdateQuestion({ ...question, subItems: [...question.subItems, newItem] });
   };
 
@@ -89,18 +87,39 @@ export function SectionEditorMatching({
     onUpdateQuestion({ ...question, subItems: updated });
   };
 
+  const handleOptionsChange = (updatedRawOptions: string[]) => {
+    const validLetters = new Set(
+      updatedRawOptions.map((opt, idx) => parseMatchingOption(opt, idx).letter),
+    );
+    const fallbackLetter = updatedRawOptions[0]
+      ? parseMatchingOption(updatedRawOptions[0], 0).letter
+      : null;
+
+    const updatedSubItems = question.subItems.map((sub) => {
+      const currentAnswer = sub.correctAnswer?.toUpperCase();
+      const isValid = currentAnswer ? validLetters.has(currentAnswer) : false;
+
+      return {
+        ...sub,
+        options: updatedRawOptions,
+        correctAnswer: isValid ? sub.correctAnswer : fallbackLetter,
+      };
+    });
+
+    onUpdateQuestion({ ...question, subItems: updatedSubItems });
+  };
+
   const hasContent = Boolean(question.contextContent?.trim());
 
   return (
     <Card
-      id={`question-card-2-${questionNumber - 1}`}
+      id={id ?? `question-card-2-${questionNumber - 1}`}
       onClick={onFocus}
       onFocusCapture={onFocus}
-      className="border-border/70 rounded-xl border bg-card p-4 space-y-4 shadow-xs transition-shadow hover:shadow-sm"
+      className="group border-border/70 bg-card space-y-2.5 rounded-xl border p-3.5 shadow-xs transition-shadow hover:shadow-sm sm:p-4"
     >
       <QuestionEditorCardHeader
         questionNumber={questionNumber}
-        pointsLabel=""
         imageUrl={question.imageUrl}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
@@ -124,137 +143,55 @@ export function SectionEditorMatching({
           <p className="line-clamp-1 italic">
             {hasContent ? question.contextContent : "Chưa có nội dung ngữ cảnh..."}
           </p>
-          <span className="shrink-0 font-medium">{question.subItems.length} vế ghép</span>
+          <div className="flex shrink-0 items-center gap-2 font-medium">
+            <span>{question.subItems.length} vế ghép</span>
+            <span>•</span>
+            <span>{options.length} phương án</span>
+          </div>
         </button>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2.5">
           <ExamMarkdownEditor
+            label="Nội dung / Ngữ cảnh đề bài"
             value={question.contextContent}
             onChange={handleContextChange}
             editorMode={editorMode}
-            placeholder="Nhập thông tin bảng hoặc danh sách thông tin cần ghép nối..."
+            placeholder="Nhập thông tin bối cảnh hoặc đoạn văn dẫn nhập cho câu hỏi ghép nối..."
             rows={3}
           />
 
-          <div className="border-t border-border/40 pt-3 space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="border-border/40 space-y-2 border-t pt-2">
+            <div className="flex items-center justify-between px-0.5">
               <span className="text-foreground text-xs font-semibold">
-                Các cặp ghép nối ({question.subItems.length} cặp):
+                Cấu hình các vế ghép và phương án:
               </span>
-              {editorMode === "edit" && (
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={handleAddPair}
-                  className="h-7 gap-1 text-xs font-semibold text-primary hover:bg-primary/10"
-                >
-                  <Plus className="size-3.5" />
-                  Thêm vế ghép
-                </Button>
-              )}
+              <span className="text-muted-foreground text-[11px] font-medium">
+                {question.subItems.length} vế ghép • {options.length} phương án
+              </span>
             </div>
 
-            {editorMode === "preview" ? (
-              <div className="divide-y divide-border/25">
-                {question.subItems.map((subItem, sIdx) => (
-                  <div
-                    key={subItem.id || sIdx}
-                    className="flex items-start justify-between gap-3 py-2.5 first:pt-1 last:pb-1"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center font-mono text-xs font-bold text-muted-foreground">
-                        {subItem.label || `${sIdx + 1}.`}
-                      </span>
-                      <div className="text-foreground text-xs leading-relaxed sm:text-sm">
-                        {subItem.content.trim() ? (
-                          <ChemRenderer content={subItem.content} />
-                        ) : (
-                          <span className="text-muted-foreground text-xs italic">
-                            Chưa có nội dung vế ghép...
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-1.5 text-xs font-semibold">
-                      <ArrowRight className="size-3.5 text-muted-foreground" />
-                      <Badge variant="secondary" className="px-2 py-0.5 font-bold">
-                        {subItem.correctAnswer || "A"}
-                      </Badge>
-                    </div>
-                  </div>
-                ))}
+            <div className="grid grid-cols-1 gap-3.5 lg:grid-cols-12 lg:items-start">
+              <div className="lg:col-span-7">
+                <SectionEditorMatchingPairs
+                  subItems={question.subItems}
+                  options={options}
+                  title={col1Title}
+                  editorMode={editorMode}
+                  onSubItemChange={handleSubItemChange}
+                  onAddPair={handleAddPair}
+                  onRemovePair={handleRemovePair}
+                />
               </div>
-            ) : (
-              <div className="divide-y divide-border/25">
-                {question.subItems.map((subItem, sIdx) => (
-                  <div
-                    key={subItem.id || sIdx}
-                    className="flex items-start gap-2.5 py-2 first:pt-1 last:pb-1"
-                  >
-                    <span className="mt-1.5 flex size-5 shrink-0 items-center justify-center font-mono text-xs font-bold text-muted-foreground">
-                      {subItem.label || `${sIdx + 1}.`}
-                    </span>
 
-                    <div className="w-full flex-1">
-                      <textarea
-                        value={subItem.content}
-                        onChange={(e) =>
-                          handleSubItemChange(sIdx, { content: e.target.value })
-                        }
-                        placeholder={`Nội dung vế ghép ${sIdx + 1}...`}
-                        rows={1}
-                        className="field-sizing-content min-h-[32px] w-full resize-none rounded-md bg-transparent px-2 py-1 text-xs font-medium text-foreground transition-colors placeholder:text-muted-foreground/50 hover:bg-muted/20 focus-visible:bg-muted/20 focus-visible:outline-none"
-                      />
-                    </div>
-
-                    <div className="flex shrink-0 items-center gap-1.5">
-                      <ArrowRight className="size-3.5 text-muted-foreground" />
-                      <span className="text-muted-foreground text-xs font-normal">Ghép với:</span>
-
-                      <Select
-                        value={subItem.correctAnswer ?? "A"}
-                        onValueChange={(val) =>
-                          handleSubItemChange(sIdx, { correctAnswer: val })
-                        }
-                      >
-                        <SelectTrigger className="h-7 w-12 text-xs font-bold">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {MATCHING_TARGETS.map((opt) => (
-                            <SelectItem key={opt} value={opt} className="text-xs font-bold">
-                              {opt}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      {question.subItems.length > 1 && (
-                        <TooltipProvider delayDuration={200}>
-                          <Tooltip>
-                            <TooltipTrigger asChild>
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon-xs"
-                                onClick={() => handleRemovePair(sIdx)}
-                                className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-6"
-                                aria-label="Xóa cặp ghép này"
-                              >
-                                <Trash2 className="size-3.5" />
-                              </Button>
-                            </TooltipTrigger>
-                            <TooltipContent side="top">Xóa cặp ghép này</TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      )}
-                    </div>
-                  </div>
-                ))}
+              <div className="lg:col-span-5">
+                <SectionEditorMatchingOptions
+                  options={options}
+                  title={col2Title}
+                  editorMode={editorMode}
+                  onOptionsChange={handleOptionsChange}
+                />
               </div>
-            )}
+            </div>
           </div>
         </div>
       )}

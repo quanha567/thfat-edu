@@ -115,71 +115,81 @@ export default function AdminDashboardPage() {
           </Button>
         </CardHeader>
         <CardContent>
-          {isLoadingExams ? (
-            <div className="space-y-3 py-2">
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-              <Skeleton className="h-10 w-full" />
-            </div>
-          ) : recentExams.length === 0 ? (
-            <div className="py-8 text-center">
-              <p className="text-muted-foreground text-sm">Chưa có đề thi nào trong hệ thống.</p>
-              <Button asChild variant="outline" size="sm" className="mt-3 text-xs">
-                <Link href="/admin/exams/create">Tạo đề thi đầu tiên</Link>
-              </Button>
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead className="text-xs">Tên đề thi</TableHead>
-                    <TableHead className="text-xs">Thời lượng & Điểm</TableHead>
-                    <TableHead className="text-xs">Trạng thái</TableHead>
-                    <TableHead className="text-xs">Ngày tạo</TableHead>
-                    <TableHead className="text-right text-xs">Thao tác</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recentExams.map((exam) => {
-                    const formattedDate = exam.createdAt
-                      ? format(parseISO(exam.createdAt), "dd/MM/yyyy HH:mm")
-                      : "—";
+          {(() => {
+            if (isLoadingExams) {
+              return (
+                <div className="space-y-3 py-2">
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                  <Skeleton className="h-10 w-full" />
+                </div>
+              );
+            }
 
-                    return (
-                      <TableRow key={exam.id}>
-                        <TableCell className="font-medium">
-                          <Link
-                            href={`/admin/exams/${exam.id}/edit`}
-                            className="text-foreground line-clamp-1 text-sm font-semibold hover:underline"
-                          >
-                            {exam.title}
-                          </Link>
-                          <span className="text-muted-foreground text-xs">
-                            {exam.totalQuestions} câu hỏi
-                          </span>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {exam.durationMinutes} phút • {exam.totalPoints}đ
-                        </TableCell>
-                        <TableCell>
-                          <ExamStatusBadge status={exam.status} />
-                        </TableCell>
-                        <TableCell className="text-muted-foreground text-xs">
-                          {formattedDate}
-                        </TableCell>
-                        <TableCell className="text-right">
-                          <Button asChild variant="ghost" size="sm" className="h-8 px-2 text-xs">
-                            <Link href={`/admin/exams/${exam.id}/edit`}>Chỉnh sửa</Link>
-                          </Button>
-                        </TableCell>
-                      </TableRow>
-                    );
-                  })}
-                </TableBody>
-              </Table>
-            </div>
-          )}
+            if (recentExams.length === 0) {
+              return (
+                <div className="py-8 text-center">
+                  <p className="text-muted-foreground text-sm">Chưa có đề thi nào trong hệ thống.</p>
+                  <Button asChild variant="outline" size="sm" className="mt-3 text-xs">
+                    <Link href="/admin/exams/create">Tạo đề thi đầu tiên</Link>
+                  </Button>
+                </div>
+              );
+            }
+
+            return (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="text-xs">Tên đề thi</TableHead>
+                      <TableHead className="text-xs">Thời lượng & Điểm</TableHead>
+                      <TableHead className="text-xs">Trạng thái</TableHead>
+                      <TableHead className="text-xs">Ngày tạo</TableHead>
+                      <TableHead className="text-right text-xs">Thao tác</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recentExams.map((exam) => {
+                      const formattedDate = exam.createdAt
+                        ? format(parseISO(exam.createdAt), "dd/MM/yyyy HH:mm")
+                        : "—";
+
+                      return (
+                        <TableRow key={exam.id}>
+                          <TableCell className="font-medium">
+                            <Link
+                              href={`/admin/exams/${exam.id}/edit`}
+                              className="text-foreground line-clamp-1 text-sm font-semibold hover:underline"
+                            >
+                              {exam.title}
+                            </Link>
+                            <span className="text-muted-foreground text-xs">
+                              {exam.totalQuestions} câu hỏi
+                            </span>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {exam.durationMinutes} phút • {exam.totalPoints}đ
+                          </TableCell>
+                          <TableCell>
+                            <ExamStatusBadge status={exam.status} />
+                          </TableCell>
+                          <TableCell className="text-muted-foreground text-xs">
+                            {formattedDate}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <Button asChild variant="ghost" size="sm" className="h-8 px-2 text-xs">
+                              <Link href={`/admin/exams/${exam.id}/edit`}>Chỉnh sửa</Link>
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
+            );
+          })()}
         </CardContent>
       </Card>
     </div>

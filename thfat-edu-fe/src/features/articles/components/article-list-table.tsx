@@ -36,6 +36,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 
+import { DEFAULT_ARTICLE_THUMBNAIL } from "../constants";
 import { useArticles } from "../hooks/use-articles";
 import { useDeleteArticle } from "../hooks/use-delete-article";
 import type { TArticleStatus } from "../types/article.types";
@@ -131,21 +132,15 @@ export function ArticleListTable() {
       <TableRow key={item.id}>
         <TableCell>
           <div className="flex items-center gap-3">
-            {item.thumbnailUrl ? (
-              <div className="relative size-10 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
-                <Image
-                  src={item.thumbnailUrl}
-                  alt={item.title}
-                  fill
-                  sizes="40px"
-                  className="object-cover"
-                />
-              </div>
-            ) : (
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-md border border-border bg-muted/60 text-muted-foreground text-xs font-semibold">
-                N/A
-              </div>
-            )}
+            <div className="relative size-10 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+              <Image
+                src={item.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
+                alt={item.title}
+                fill
+                sizes="40px"
+                className="object-cover"
+              />
+            </div>
             <div className="flex min-w-0 flex-col">
               <span className="font-semibold text-foreground text-sm line-clamp-1">
                 {item.title}

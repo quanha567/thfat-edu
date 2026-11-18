@@ -24,6 +24,18 @@ type TRenderSectionContentOptions = Omit<TExamQuestionViewerProps, "questionNumb
   isSingleSubItem: boolean;
 };
 
+function formatSubLabel(label?: string | null): string {
+  if (!label) {
+    return "";
+  }
+
+  if (label.toLowerCase().includes("câu")) {
+    return `${label}.`;
+  }
+
+  return `Câu ${label}.`;
+}
+
 function renderSectionContent({
   question,
   sectionType,
@@ -56,24 +68,21 @@ function renderSectionContent({
   }
 
   return (
-    <div className="space-y-4 divide-y divide-neutral-100 pt-1">
+    <div className="space-y-6 pt-2">
       {question.subItems.map((si) => {
         const state = answersMap[si.id];
         const selectedAnswer = state?.selectedAnswer ?? "";
         const isFlagged = state?.isFlagged ?? false;
         const isContentDifferent =
           si.content.trim() !== question.contextContent?.trim() && !isSingleSubItem;
+        const subLabel = formatSubLabel(si.label);
 
         return (
-          <div
-            key={si.id}
-            id={`subitem-${si.id}`}
-            className="scroll-mt-24 space-y-3 pt-3 first:pt-0"
-          >
+          <div key={si.id} id={`subitem-${si.id}`} className="scroll-mt-24 space-y-3">
             {isContentDifferent && (
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-start gap-2 text-sm leading-relaxed font-medium text-neutral-900">
-                  <span className="shrink-0 font-bold text-neutral-800">{si.label}</span>
+                  {subLabel && <span className="shrink-0 font-bold text-neutral-800">{subLabel}</span>}
                   <ChemRenderer content={si.content} />
                 </div>
 
@@ -81,11 +90,11 @@ function renderSectionContent({
                   <button
                     type="button"
                     onClick={() => onToggleFlag(si.id)}
-                    title={isFlagged ? "Bỏ cắm cờ" : "Cắm cờ câu này"}
+                    title={isFlagged ? "Bỏ đánh dấu" : "Đánh dấu xem lại"}
                     className={cn(
                       "shrink-0 rounded-md p-1.5 transition-colors",
                       isFlagged
-                        ? "bg-amber-100 text-amber-600 hover:bg-amber-200"
+                        ? "bg-warning-100 text-warning-700 hover:bg-warning-200"
                         : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600",
                     )}
                   >
@@ -104,7 +113,6 @@ function renderSectionContent({
                   onAnswerChange={onAnswerChange}
                 />
               )}
-
               {sectionType === "short_answer" && (
                 <Input
                   type="text"
@@ -148,7 +156,9 @@ export function ExamQuestionViewer({
         <div className="flex items-start justify-between gap-3">
           <div className="flex flex-1 items-start gap-2.5 text-sm leading-relaxed">
             <span className="bg-primary-100 text-primary-800 inline-flex shrink-0 rounded-md px-2.5 py-1 text-xs font-bold">
-              Câu {questionNumber}
+              {sectionType === "group_mcq" && question.subItems.length > 1
+                ? `Chùm câu hỏi (Câu ${questionNumber} – ${questionNumber + question.subItems.length - 1})`
+                : `Câu ${questionNumber}`}
             </span>
             {displayContext && (
               <div className="prose prose-neutral max-w-none pt-0.5 text-sm font-medium text-neutral-900">
@@ -161,15 +171,15 @@ export function ExamQuestionViewer({
             <button
               type="button"
               onClick={() => onToggleFlag(singleSubItem.id)}
-              title={isSingleFlagged ? "Bỏ cắm cờ" : "Cắm cờ câu này"}
+              title={isSingleFlagged ? "Bỏ đánh dấu" : "Đánh dấu xem lại"}
               className={cn(
                 "shrink-0 rounded-md p-1.5 transition-colors",
                 isSingleFlagged
-                  ? "bg-amber-100 text-amber-600 hover:bg-amber-200"
+                  ? "bg-warning-100 text-warning-700 hover:bg-warning-200"
                   : "text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600",
               )}
             >
-              <Flag className={cn("h-4 w-4", isSingleFlagged && "fill-current text-amber-500")} />
+              <Flag className={cn("h-4 w-4", isSingleFlagged && "fill-current text-warning-500")} />
             </button>
           )}
         </div>

@@ -158,7 +158,7 @@ export function createUserColumns({
             ? {
                 id: "restore",
                 label: "Khôi phục tài khoản",
-                icon: <RotateCcw className="size-4 text-emerald-600" />,
+                icon: <RotateCcw className="text-success-600 size-4" />,
                 onClick: () => onRestore(user),
               }
             : {

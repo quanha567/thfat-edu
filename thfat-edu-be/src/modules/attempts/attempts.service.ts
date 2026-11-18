@@ -32,11 +32,11 @@ export function normalizeBooleanAnswer(value: unknown): "true" | "false" | null 
 
   const raw = String(value).trim().toLowerCase();
 
-  if (["true", "t", "đ", "1"].includes(raw)) {
+  if (["true", "t", "đ", "d", "1", "đúng", "dung"].includes(raw)) {
     return "true";
   }
 
-  if (["false", "f", "s", "0"].includes(raw)) {
+  if (["false", "f", "s", "0", "sai"].includes(raw)) {
     return "false";
   }
 
@@ -45,9 +45,26 @@ export function normalizeBooleanAnswer(value: unknown): "true" | "false" | null 
 
 export function calculateGraduatedTrueFalsePoints(
   correctCount: number,
-  totalPoints: number = 1.0,
+  totalPoints: number = 6.0,
 ): number {
-  const baseScale: Record<number, number> = {
+  if (correctCount <= 0) {
+    return 0;
+  }
+
+  if (totalPoints > 2.0) {
+    const vsatScale: Record<number, number> = {
+      0: 0,
+      1: 1.0,
+      2: 2.0,
+      3: 3.0,
+      4: 6.0,
+    };
+    const base = vsatScale[correctCount] ?? 0;
+
+    return Number(((base / 6.0) * totalPoints).toFixed(2));
+  }
+
+  const moetScale: Record<number, number> = {
     0: 0,
     1: 0.1,
     2: 0.25,
@@ -55,7 +72,7 @@ export function calculateGraduatedTrueFalsePoints(
     4: 1.0,
   };
 
-  const ratio = baseScale[correctCount] ?? 0;
+  const ratio = moetScale[correctCount] ?? 0;
 
   return Number((ratio * totalPoints).toFixed(2));
 }
@@ -557,7 +574,12 @@ export class AttemptsService {
     }
 
     const submittedAt = new Date();
-    const finalScore = grandTotalPoints.toFixed(2);
+    const maxQuizPoints = parseFloat(quizWithStructure.totalPoints || "150.00");
+    const clampedScore =
+      !isNaN(maxQuizPoints) && maxQuizPoints > 0
+        ? Math.min(grandTotalPoints, maxQuizPoints)
+        : grandTotalPoints;
+    const finalScore = clampedScore.toFixed(2);
 
     await this.database
       .update(examAttempts)
@@ -773,15 +795,21 @@ export class AttemptsService {
     let answeredCount = 0;
 
     for (const subItem of subItems) {
-      totalPoints += Number(subItem.points || "1.00");
+      totalPoints += Number(subItem.points || "1.50");
       const userAnswer = answerMap.get(subItem.id);
 
       if (userAnswer) {
         answeredCount++;
       }
 
+      const normalizedUser = normalizeBooleanAnswer(userAnswer);
+      const normalizedCorrect = normalizeBooleanAnswer(subItem.correctAnswer);
+
       const isCorrect =
-        normalizeBooleanAnswer(userAnswer) === normalizeBooleanAnswer(subItem.correctAnswer);
+        Boolean(userAnswer) &&
+        normalizedUser !== null &&
+        normalizedCorrect !== null &&
+        normalizedUser === normalizedCorrect;
 
       if (isCorrect) {
         correctCount++;
@@ -796,10 +824,36 @@ export class AttemptsService {
       });
     }
 
-    const points = calculateGraduatedTrueFalsePoints(
-      correctCount,
-      totalPoints > 0 ? totalPoints : 1.0,
-    );
+    let effectiveTotalPoints = 6.0;
+    if (totalPoints > 0 && totalPoints <= 6.0) {
+      effectiveTotalPoints = totalPoints;
+    }
+
+    const points = calculateGraduatedTrueFalsePoints(correctCount, effectiveTotalPoints);
+
+    if (points > 0 && correctCount > 0) {
+      const pointPerCorrect = Number((points / correctCount).toFixed(2));
+      for (const subItem of subItems) {
+        const userAnswer = answerMap.get(subItem.id);
+        const normalizedUser = normalizeBooleanAnswer(userAnswer);
+        const normalizedCorrect = normalizeBooleanAnswer(subItem.correctAnswer);
+        const isCorrect =
+          Boolean(userAnswer) &&
+          normalizedUser !== null &&
+          normalizedCorrect !== null &&
+          normalizedUser === normalizedCorrect;
+
+        if (isCorrect) {
+          await this.upsertGradedAnswer({
+            attemptId,
+            subItemId: subItem.id,
+            selectedAnswer: userAnswer,
+            isCorrect: true,
+            pointsEarned: pointPerCorrect.toFixed(2),
+          });
+        }
+      }
+    }
 
     return { points, answeredCount };
   }
@@ -834,7 +888,16 @@ export class AttemptsService {
                 .trim()
                 .toUpperCase();
 
-      const pointsValue = Number(subItem.points || "1.50");
+      let defaultPoint = "1.50";
+      if (sectionType === "group_mcq" || sectionType === "short_answer") {
+        defaultPoint = "6.00";
+      }
+
+      let pointsValue = Number(subItem.points || defaultPoint);
+      if (sectionType === "matching" && pointsValue > 1.50) {
+        pointsValue = 1.50;
+      }
+
       const pointsEarned = isCorrect ? pointsValue : 0;
 
       earnedPoints += pointsEarned;
@@ -912,6 +975,12 @@ export class AttemptsService {
   }
 
   private async loadFullQuizForGrading(quizId: string) {
+    const [quiz] = await this.database
+      .select({ totalPoints: quizzes.totalPoints })
+      .from(quizzes)
+      .where(eq(quizzes.id, quizId))
+      .limit(1);
+
     const sectionsRows = await this.database
       .select()
       .from(quizSections)
@@ -948,7 +1017,7 @@ export class AttemptsService {
       });
     }
 
-    return { sections };
+    return { totalPoints: quiz?.totalPoints ?? "150.00", sections };
   }
 }
 

@@ -4,13 +4,14 @@ import { ChemRenderer } from "@/components/chemistry/chem-renderer";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { Check, X } from "lucide-react";
 
 import { type TQuizQuestion, type TQuizSubItem } from "../../types";
 import { ExamMarkdownEditor } from "./exam-markdown-editor";
 import { QuestionEditorCardHeader } from "./question-editor-card-header";
+import { TrueFalseBinarySwitch } from "./true-false-binary-switch";
 
 export type TSectionEditorTrueFalseProps = {
+  id?: string;
   question: TQuizQuestion;
   questionNumber: number;
   canMoveUp: boolean;
@@ -29,6 +30,7 @@ export type TSectionEditorTrueFalseProps = {
 };
 
 export function SectionEditorTrueFalse({
+  id,
   question,
   questionNumber,
   canMoveUp,
@@ -45,35 +47,28 @@ export function SectionEditorTrueFalse({
   onDelete,
   onUpdateQuestion,
 }: TSectionEditorTrueFalseProps) {
-  const handleContextChange = (val: string) => {
+  const hasContent = Boolean(question.contextContent?.trim());
+  const handleContextChange = (val: string) =>
     onUpdateQuestion({ ...question, contextContent: val });
-  };
-
-  const handleImageChange = (url: string | null) => {
+  const handleImageChange = (url: string | null) =>
     onUpdateQuestion({ ...question, imageUrl: url });
-  };
-
   const handleSubItemChange = (index: number, patch: Partial<TQuizSubItem>) => {
     const updated = [...question.subItems];
-    const target = updated[index];
-    if (target) {
-      updated[index] = { ...target, ...patch };
+    if (updated[index]) {
+      updated[index] = { ...updated[index], ...patch };
       onUpdateQuestion({ ...question, subItems: updated });
     }
   };
 
-  const hasContent = Boolean(question.contextContent?.trim());
-
   return (
     <Card
-      id={`question-card-0-${questionNumber - 1}`}
+      id={id ?? `question-card-0-${questionNumber - 1}`}
       onClick={onFocus}
       onFocusCapture={onFocus}
-      className="border-border/70 rounded-xl border bg-card p-4 space-y-4 shadow-xs transition-shadow hover:shadow-sm"
+      className="group border-border/70 bg-card space-y-2.5 rounded-xl border p-3.5 shadow-xs transition-shadow hover:shadow-sm sm:p-4"
     >
       <QuestionEditorCardHeader
         questionNumber={questionNumber}
-        pointsLabel=""
         imageUrl={question.imageUrl}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
@@ -100,8 +95,9 @@ export function SectionEditorTrueFalse({
           <span className="shrink-0 font-medium">{question.subItems.length} ý phát biểu</span>
         </button>
       ) : (
-        <div className="space-y-4">
+        <div className="space-y-2.5">
           <ExamMarkdownEditor
+            label="Nội dung / Ngữ cảnh đề bài"
             value={question.contextContent}
             onChange={handleContextChange}
             editorMode={editorMode}
@@ -109,13 +105,16 @@ export function SectionEditorTrueFalse({
             rows={3}
           />
 
-          <div className="border-t border-border/40 pt-3 space-y-2">
-            <span className="text-foreground text-xs font-semibold">
-              Các ý phát biểu:
-            </span>
+          <div className="border-border/40 space-y-2 border-t pt-2">
+            <div className="flex items-center justify-between px-0.5">
+              <span className="text-foreground text-xs font-semibold">Các ý phát biểu:</span>
+              <span className="text-muted-foreground text-[11px] font-medium">
+                {question.subItems.length} ý phát biểu
+              </span>
+            </div>
 
             {editorMode === "preview" ? (
-              <div className="divide-y divide-border/25">
+              <div className="space-y-1.5">
                 {question.subItems.map((subItem, sIdx) => {
                   const isTrue =
                     subItem.correctAnswer === "Đúng" || subItem.correctAnswer === "true";
@@ -123,13 +122,13 @@ export function SectionEditorTrueFalse({
                   return (
                     <div
                       key={subItem.id || sIdx}
-                      className="flex items-start justify-between gap-3 py-2.5 first:pt-1 last:pb-1"
+                      className="border-border/40 bg-muted/10 flex items-start justify-between gap-3 rounded-lg border p-2 sm:px-2.5"
                     >
-                      <div className="flex items-start gap-2.5">
-                        <span className="mt-0.5 flex size-5 shrink-0 items-center justify-center font-mono text-xs font-bold text-muted-foreground">
-                          {subItem.label || `${String.fromCharCode(97 + sIdx)}.`}
+                      <div className="flex min-w-0 flex-1 items-start gap-2.5">
+                        <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold shadow-2xs">
+                          {subItem.label || sIdx + 1}
                         </span>
-                        <div className="text-foreground text-xs leading-relaxed sm:text-sm">
+                        <div className="text-foreground mt-0.5 text-xs leading-relaxed sm:text-sm">
                           {subItem.content.trim() ? (
                             <ChemRenderer content={subItem.content} />
                           ) : (
@@ -145,8 +144,8 @@ export function SectionEditorTrueFalse({
                         className={cn(
                           "shrink-0 px-2 py-0.5 text-xs font-semibold",
                           isTrue
-                            ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-400"
-                            : "bg-rose-500/15 text-rose-700 dark:text-rose-400",
+                            ? "bg-success-500/15 text-success-700 dark:text-success-400"
+                            : "bg-error-500/15 text-error-700 dark:text-error-400",
                         )}
                       >
                         {isTrue ? "Đúng" : "Sai"}
@@ -156,7 +155,7 @@ export function SectionEditorTrueFalse({
                 })}
               </div>
             ) : (
-              <div className="divide-y divide-border/25">
+              <div className="space-y-1.5">
                 {question.subItems.map((subItem, sIdx) => {
                   const isTrue =
                     subItem.correctAnswer === "Đúng" || subItem.correctAnswer === "true";
@@ -164,51 +163,27 @@ export function SectionEditorTrueFalse({
                   return (
                     <div
                       key={subItem.id || sIdx}
-                      className="flex items-start gap-2.5 py-2 first:pt-1 last:pb-1"
+                      className="border-border/40 bg-muted/10 hover:border-border hover:bg-muted/20 flex items-start gap-2.5 rounded-lg border p-1.5 transition-all sm:px-2.5"
                     >
-                      <span className="mt-1.5 flex size-5 shrink-0 items-center justify-center font-mono text-xs font-bold text-muted-foreground">
-                        {subItem.label || `${String.fromCharCode(97 + sIdx)}.`}
+                      <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 flex size-6 shrink-0 items-center justify-center rounded-full border font-mono text-xs font-bold shadow-2xs">
+                        {subItem.label || sIdx + 1}
                       </span>
 
-                      <div className="w-full flex-1">
-                        <textarea
+                      <div className="w-full min-w-0 flex-1">
+                        <ExamMarkdownEditor
                           value={subItem.content}
-                          onChange={(e) =>
-                            handleSubItemChange(sIdx, { content: e.target.value })
-                          }
-                          placeholder={`Nhập ý phát biểu ${String.fromCharCode(97 + sIdx)}...`}
+                          onChange={(val) => handleSubItemChange(sIdx, { content: val })}
+                          placeholder={`Nhập ý phát biểu ${sIdx + 1}...`}
                           rows={1}
-                          className="field-sizing-content min-h-[32px] w-full resize-none rounded-md bg-transparent px-2 py-1 text-xs font-medium text-foreground transition-colors placeholder:text-muted-foreground/50 hover:bg-muted/20 focus-visible:bg-muted/20 focus-visible:outline-none"
+                          compact
                         />
                       </div>
 
-                      <div className="flex shrink-0 items-center rounded-md bg-muted/60 p-0.5">
-                        <button
-                          type="button"
-                          onClick={() => handleSubItemChange(sIdx, { correctAnswer: "Đúng" })}
-                          className={cn(
-                            "flex items-center gap-1 rounded px-2.5 py-1 text-xs font-semibold transition-all",
-                            isTrue
-                              ? "bg-emerald-500/20 font-bold text-emerald-700 dark:text-emerald-400"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
-                        >
-                          <Check className="size-3" />
-                          Đúng
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleSubItemChange(sIdx, { correctAnswer: "Sai" })}
-                          className={cn(
-                            "flex items-center gap-1 rounded px-2.5 py-1 text-xs font-semibold transition-all",
-                            !isTrue
-                              ? "bg-rose-500/20 font-bold text-rose-700 dark:text-rose-400"
-                              : "text-muted-foreground hover:text-foreground",
-                          )}
-                        >
-                          <X className="size-3" />
-                          Sai
-                        </button>
+                      <div className="mt-0.5">
+                        <TrueFalseBinarySwitch
+                          isTrue={isTrue}
+                          onChange={(val) => handleSubItemChange(sIdx, { correctAnswer: val })}
+                        />
                       </div>
                     </div>
                   );

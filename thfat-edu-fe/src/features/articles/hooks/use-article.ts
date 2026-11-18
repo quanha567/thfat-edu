@@ -8,9 +8,10 @@ import type { TArticleDetail } from "../types/article.types";
 export type TUseArticleOptions = {
   idOrSlug: string;
   isAdmin?: boolean;
+  initialData?: TArticleDetail;
 };
 
-export function useArticle({ idOrSlug, isAdmin = false }: TUseArticleOptions) {
+export function useArticle({ idOrSlug, isAdmin = false, initialData }: TUseArticleOptions) {
   return useQuery<TArticleDetail>({
     queryKey: queryKeys.articles.detail(idOrSlug),
     queryFn: async () => {
@@ -28,6 +29,7 @@ export function useArticle({ idOrSlug, isAdmin = false }: TUseArticleOptions) {
       return res.json();
     },
     enabled: Boolean(idOrSlug),
+    initialData,
     staleTime: 60 * 1000,
   });
 }

@@ -26,11 +26,11 @@ export type TExamRoomHeaderProps = {
 
 function getTimerClassName(isLowTime: boolean, isMediumTime: boolean): string {
   if (isLowTime) {
-    return "bg-red-50 text-red-600 animate-pulse border border-red-200";
+    return "bg-error-50 text-error-600 animate-pulse border border-error-200";
   }
 
   if (isMediumTime) {
-    return "bg-amber-50 text-amber-600 border border-amber-200";
+    return "bg-warning-50 text-warning-700 border border-warning-200";
   }
 
   return "bg-neutral-100 text-neutral-800";
@@ -118,7 +118,7 @@ export function ExamRoomHeader({
               )}`}
             >
               {isLowTime ? (
-                <AlertCircle className="h-4 w-4 text-red-600" />
+                <AlertCircle className="text-error-600 h-4 w-4" />
               ) : (
                 <Clock className="h-4 w-4 text-neutral-500" />
               )}

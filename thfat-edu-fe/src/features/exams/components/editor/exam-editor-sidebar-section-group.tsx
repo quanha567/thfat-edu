@@ -1,12 +1,13 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
 
 import { type TQuizSection } from "../../types";
 
 export type TExamEditorSidebarSectionGroupProps = {
   section: TQuizSection;
   sectionIndex: number;
+  startQuestionNumber?: number;
   errorQuestionKeys: Set<string>;
   activeKey: string | null;
   onSelectQuestion: (sectionIdx: number, questionIdx: number) => void;
@@ -24,9 +25,22 @@ function parseSectionTitle(rawTitle: string) {
   };
 }
 
+function getQuestionButtonClass(isActive: boolean, isErr: boolean) {
+  if (isActive) {
+    return "bg-primary text-primary-foreground font-bold border border-primary shadow-2xs";
+  }
+
+  if (isErr) {
+    return "border border-destructive/50 bg-destructive/10 text-destructive font-bold hover:bg-destructive/15";
+  }
+
+  return "border border-border/60 bg-muted/20 text-foreground hover:border-primary/40 hover:bg-primary/5 hover:text-primary";
+}
+
 export function ExamEditorSidebarSectionGroup({
   section,
   sectionIndex,
+  startQuestionNumber = 1,
   errorQuestionKeys,
   activeKey,
   onSelectQuestion,
@@ -34,62 +48,107 @@ export function ExamEditorSidebarSectionGroup({
   const { part, name } = parseSectionTitle(section.title);
 
   return (
-    <div className="rounded-xl border border-border/60 bg-card p-3 space-y-2.5 shadow-2xs transition-colors hover:border-border/90">
-      <div className="flex items-center justify-between gap-1.5 text-xs">
-        <div className="flex items-center gap-1.5 min-w-0 flex-1">
+    <div className="space-y-2 border-b border-border/30 pb-3 last:border-b-0 last:pb-0">
+      <div className="flex items-center justify-between text-xs px-0.5">
+        <div className="flex items-center gap-1.5 min-w-0">
           {part ? (
-            <span className="shrink-0 rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-bold text-primary dark:bg-primary/25">
-              {part}
-            </span>
+            <span className="font-bold text-primary text-xs shrink-0">{part}:</span>
           ) : null}
-          <span
-            className="truncate font-semibold text-foreground/90 text-xs"
-            title={section.title}
-          >
+          <span className="truncate font-semibold text-foreground text-xs" title={section.title}>
             {name}
           </span>
         </div>
 
-        <Badge
-          variant="secondary"
-          className="shrink-0 text-[10px] font-medium px-1.5 py-0 rounded-full text-muted-foreground"
-        >
-          {section.questions.length} câu
-        </Badge>
+        <span className="text-muted-foreground text-[11px] font-medium shrink-0">
+          {section.sectionType === "group_mcq"
+            ? `${section.questions.reduce((acc, q) => acc + (q.subItems?.length || 1), 0)} câu (${section.questions.length} chùm)`
+            : `${section.questions.length} câu`}
+        </span>
       </div>
 
-      <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
-        {section.questions.map((_, qIdx) => {
-          const key = `${sectionIndex}-${qIdx}`;
-          const isErr = errorQuestionKeys.has(key);
-          const isActive = activeKey === key;
+      <div className="grid grid-cols-5 gap-1.5">
+        {section.sectionType === "group_mcq"
+          ? (() => {
+              let subCounter = 0;
 
-          let buttonClass =
-            "border border-border/70 bg-neutral-50/70 text-foreground/80 hover:border-primary/40 hover:bg-primary-50/60 hover:text-primary active:scale-95 shadow-2xs dark:bg-neutral-900/40 dark:border-neutral-800 dark:text-neutral-300 dark:hover:bg-primary-950/40 dark:hover:border-primary-700";
+              return section.questions.flatMap((q, qIdx) => {
+                const qKey = `${sectionIndex}-${qIdx}`;
+                const isErr = errorQuestionKeys.has(qKey);
+                const isActive = activeKey === qKey;
+                const statusClass = getQuestionButtonClass(isActive, isErr);
 
-          if (isErr) {
-            buttonClass =
-              "border border-destructive/40 bg-destructive/10 text-destructive hover:bg-destructive/20 font-bold ring-1 ring-destructive/20 relative";
-          } else if (isActive) {
-            buttonClass =
-              "bg-primary text-primary-foreground font-bold border-primary shadow-xs ring-2 ring-primary/25 ring-offset-2 ring-offset-background scale-[1.04] z-10";
-          }
+                if (!q.subItems || q.subItems.length === 0) {
+                  const qNum = startQuestionNumber + subCounter++;
 
-          return (
-            <button
-              key={key}
-              type="button"
-              onClick={() => onSelectQuestion(sectionIndex, qIdx)}
-              className={`flex h-8 sm:h-8.5 w-full items-center justify-center rounded-lg text-xs font-semibold tabular-nums transition-all duration-150 cursor-pointer ${buttonClass}`}
-              title={`Chuyển tới câu ${qIdx + 1} (${section.title})`}
-            >
-              {qIdx + 1}
-              {isErr && !isActive && (
-                <span className="absolute -top-1 -right-1 size-2 rounded-full bg-destructive ring-2 ring-background" />
-              )}
-            </button>
-          );
-        })}
+                  return (
+                    <button
+                      key={qKey}
+                      type="button"
+                      onClick={() => onSelectQuestion(sectionIndex, qIdx)}
+                      className={cn(
+                        "relative flex h-8 w-full items-center justify-center rounded-md text-xs font-semibold tabular-nums transition-colors cursor-pointer",
+                        statusClass,
+                      )}
+                      title={`Chuyển tới câu ${qNum} (${section.title})`}
+                    >
+                      {qNum}
+                    </button>
+                  );
+                }
+
+                return q.subItems.map((si, sIdx) => {
+                  const subKey = `${sectionIndex}-${qIdx}-sub-${sIdx}`;
+                  const qNum = startQuestionNumber + subCounter++;
+                  const parsedLabelNum = si.label?.match(/\d+/)?.[0];
+                  const displayNum = parsedLabelNum ? Number(parsedLabelNum) : qNum;
+
+                  return (
+                    <button
+                      key={subKey}
+                      type="button"
+                      onClick={() => {
+                        onSelectQuestion(sectionIndex, qIdx);
+                        const cardId = `question-card-${sectionIndex}-${qIdx}`;
+                        const el = document.getElementById(`subitem-${cardId}-${sIdx}`);
+                        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+                      }}
+                      className={cn(
+                        "relative flex h-8 w-full items-center justify-center rounded-md text-xs font-semibold tabular-nums transition-colors cursor-pointer",
+                        statusClass,
+                      )}
+                      title={`Chuyển tới ${si.label || `Câu ${displayNum}`} (${section.title})`}
+                    >
+                      {displayNum}
+                    </button>
+                  );
+                });
+              });
+            })()
+          : section.questions.map((_, qIdx) => {
+              const key = `${sectionIndex}-${qIdx}`;
+              const isErr = errorQuestionKeys.has(key);
+              const isActive = activeKey === key;
+              const statusClass = getQuestionButtonClass(isActive, isErr);
+              const questionNumber = startQuestionNumber + qIdx;
+
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => onSelectQuestion(sectionIndex, qIdx)}
+                  className={cn(
+                    "relative flex h-8 w-full items-center justify-center rounded-md text-xs font-semibold tabular-nums transition-colors cursor-pointer",
+                    statusClass,
+                  )}
+                  title={`Chuyển tới câu ${questionNumber} (${section.title})`}
+                >
+                  {questionNumber}
+                  {isErr && !isActive && (
+                    <span className="absolute -top-1 -right-1 size-1.5 rounded-full bg-destructive" />
+                  )}
+                </button>
+              );
+            })}
       </div>
     </div>
   );

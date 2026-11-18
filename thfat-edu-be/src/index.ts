@@ -8,6 +8,7 @@ import { attemptsRoutes } from "./modules/attempts";
 import { articlesRoutes } from "./modules/articles";
 import { authRoutes } from "./modules/auth";
 import { healthRoutes } from "./modules/health/health.routes";
+import { leaderboardRoutes } from "./modules/leaderboard";
 import { quizzesRoutes } from "./modules/quizzes";
 import { settingsRoutes } from "./modules/settings";
 import { usersRoutes } from "./modules/users";
@@ -24,6 +25,7 @@ export const app = new Elysia()
   .use(usersRoutes)
   .use(settingsRoutes)
   .use(articlesRoutes)
+  .use(leaderboardRoutes)
   .group("/api", (group) =>
     group
       .use(healthRoutes)
@@ -32,7 +34,8 @@ export const app = new Elysia()
       .use(attemptsRoutes)
       .use(usersRoutes)
       .use(settingsRoutes)
-      .use(articlesRoutes),
+      .use(articlesRoutes)
+      .use(leaderboardRoutes),
   );
 
 export type App = typeof app;

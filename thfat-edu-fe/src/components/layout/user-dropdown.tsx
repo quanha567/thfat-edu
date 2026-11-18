@@ -2,7 +2,6 @@
 
 import { BaseAvatar } from "@/components/base";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -66,7 +65,7 @@ function renderRoleBadge(role: TUserRole): ReactNode {
     return (
       <Badge
         variant="outline"
-        className="border-purple-200/80 bg-purple-50 text-[10px] font-semibold tracking-wide text-purple-700 dark:border-purple-800 dark:bg-purple-950 dark:text-purple-300"
+        className="border-primary-200/80 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-300 text-[10px] font-semibold tracking-wide"
       >
         Giáo viên
       </Badge>
@@ -76,7 +75,7 @@ function renderRoleBadge(role: TUserRole): ReactNode {
   return (
     <Badge
       variant="outline"
-      className="border-sky-200/80 bg-sky-50 text-[10px] font-semibold tracking-wide text-sky-700 dark:border-sky-800 dark:bg-sky-950 dark:text-sky-300"
+      className="border-muted bg-muted text-muted-foreground dark:border-border dark:bg-neutral-800 dark:text-neutral-300 text-[10px] font-semibold tracking-wide"
     >
       Học viên
     </Badge>
@@ -113,12 +112,11 @@ function renderTrigger(
 
   if (variant === "navbar") {
     return (
-      <Button
-        variant="ghost"
-        size="sm"
+      <button
+        type="button"
         className={cn(
-          "group flex h-9.5 cursor-pointer items-center gap-2.5 rounded-full border border-white/10 bg-white/5 py-1 pr-3 pl-1.5 text-white transition-colors",
-          "hover:border-white/20 hover:bg-white/10 data-[state=open]:border-white/25 data-[state=open]:bg-white/15",
+          "group flex h-11 cursor-pointer items-center gap-2.5 rounded-full border border-white/20 bg-white/10 p-1.5 pr-4 text-white shadow-xs backdrop-blur-md transition-all outline-none",
+          "hover:border-white/35 hover:bg-white/15 focus-visible:ring-2 focus-visible:ring-primary/40 data-[state=open]:border-primary data-[state=open]:bg-white/20",
           className,
         )}
       >
@@ -126,29 +124,34 @@ function renderTrigger(
           src={user.avatarUrl}
           name={user.fullName ?? undefined}
           size="default"
-          className="ring-1 ring-white/20"
+          className="ring-1 ring-white/30"
         />
-        <span className="max-w-[140px] truncate text-sm font-medium text-white">
-          {user.fullName || "Tài khoản"}
-        </span>
-        <ChevronDown className="size-3.5 text-white/60 transition-transform duration-200 group-hover:text-white group-data-[state=open]:rotate-180" />
-      </Button>
+        <div className="flex flex-col justify-center text-left">
+          <span className="max-w-[120px] truncate text-xs font-bold leading-tight text-white">
+            {user.fullName || "Tài khoản"}
+          </span>
+          <span className="text-[10px] font-medium leading-tight text-primary-200">
+            {getRoleLabel(user.role)}
+          </span>
+        </div>
+        <ChevronDown className="size-3.5 text-white/70 transition-transform duration-200 group-hover:text-white group-data-[state=open]:rotate-180" />
+      </button>
     );
   }
 
   return (
-    <Button
-      variant="ghost"
+    <button
+      type="button"
       className={cn(
-        "group flex h-9.5 cursor-pointer items-center gap-2.5 rounded-full border border-border/60 bg-background/50 py-1 pr-3 pl-1.5 shadow-2xs transition-all",
-        "hover:border-border hover:bg-muted/60 data-[state=open]:border-border data-[state=open]:bg-muted/80",
+        "group flex h-10 cursor-pointer items-center gap-2.5 rounded-full border border-border/60 bg-background/50 p-1.5 pr-3.5 shadow-2xs transition-all outline-none",
+        "hover:border-border hover:bg-muted/60 focus-visible:ring-2 focus-visible:ring-primary/40 data-[state=open]:border-border data-[state=open]:bg-muted/80",
         className,
       )}
     >
       <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex size-7.5 shrink-0 items-center justify-center rounded-full shadow-2xs ring-2">
         <BaseAvatar src={user.avatarUrl} name={user.fullName ?? undefined} size="default" />
       </div>
-      <div className="hidden flex-col text-left md:flex">
+      <div className="hidden flex-col justify-center text-left md:flex">
         <span className="text-foreground text-xs leading-tight font-semibold">
           {user.fullName || "Admin"}
         </span>
@@ -157,7 +160,7 @@ function renderTrigger(
         </span>
       </div>
       <ChevronDown className="text-muted-foreground group-hover:text-foreground size-3.5 transition-transform duration-200 group-data-[state=open]:rotate-180" />
-    </Button>
+    </button>
   );
 }
 
@@ -232,7 +235,7 @@ export function UserDropdown({
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
           <Link href="/leaderboard" className="flex w-full items-center gap-2.5">
             <Trophy className="text-muted-foreground size-4" />
-            <span>Bảng vàng vinh danh</span>
+            <span>Bảng xếp hạng thành tích</span>
           </Link>
         </DropdownMenuItem>
 

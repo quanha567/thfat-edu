@@ -90,7 +90,7 @@ export function ExamCreateProgressCard({
               >
                 <span className="text-neutral-500 select-none">[{log.timestamp}]</span>
                 {log.type === "section" ? (
-                  <span className="flex items-center gap-1 font-bold text-emerald-400">
+                  <span className="text-success-400 flex items-center gap-1 font-bold">
                     <CheckCircle2 className="inline size-3 shrink-0" />
                     {log.message}
                   </span>

@@ -83,14 +83,14 @@ export function AiArticleAssistant({
           <div>
             <div className="flex items-center gap-2">
               <span className="font-semibold text-foreground text-sm">
-                Trợ lý AI viết bài (AI Writing Assistant)
+                Trợ lý viết bài AI
               </span>
               <Badge variant="secondary" className="font-medium text-[10px]">
                 NVIDIA Nemotron 3
               </Badge>
             </div>
             <p className="text-muted-foreground text-xs">
-              Nhập ý tưởng sơ lược để AI gợi ý dàn ý và tự động gõ bài viết vào Editor
+              Nhập ý tưởng để AI xây dựng dàn ý và soạn thảo nội dung trực tiếp vào bài viết
             </p>
           </div>
         </div>
@@ -131,7 +131,7 @@ export function AiArticleAssistant({
                 ) : (
                   <>
                     <Wand2 className="size-3.5" />
-                    <span>Cải tiến Prompt</span>
+                    <span>Tối ưu dàn ý</span>
                   </>
                 )}
               </Button>
@@ -146,10 +146,10 @@ export function AiArticleAssistant({
                   htmlFor="ai-refined-prompt"
                   className="font-semibold text-xs text-foreground"
                 >
-                  Bước 2: Dàn ý & Prompt đã được AI tối ưu (Có thể chỉnh sửa lại)
+                  Bước 2: Dàn ý và yêu cầu chi tiết (có thể chỉnh sửa trước khi tạo)
                 </Label>
                 <span className="text-[11px] text-muted-foreground">
-                  Chuẩn hóa theo format giáo dục & KaTeX
+                  Chuẩn hóa cấu trúc sư phạm và công thức KaTeX
                 </span>
               </div>
 
@@ -204,7 +204,7 @@ export function AiArticleAssistant({
                       className="gap-1.5 text-xs font-semibold shadow-xs"
                     >
                       <Sparkles className="size-3.5" />
-                      <span>Viết vào Editor</span>
+                      <span>Tạo nội dung bài viết</span>
                     </Button>
                   )}
                 </div>

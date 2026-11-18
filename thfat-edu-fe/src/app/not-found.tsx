@@ -10,7 +10,7 @@ export default function NotFound() {
     <div className="bg-background text-foreground flex min-h-screen flex-col">
       <MainNavbar />
 
-      <main className="flex flex-1 flex-col items-center justify-center px-4 py-20 text-center sm:px-6">
+      <main className="flex flex-1 flex-col items-center justify-center px-4 pt-24 pb-20 text-center sm:px-6">
         <span className="text-primary-700 dark:text-primary-400 text-7xl font-bold tracking-tight sm:text-8xl">
           404
         </span>

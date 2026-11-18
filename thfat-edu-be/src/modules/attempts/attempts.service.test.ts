@@ -16,6 +16,9 @@ describe("attempts.service - Grading Engine Helpers", () => {
       expect(normalizeBooleanAnswer("Đ")).toBe("true");
       expect(normalizeBooleanAnswer("đ")).toBe("true");
       expect(normalizeBooleanAnswer("1")).toBe("true");
+      expect(normalizeBooleanAnswer("Đúng")).toBe("true");
+      expect(normalizeBooleanAnswer("đúng")).toBe("true");
+      expect(normalizeBooleanAnswer("dung")).toBe("true");
     });
 
     it("normalizes false values accurately", () => {
@@ -25,6 +28,8 @@ describe("attempts.service - Grading Engine Helpers", () => {
       expect(normalizeBooleanAnswer("S")).toBe("false");
       expect(normalizeBooleanAnswer("s")).toBe("false");
       expect(normalizeBooleanAnswer("0")).toBe("false");
+      expect(normalizeBooleanAnswer("Sai")).toBe("false");
+      expect(normalizeBooleanAnswer("sai")).toBe("false");
     });
 
     it("returns null for empty or invalid values", () => {
@@ -35,6 +40,14 @@ describe("attempts.service - Grading Engine Helpers", () => {
   });
 
   describe("calculateGraduatedTrueFalsePoints", () => {
+    it("applies VSAT graduated scale accurately for 6.0 total point question", () => {
+      expect(calculateGraduatedTrueFalsePoints(0, 6.0)).toBe(0);
+      expect(calculateGraduatedTrueFalsePoints(1, 6.0)).toBe(1.0);
+      expect(calculateGraduatedTrueFalsePoints(2, 6.0)).toBe(2.0);
+      expect(calculateGraduatedTrueFalsePoints(3, 6.0)).toBe(3.0);
+      expect(calculateGraduatedTrueFalsePoints(4, 6.0)).toBe(6.0);
+    });
+
     it("applies MOET graduated scale accurately for 1.0 total point question", () => {
       expect(calculateGraduatedTrueFalsePoints(0, 1.0)).toBe(0);
       expect(calculateGraduatedTrueFalsePoints(1, 1.0)).toBe(0.1);

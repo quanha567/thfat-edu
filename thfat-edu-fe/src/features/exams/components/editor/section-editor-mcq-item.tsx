@@ -7,10 +7,13 @@ import { cn } from "@/lib/utils";
 import { Trash2 } from "lucide-react";
 
 import { type TQuizSubItem } from "../../types";
+import { ExamMarkdownEditor } from "./exam-markdown-editor";
 
 export type TSectionEditorMcqItemProps = {
+  id?: string;
   subItem: TQuizSubItem;
   index: number;
+  questionNumber?: number;
   canRemove: boolean;
   editorMode?: "edit" | "preview";
   onRemove: () => void;
@@ -20,8 +23,10 @@ export type TSectionEditorMcqItemProps = {
 const OPTION_KEYS = ["A", "B", "C", "D"] as const;
 
 export function SectionEditorMcqItem({
+  id,
   subItem,
   index,
+  questionNumber,
   canRemove,
   editorMode = "edit",
   onRemove,
@@ -31,19 +36,22 @@ export function SectionEditorMcqItem({
     subItem.options && subItem.options.length === 4 ? subItem.options : ["", "", "", ""];
 
   const handleOptionChange = (optIdx: number, val: string) => {
+    const cleanedVal = val.replace(/^[A-D]\.\s*/i, "");
     const updatedOptions = [...options];
-    updatedOptions[optIdx] = val;
+    updatedOptions[optIdx] = cleanedVal;
     onChange({ options: updatedOptions });
   };
 
+  const displayLabel = subItem.label || (questionNumber ? `Câu ${questionNumber}` : `Câu ${index + 1}`);
+
   if (editorMode === "preview") {
     return (
-      <div className="space-y-2 py-2">
-        <div className="flex items-start gap-2">
-          <span className="flex size-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
-            {subItem.label || `${index + 1}`}
+      <div id={id} className="border-border/40 bg-muted/10 space-y-2 rounded-lg border p-2 sm:px-2.5">
+        <div className="flex items-start gap-2.5">
+          <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 inline-flex h-6 shrink-0 items-center justify-center rounded-md border px-2 font-mono text-xs font-bold shadow-2xs">
+            {displayLabel}
           </span>
-          <div className="text-foreground text-xs leading-relaxed sm:text-sm">
+          <div className="text-foreground mt-0.5 min-w-0 flex-1 text-xs leading-relaxed sm:text-sm">
             {subItem.content.trim() ? (
               <ChemRenderer content={subItem.content} />
             ) : (
@@ -54,7 +62,7 @@ export function SectionEditorMcqItem({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-2 pt-1 pl-7 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-1.5 pl-0 sm:grid-cols-2 sm:pl-8.5">
           {OPTION_KEYS.map((optKey, optIdx) => {
             const isSelected = (subItem.correctAnswer ?? "").trim().toUpperCase() === optKey;
             const optContent = options[optIdx] ?? "";
@@ -63,16 +71,18 @@ export function SectionEditorMcqItem({
               <div
                 key={optKey}
                 className={cn(
-                  "flex items-start gap-2 rounded-lg p-2 text-xs transition-colors",
+                  "flex items-start gap-2 rounded-lg p-2 text-xs transition-colors border",
                   isSelected
-                    ? "bg-primary/10 font-medium text-foreground ring-1 ring-primary/30"
-                    : "bg-muted/20 text-muted-foreground",
+                    ? "bg-success-500/15 border-success-500/30 text-success-800 dark:text-success-300 font-medium"
+                    : "border-border/30 bg-muted/20 text-muted-foreground",
                 )}
               >
                 <span
                   className={cn(
                     "flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
-                    isSelected ? "bg-primary text-primary-foreground" : "bg-muted text-foreground",
+                    isSelected
+                      ? "bg-success-600 text-white shadow-2xs"
+                      : "bg-muted text-muted-foreground border border-border/40",
                   )}
                 >
                   {optKey}
@@ -93,13 +103,20 @@ export function SectionEditorMcqItem({
   }
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="font-mono text-xs font-bold text-foreground">
-            {subItem.label || `Ý ${index + 1}`}
-          </span>
-          <span className="text-muted-foreground text-xs font-normal">• 1.5 điểm</span>
+    <div id={id} className="group/item border-border/40 bg-muted/10 hover:border-border hover:bg-muted/20 space-y-2 rounded-lg border p-2 transition-all sm:px-2.5">
+      <div className="flex items-start gap-2.5">
+        <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 inline-flex h-6 shrink-0 items-center justify-center rounded-md border px-2 font-mono text-xs font-bold shadow-2xs">
+          {displayLabel}
+        </span>
+
+        <div className="w-full min-w-0 flex-1">
+          <ExamMarkdownEditor
+            value={subItem.content}
+            onChange={(val) => onChange({ content: val })}
+            placeholder={`Nhập nội dung cho ${displayLabel}...`}
+            rows={1}
+            compact
+          />
         </div>
 
         {canRemove && (
@@ -111,7 +128,7 @@ export function SectionEditorMcqItem({
                   variant="ghost"
                   size="icon-xs"
                   onClick={onRemove}
-                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive size-6"
+                  className="text-muted-foreground hover:bg-destructive/10 hover:text-destructive mt-0.5 size-6 shrink-0"
                   aria-label="Xóa câu hỏi con"
                 >
                   <Trash2 className="size-3.5" />
@@ -123,15 +140,7 @@ export function SectionEditorMcqItem({
         )}
       </div>
 
-      <textarea
-        value={subItem.content}
-        onChange={(e) => onChange({ content: e.target.value })}
-        placeholder="Nhập nội dung câu hỏi con..."
-        rows={1}
-        className="field-sizing-content min-h-[34px] w-full resize-none rounded-md bg-background px-2.5 py-1.5 text-xs font-medium text-foreground transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring border border-border/50"
-      />
-
-      <div className="grid grid-cols-1 gap-2 pt-0.5 sm:grid-cols-2">
+      <div className="grid grid-cols-1 gap-1.5 pl-0 sm:grid-cols-2 sm:pl-8.5">
         {OPTION_KEYS.map((optKey, optIdx) => {
           const isSelected = (subItem.correctAnswer ?? "").trim().toUpperCase() === optKey;
 
@@ -139,19 +148,19 @@ export function SectionEditorMcqItem({
             <div
               key={optKey}
               className={cn(
-                "flex items-center gap-2 rounded-lg bg-background p-1.5 transition-all",
+                "flex items-center gap-2 rounded-lg bg-background p-1.5 transition-all border",
                 isSelected
-                  ? "ring-1 ring-primary/40 bg-primary/5"
-                  : "hover:bg-muted/30 border border-border/40",
+                  ? "border-success-500/50 bg-success-500/10 ring-1 ring-success-500/30 text-success-950 dark:text-success-200"
+                  : "border-border/50 hover:bg-muted/30 hover:border-border",
               )}
             >
               <button
                 type="button"
                 onClick={() => onChange({ correctAnswer: optKey })}
                 className={cn(
-                  "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all",
+                  "flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-all cursor-pointer",
                   isSelected
-                    ? "bg-primary text-primary-foreground shadow-2xs"
+                    ? "bg-success-600 text-white shadow-2xs"
                     : "bg-muted text-muted-foreground hover:bg-primary/20 hover:text-primary",
                 )}
                 title={`Chọn ${optKey} làm đáp án đúng`}
@@ -159,12 +168,15 @@ export function SectionEditorMcqItem({
                 {optKey}
               </button>
 
-              <input
-                value={options[optIdx] ?? ""}
-                onChange={(e) => handleOptionChange(optIdx, e.target.value)}
-                placeholder={`Phương án ${optKey}...`}
-                className="h-7 w-full border-0 bg-transparent px-1 text-xs text-foreground placeholder:text-muted-foreground focus-visible:outline-none"
-              />
+              <div className="w-full min-w-0 flex-1">
+                <ExamMarkdownEditor
+                  value={options[optIdx] ?? ""}
+                  onChange={(val) => handleOptionChange(optIdx, val)}
+                  placeholder={`Phương án ${optKey}...`}
+                  rows={1}
+                  compact
+                />
+              </div>
             </div>
           );
         })}

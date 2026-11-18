@@ -103,7 +103,7 @@ export function AttemptRulesCard({ control, register, setValue, errors }: TAttem
                   }`}
                 >
                   <div className="text-foreground flex items-center gap-2 text-sm font-semibold">
-                    <Trophy className="h-4 w-4 text-amber-500" />
+                    <Trophy className="text-warning-500 h-4 w-4" />
                     Lấy điểm cao nhất (Highest)
                   </div>
                   <p className="text-muted-foreground text-xs leading-normal">

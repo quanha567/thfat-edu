@@ -5,6 +5,7 @@ import { ArrowLeft, Calendar, Eye } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
+import { DEFAULT_ARTICLE_THUMBNAIL } from "../constants";
 import type { TArticleDetail } from "../types/article.types";
 import { ArticleMarkdownRenderer } from "./article-markdown-renderer";
 
@@ -97,18 +98,16 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
       </div>
 
       {/* Featured Thumbnail */}
-      {article.thumbnailUrl && (
-        <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted shadow-sm">
-          <Image
-            src={article.thumbnailUrl}
-            alt={article.title}
-            fill
-            sizes="(max-width: 1024px) 100vw, 896px"
-            className="object-cover"
-            priority
-          />
-        </div>
-      )}
+      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted shadow-sm">
+        <Image
+          src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
+          alt={article.title}
+          fill
+          sizes="(max-width: 1024px) 100vw, 896px"
+          className="object-cover"
+          priority
+        />
+      </div>
 
       {/* Article Markdown Content */}
       <ArticleMarkdownRenderer

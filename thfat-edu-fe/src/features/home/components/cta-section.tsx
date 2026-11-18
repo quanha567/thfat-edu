@@ -1,7 +1,6 @@
 import { FadeInView } from "@/components/motion";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -9,46 +8,55 @@ import { HOME_CTA_DATA } from "../constants/home.data";
 
 export function CtaSection() {
   return (
-    <FadeInView delay={0.15} className="h-full">
-      <Card className="from-primary-950 via-primary-900 to-primary-800 relative flex h-full flex-col justify-between gap-0 overflow-hidden rounded-2xl border-none bg-gradient-to-br p-8 text-white shadow-xl lg:p-10">
-        {/* Decorative radial lighting */}
-        <div className="bg-highlight/15 pointer-events-none absolute -top-12 -right-12 h-48 w-48 rounded-full blur-3xl" />
-        <div className="bg-primary-500/20 pointer-events-none absolute -bottom-12 -left-12 h-48 w-48 rounded-full blur-3xl" />
+    <FadeInView delay={0.15} className="w-full">
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#071d49] via-[#0b2f77] to-[#0f3d99] px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10 md:px-12">
+        {/* Decorative subtle lighting */}
+        <div className="pointer-events-none absolute -top-12 -right-12 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-12 left-1/3 h-48 w-48 rounded-full bg-gold-400/10 blur-3xl" />
 
-        <div className="relative z-10 space-y-3">
-          <h3 className="text-h2 sm:text-h1 leading-tight font-extrabold tracking-tight text-white">
-            Sẵn sàng chinh phục <br />
-            kỳ thi V-SAT?
-          </h3>
-          <p className="text-body-sm text-primary-100/90 max-w-xs leading-relaxed">
-            {HOME_CTA_DATA.description}
-          </p>
-        </div>
+        <div className="relative z-10 flex flex-col items-center justify-between gap-6 md:flex-row md:gap-8">
+          {/* Left info */}
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-gold-400/20 text-gold-300 backdrop-blur-sm">
+              <Zap className="h-6 w-6 fill-gold-300" />
+            </div>
 
-        <div className="relative z-10 mt-8 flex items-center justify-between gap-4">
-          <Button
-            asChild
-            size="lg"
-            className="text-primary-950 hover:bg-primary-50 rounded-full bg-white px-6 font-bold shadow-lg transition-transform hover:scale-105"
-          >
-            <Link href={HOME_CTA_DATA.ctaHref} className="flex items-center gap-2">
-              <span>{HOME_CTA_DATA.ctaText}</span>
-              <ArrowRight className="text-primary h-4 w-4" />
-            </Link>
-          </Button>
+            <div className="space-y-1 text-left">
+              <h3 className="text-h3 sm:text-h2 font-extrabold tracking-tight text-white">
+                Kiểm tra năng lực với đề thi thử V-SAT
+              </h3>
+              <p className="text-body-sm font-medium text-primary-100/90 sm:text-body">
+                {HOME_CTA_DATA.description}
+              </p>
+            </div>
+          </div>
 
-          {/* 3D Rocket */}
-          <div className="relative h-28 w-28 shrink-0 overflow-hidden rounded-2xl">
-            <Image
-              src={HOME_CTA_DATA.imageSrc}
-              alt="3D Rocket Launching"
-              fill
-              className="object-contain"
-              sizes="112px"
-            />
+          {/* Right: Yellow CTA button & 3D Rocket */}
+          <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
+            <Button
+              asChild
+              size="lg"
+              className="rounded-full bg-gold-400 px-7 py-3 text-base font-bold text-primary-950 shadow-lg shadow-gold-500/25 transition-all hover:bg-gold-300 hover:scale-105"
+            >
+              <Link href={HOME_CTA_DATA.ctaHref} className="flex items-center gap-2">
+                <span>{HOME_CTA_DATA.ctaText}</span>
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+            </Button>
+
+            {/* 3D Rocket visual */}
+            <div className="relative h-24 w-24 shrink-0 sm:h-28 sm:w-28">
+              <Image
+                src={HOME_CTA_DATA.imageSrc}
+                alt="3D Rocket Launching"
+                fill
+                className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+                sizes="112px"
+              />
+            </div>
           </div>
         </div>
-      </Card>
+      </div>
     </FadeInView>
   );
 }

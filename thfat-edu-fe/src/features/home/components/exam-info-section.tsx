@@ -1,8 +1,7 @@
-import { SectionBadge } from "@/components/base";
 import { FadeInView } from "@/components/motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, HelpCircle } from "lucide-react";
 import Link from "next/link";
 
 import { HOME_EXAM_INFO_DATA } from "../constants/home.data";
@@ -11,10 +10,15 @@ import { MetricCard } from "./metric-card";
 export function ExamInfoSection() {
   return (
     <FadeInView className="h-full">
-      <Card className="border-border bg-card flex h-full flex-col justify-between gap-0 rounded-2xl p-8 shadow-xs lg:p-10">
+      <Card className="flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-6 shadow-xs transition-all hover:shadow-md dark:border-white/10 dark:bg-neutral-900/80 sm:p-8 lg:p-10">
         <div>
-          <SectionBadge>{HOME_EXAM_INFO_DATA.tagline}</SectionBadge>
-          <h3 className="text-h2 sm:text-h1 text-foreground mb-8 font-bold tracking-tight">
+          {/* Pill Tag */}
+          <div className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-primary-100 bg-primary-50 px-3.5 py-1 text-xs font-semibold text-primary-700 dark:border-primary-900 dark:bg-primary-950/50 dark:text-cyan-300">
+            <HelpCircle className="h-3.5 w-3.5" />
+            <span>{HOME_EXAM_INFO_DATA.tagline}</span>
+          </div>
+
+          <h3 className="text-h2 sm:text-h1 mb-8 font-bold tracking-tight text-neutral-900 dark:text-white">
             {HOME_EXAM_INFO_DATA.title}
           </h3>
 
@@ -30,7 +34,7 @@ export function ExamInfoSection() {
           <Button
             asChild
             variant="outline"
-            className="border-primary-200 text-primary hover:bg-primary-50 hover:text-primary-800 rounded-full px-6 font-semibold transition-colors"
+            className="border-primary-600 text-primary-600 hover:bg-primary-50 hover:text-primary-700 dark:border-cyan-400 dark:text-cyan-400 dark:hover:bg-cyan-950/30 rounded-full px-6 font-semibold transition-colors"
           >
             <Link href={HOME_EXAM_INFO_DATA.ctaHref} className="flex items-center gap-2">
               <span>{HOME_EXAM_INFO_DATA.ctaText}</span>

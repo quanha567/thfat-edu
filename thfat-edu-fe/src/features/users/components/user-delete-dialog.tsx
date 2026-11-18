@@ -44,14 +44,14 @@ export function UserDeleteDialog({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            {isDelete ? "Xác nhận xóa mềm người dùng?" : "Xác nhận khôi phục người dùng?"}
+            {isDelete ? "Xác nhận xóa tài khoản người dùng?" : "Xác nhận khôi phục tài khoản?"}
           </AlertDialogTitle>
           <AlertDialogDescription>
             {isDelete ? (
               <>
                 Tài khoản <strong className="text-foreground">{user.fullName}</strong> ({user.email}
-                ) sẽ bị chuyển sang trạng thái xóa mềm, vô hiệu hóa đăng nhập ngay lập tức. Toàn bộ
-                lịch sử làm bài và dữ liệu của người dùng này vẫn được bảo toàn.
+                ) sẽ bị tạm xóa và vô hiệu hóa quyền đăng nhập. Toàn bộ
+                lịch sử làm bài và dữ liệu học tập vẫn được bảo toàn trong hệ thống.
               </>
             ) : (
               <>

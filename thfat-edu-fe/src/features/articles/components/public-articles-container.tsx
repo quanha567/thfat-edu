@@ -1,6 +1,5 @@
 "use client";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -35,7 +34,7 @@ export function PublicArticlesContainer() {
       return (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {["skel-1", "skel-2", "skel-3", "skel-4", "skel-5", "skel-6"].map((key) => (
-            <div key={key} className="space-y-3 rounded-xl border border-border p-4">
+            <div key={key} className="border-border space-y-3 rounded-xl border p-4">
               <Skeleton className="aspect-video w-full rounded-lg" />
               <Skeleton className="h-5 w-3/4" />
               <Skeleton className="h-4 w-full" />
@@ -74,13 +73,7 @@ export function PublicArticlesContainer() {
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-12 lg:px-8">
       {/* Header Banner */}
       <div className="mb-10 text-center sm:mb-12">
-        <Badge
-          variant="outline"
-          className="text-primary-600 dark:text-primary-400 border-primary-500/30 mb-3 px-3 py-1 font-semibold text-xs"
-        >
-          Truyền thông & Tin tức
-        </Badge>
-        <h1 className="text-3xl font-black tracking-tight text-foreground sm:text-4xl lg:text-5xl">
+        <h1 className="text-foreground text-3xl font-black tracking-tight sm:text-4xl lg:text-5xl">
           Tin tức & Cẩm nang học tập
         </h1>
         <p className="text-muted-foreground mx-auto mt-3 max-w-2xl text-sm sm:text-base">

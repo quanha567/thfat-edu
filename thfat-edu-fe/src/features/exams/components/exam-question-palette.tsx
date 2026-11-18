@@ -95,17 +95,17 @@ export function ExamQuestionPalette({
         </div>
         <div className="flex items-center gap-1.5">
           <span className="border-primary-600 bg-primary-50 h-3 w-3 rounded-xs border-2" />
-          <span>Làm dở</span>
+          <span>Làm một phần</span>
         </div>
         <div className="flex items-center gap-1.5">
           <span className="h-3 w-3 rounded-xs border border-neutral-300 bg-white" />
           <span>Chưa làm</span>
         </div>
         <div className="flex items-center gap-1.5">
-          <span className="flex h-3 w-3 items-center justify-center rounded-xs bg-amber-400 text-white">
+          <span className="bg-warning-500 flex h-3 w-3 items-center justify-center rounded-xs text-white">
             <Flag className="h-2 w-2 fill-current" />
           </span>
-          <span>Cắm cờ ({flaggedQuestionsCount})</span>
+          <span>Đánh dấu ({flaggedQuestionsCount})</span>
         </div>
       </div>
 
@@ -136,7 +136,7 @@ export function ExamQuestionPalette({
                   >
                     {questionNumber}
                     {isFlagged && (
-                      <span className="absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-amber-400 text-white shadow-xs">
+                      <span className="bg-warning-500 absolute -top-1 -right-1 flex h-3.5 w-3.5 items-center justify-center rounded-full text-white shadow-xs">
                         <Flag className="h-2 w-2 fill-current" />
                       </span>
                     )}

@@ -1,14 +1,25 @@
 "use client";
 
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArticleDetailView, useArticle } from "@/features/articles";
+import { ArticleDetailView, useArticle, type TArticleDetail } from "@/features/articles";
+import { use } from "react";
 
 export type TArticleDetailClientProps = {
-  slug: string;
+  params: Promise<{ slug: string }>;
+  initialData?: TArticleDetail;
 };
 
-export function ArticleDetailClient({ slug }: TArticleDetailClientProps) {
-  const { data: article, isLoading, error } = useArticle({ idOrSlug: slug, isAdmin: false });
+export function ArticleDetailClient({ params, initialData }: TArticleDetailClientProps) {
+  const { slug } = use(params);
+  const {
+    data: article,
+    isLoading,
+    error,
+  } = useArticle({
+    idOrSlug: slug,
+    isAdmin: false,
+    initialData,
+  });
 
   if (isLoading) {
     return (
@@ -29,9 +40,10 @@ export function ArticleDetailClient({ slug }: TArticleDetailClientProps) {
   if (error || !article) {
     return (
       <div className="mx-auto max-w-xl px-4 py-24 text-center">
-        <h2 className="text-xl font-bold text-foreground">Không tìm thấy bài viết</h2>
+        <h2 className="text-foreground text-xl font-bold">Không tìm thấy bài viết</h2>
         <p className="text-muted-foreground mt-2 text-sm">
-          Bài viết này không tồn tại hoặc đã được chuyển vào lưu trữ. Vui lòng quay lại danh sách bài viết.
+          Bài viết này không tồn tại hoặc đã được chuyển vào lưu trữ. Vui lòng quay lại danh sách
+          bài viết.
         </p>
       </div>
     );

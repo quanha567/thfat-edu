@@ -22,6 +22,7 @@ import { QuestionDeleteDialog } from "./question-delete-dialog";
 
 export type TQuestionEditorCardHeaderProps = {
   questionNumber: number;
+  customBadge?: string;
   pointsLabel?: string;
   imageUrl?: string | null;
   canMoveUp: boolean;
@@ -39,6 +40,7 @@ export type TQuestionEditorCardHeaderProps = {
 
 export function QuestionEditorCardHeader({
   questionNumber,
+  customBadge,
   pointsLabel: _pointsLabel,
   imageUrl,
   canMoveUp,
@@ -73,8 +75,8 @@ export function QuestionEditorCardHeader({
               </Button>
             )}
 
-            <Badge variant="secondary" className="px-2.5 py-0.5 text-xs font-bold">
-              Câu {questionNumber}
+            <Badge className="bg-primary/10 text-primary border border-primary/20 hover:bg-primary/15 px-2.5 py-0.5 text-xs font-bold transition-colors">
+              {customBadge || `Câu ${questionNumber}`}
             </Badge>
           </div>
 
@@ -120,57 +122,59 @@ export function QuestionEditorCardHeader({
 
             <div className="mx-0.5 h-3.5 w-px bg-border/60" />
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-xs"
-                  onClick={onMoveUp}
-                  disabled={!canMoveUp}
-                  aria-label="Di chuyển lên"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowUp className="size-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Di chuyển lên</TooltipContent>
-            </Tooltip>
+            <div className="flex items-center gap-0.5 opacity-60 transition-opacity group-hover:opacity-100 hover:opacity-100">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={onMoveUp}
+                    disabled={!canMoveUp}
+                    aria-label="Di chuyển lên"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowUp className="size-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Di chuyển lên</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-xs"
-                  onClick={onMoveDown}
-                  disabled={!canMoveDown}
-                  aria-label="Di chuyển xuống"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <ArrowDown className="size-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Di chuyển xuống</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={onMoveDown}
+                    disabled={!canMoveDown}
+                    aria-label="Di chuyển xuống"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <ArrowDown className="size-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Di chuyển xuống</TooltipContent>
+              </Tooltip>
 
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon-xs"
-                  onClick={onDuplicate}
-                  aria-label="Nhân bản câu hỏi"
-                  className="text-muted-foreground hover:text-foreground"
-                >
-                  <Copy className="size-3.5" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Nhân bản câu hỏi</TooltipContent>
-            </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon-xs"
+                    onClick={onDuplicate}
+                    aria-label="Nhân bản câu hỏi"
+                    className="text-muted-foreground hover:text-foreground"
+                  >
+                    <Copy className="size-3.5" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Nhân bản câu hỏi</TooltipContent>
+              </Tooltip>
 
-            <QuestionDeleteDialog questionNumber={questionNumber} onDelete={onDelete} />
+              <QuestionDeleteDialog questionNumber={questionNumber} onDelete={onDelete} />
+            </div>
           </div>
         </div>
 
