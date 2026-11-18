@@ -18,4 +18,17 @@ describe("JsonLd component", () => {
     expect(script).toBeTruthy();
     expect(script?.textContent).toBe(JSON.stringify(data));
   });
+
+  it("escapes '<' characters to prevent script injection / XSS", () => {
+    const maliciousData = {
+      description: "</script><script>alert('xss')</script>",
+    };
+
+    const { container } = render(<JsonLd data={maliciousData} />);
+    const script = container.querySelector('script[type="application/ld+json"]');
+
+    expect(script).toBeTruthy();
+    expect(script?.textContent).not.toContain("<");
+    expect(script?.textContent).toContain("\\u003c/script");
+  });
 });
