@@ -1,3 +1,4 @@
+import { getAvatarGradient, getInitials } from "@/components/base";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -7,85 +8,156 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Clock, Trophy } from "lucide-react";
+import { Crown } from "lucide-react";
 
-import { type TLeaderboardItem } from "../types/leaderboard.types";
+import {
+  formatLeaderboardDuration,
+  formatLeaderboardScore,
+} from "../constants/leaderboard.constants";
+import { type TLeaderboardItem, type TTimeframe } from "../types/leaderboard.types";
 
 export type TLeaderboardTableProps = {
   items: TLeaderboardItem[];
   currentUserId?: string;
+  timeframe?: TTimeframe;
 };
 
-export function LeaderboardTable({ items, currentUserId }: TLeaderboardTableProps) {
-  if (items.length === 0) {
+function RankBadge({ rank }: { rank: number }) {
+  if (rank === 1) {
     return (
-      <div className="bg-card text-muted-foreground rounded-xl border p-12 text-center shadow-xs">
-        <p className="text-sm font-medium">Chưa có bảng xếp hạng cho khoảng thời gian này.</p>
+      <div className="flex items-center justify-center">
+        <div className="relative flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-b from-gold-300 via-gold-400 to-gold-500 font-black text-xs sm:text-sm text-primary-950 shadow-sm shadow-gold-500/25 ring-2 ring-gold-200/90">
+          <Crown className="absolute -top-2.5 h-3.5 w-3.5 text-gold-500 fill-gold-400 drop-shadow-xs" />
+          <span>1</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (rank === 2) {
+    return (
+      <div className="flex items-center justify-center">
+        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-b from-neutral-100 via-neutral-200 to-neutral-300 font-black text-xs sm:text-sm text-neutral-800 shadow-sm shadow-neutral-400/20 ring-2 ring-neutral-200/90">
+          <span>2</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (rank === 3) {
+    return (
+      <div className="flex items-center justify-center">
+        <div className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-gradient-to-b from-gold-600 via-gold-700 to-gold-800 font-black text-xs sm:text-sm text-gold-100 shadow-sm shadow-gold-900/20 ring-2 ring-gold-500/60">
+          <span>3</span>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-card overflow-hidden rounded-xl border shadow-xs">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-muted/50">
-            <TableHead className="w-16 text-center text-xs">Hạng</TableHead>
-            <TableHead className="text-xs">Học viên</TableHead>
-            <TableHead className="text-center text-xs">Số đề</TableHead>
-            <TableHead className="hidden text-center text-xs sm:table-cell">Thời gian</TableHead>
-            <TableHead className="text-right text-xs">Tổng điểm</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {items.map((item) => {
-            const isMe = currentUserId === item.userId;
-            const durationMinutes = Math.round(item.totalDurationSeconds / 60);
+    <span className="font-semibold text-muted-foreground text-xs sm:text-sm">
+      {rank}
+    </span>
+  );
+}
 
-            return (
-              <TableRow
-                key={item.userId}
-                className={isMe ? "bg-primary-500/10 font-medium" : undefined}
-              >
-                <TableCell className="text-muted-foreground text-center text-sm font-bold">
-                  #{item.rank}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-9 w-9">
-                      <AvatarImage src={item.avatarUrl ?? undefined} alt={item.fullName} />
-                      <AvatarFallback className="text-xs font-semibold">
-                        {item.fullName.slice(0, 2).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="min-w-0">
-                      <p className="text-foreground truncate text-sm font-medium">
-                        {item.fullName} {isMe && "(Bạn)"}
-                      </p>
-                      {item.schoolName && (
-                        <p className="text-muted-foreground truncate text-xs">{item.schoolName}</p>
-                      )}
+export function LeaderboardTable({
+  items,
+  currentUserId,
+}: TLeaderboardTableProps) {
+  if (items.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-card p-12 text-center shadow-md">
+        <p className="text-sm font-medium text-muted-foreground">
+          Chưa có bảng xếp hạng cho khoảng thời gian này.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-md">
+      <div className="overflow-x-auto">
+        <Table className="w-full min-w-[620px]">
+          <TableHeader>
+            <TableRow className="border-b border-border bg-muted/50 hover:bg-muted/50">
+              <TableHead className="w-20 text-center text-xs font-bold text-muted-foreground">
+                Hạng
+              </TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">
+                Học viên
+              </TableHead>
+              <TableHead className="text-xs font-bold text-muted-foreground">
+                Trường
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-muted-foreground">
+                Điểm số
+              </TableHead>
+              <TableHead className="text-center text-xs font-bold text-muted-foreground">
+                Thời gian
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {items.map((item) => {
+              const isMe = currentUserId === item.userId;
+
+              return (
+                <TableRow
+                  key={item.userId}
+                  className={`border-b border-border transition-colors hover:bg-secondary/40 ${
+                    isMe ? "bg-secondary/80 font-medium" : ""
+                  }`}
+                >
+                  {/* Rank Column */}
+                  <TableCell className="text-center">
+                    <RankBadge rank={item.rank} />
+                  </TableCell>
+
+                  {/* Student Column */}
+                  <TableCell>
+                    <div className="flex items-center gap-3">
+                      <Avatar className="h-9 w-9 border border-border shadow-2xs">
+                        <AvatarImage src={item.avatarUrl ?? undefined} alt={item.fullName} />
+                        <AvatarFallback
+                          className={`bg-gradient-to-br ${getAvatarGradient(item.fullName)} font-bold text-xs text-white shadow-inner ring-1 ring-white/20 select-none`}
+                        >
+                          {getInitials(item.fullName)}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="min-w-0 flex items-center gap-2">
+                        <p className="truncate text-sm font-semibold text-foreground">
+                          {item.fullName}
+                        </p>
+                        {isMe && (
+                          <span className="inline-flex items-center rounded-full bg-primary-100 px-2 py-0.5 text-[10px] font-bold text-primary-700">
+                            Bạn
+                          </span>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                </TableCell>
-                <TableCell className="text-center text-sm">{item.totalExams}</TableCell>
-                <TableCell className="text-muted-foreground hidden text-center text-xs sm:table-cell">
-                  <span className="inline-flex items-center gap-1">
-                    <Clock className="h-3.5 w-3.5" />
-                    {durationMinutes} phút
-                  </span>
-                </TableCell>
-                <TableCell className="text-right">
-                  <span className="text-primary inline-flex items-center gap-1 text-sm font-bold">
-                    <Trophy className="h-3.5 w-3.5" />
-                    {item.totalScore}
-                  </span>
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
+                  </TableCell>
+
+                  {/* School Column */}
+                  <TableCell className="text-sm text-muted-foreground">
+                    <span className="line-clamp-1">{item.schoolName || "—"}</span>
+                  </TableCell>
+
+                  {/* Score Column */}
+                  <TableCell className="text-center font-bold text-foreground text-sm">
+                    {formatLeaderboardScore(item.totalScore)}
+                  </TableCell>
+
+                  {/* Duration Column */}
+                  <TableCell className="text-center text-sm text-muted-foreground">
+                    {formatLeaderboardDuration(item.totalDurationSeconds)}
+                  </TableCell>
+                </TableRow>
+              );
+            })}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }

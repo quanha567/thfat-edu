@@ -1,14 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useAutoSolveQuestion } from "../../hooks/use-auto-solve-question";
 import { useExamEditorState } from "../../hooks/use-exam-editor-state";
 import { type TQuizDetail } from "../../types";
 import { ExamEditorHeader } from "./exam-editor-header";
-import { ExamEditorOverviewBar } from "./exam-editor-overview-bar";
-import { ExamEditorOverviewDialog } from "./exam-editor-overview-dialog";
+import { ExamEditorOverviewCard } from "./exam-editor-overview-card";
 import { ExamEditorSectionCard } from "./exam-editor-section-card";
 import { ExamEditorSidebar } from "./exam-editor-sidebar";
 
@@ -18,7 +17,6 @@ export type TExamEditorContainerProps = {
 
 export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
   const router = useRouter();
-  const [isOverviewOpen, setIsOverviewOpen] = useState(false);
   const [editorMode, setEditorMode] = useState<"edit" | "preview">("edit");
   const [activeKey, setActiveKey] = useState<string>("0-0");
   const [collapsedKeys, setCollapsedKeys] = useState<Set<string>>(new Set());
@@ -46,6 +44,28 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
   const [activeSIdx, activeQIdx] = activeKey.split("-").map(Number);
   const activeSection = state.sections[activeSIdx];
   const activeQuestion = activeSection?.questions[activeQIdx] ?? null;
+
+  const sectionOffsets = useMemo(() => {
+    const offsets: number[] = [];
+    let running = 0;
+
+    for (const sec of state.sections) {
+      offsets.push(running);
+      if (sec.sectionType === "group_mcq") {
+        const totalSubs = sec.questions.reduce((acc, q) => acc + (q.subItems?.length || 1), 0);
+        running += Math.max(sec.questions.length, totalSubs);
+      } else {
+        running += sec.questions.length;
+      }
+    }
+
+    return offsets;
+  }, [state.sections]);
+
+  const activeQuestionNumber =
+    typeof activeSIdx === "number" && !isNaN(activeSIdx) && typeof activeQIdx === "number" && !isNaN(activeQIdx)
+      ? (sectionOffsets[activeSIdx] ?? 0) + activeQIdx + 1
+      : 1;
 
   const handleToggleCollapse = (key: string) => {
     setCollapsedKeys((prev) => {
@@ -110,13 +130,14 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
       <div className="mx-auto w-full max-w-[1720px] px-3 py-5 sm:px-4 md:px-6 xl:px-8">
         <div className="grid grid-cols-1 items-start gap-6 xl:grid-cols-12">
           <div className="space-y-5 xl:col-span-8 2xl:col-span-8">
-            <ExamEditorOverviewBar
+            <ExamEditorOverviewCard
               title={state.title}
+              description={state.description}
               durationMinutes={state.durationMinutes}
               totalPoints={state.totalPoints}
               status={state.status}
               pdfUrl={state.pdfUrl}
-              onOpenEdit={() => setIsOverviewOpen(true)}
+              onChange={updateOverview}
             />
 
             {state.sections.map((section, sIdx) => (
@@ -124,6 +145,7 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
                 key={section.sectionType || sIdx}
                 section={section}
                 sectionIndex={sIdx}
+                startQuestionNumber={(sectionOffsets[sIdx] ?? 0) + 1}
                 collapsedKeys={collapsedKeys}
                 solvingKey={solvingKey}
                 editorMode={editorMode}
@@ -151,23 +173,11 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
               activeQuestion={activeQuestion}
               activeSectionTitle={activeSection?.title}
               activeSectionType={activeSection?.sectionType}
-              activeQuestionNumber={activeQIdx + 1}
+              activeQuestionNumber={activeQuestionNumber}
             />
           </aside>
         </div>
       </div>
-
-      <ExamEditorOverviewDialog
-        open={isOverviewOpen}
-        onOpenChange={setIsOverviewOpen}
-        title={state.title}
-        description={state.description}
-        durationMinutes={state.durationMinutes}
-        totalPoints={state.totalPoints}
-        status={state.status}
-        pdfUrl={state.pdfUrl}
-        onChange={updateOverview}
-      />
     </div>
   );
 }

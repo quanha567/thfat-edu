@@ -63,7 +63,7 @@ export function ExamCreatePreviewCard({
       <CardHeader className="border-border space-y-3 border-b pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <div className="flex size-7 items-center justify-center rounded-md bg-emerald-500/10 text-emerald-600">
+            <div className="bg-success-500/10 text-success-600 flex size-7 items-center justify-center rounded-md">
               <CheckCircle2 className="size-4" />
             </div>
             <CardTitle className="text-sm font-bold">

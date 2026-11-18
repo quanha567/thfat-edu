@@ -21,7 +21,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "TH FAT EDU - Nền Tảng Học Hóa Học Trực Tuyến",
-  description: "Hệ thống học tập, luyện thi trắc nghiệm và tra cứu công thức hóa học hiện đại.",
+  description:
+    "Nắm vững kiến thức - Chinh phục mọi kỳ thi. Hệ thống học tập, luyện thi trắc nghiệm và tra cứu Hóa học hiện đại.",
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },

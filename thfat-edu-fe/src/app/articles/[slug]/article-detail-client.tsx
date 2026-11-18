@@ -2,12 +2,14 @@
 
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleDetailView, useArticle } from "@/features/articles";
+import { use } from "react";
 
 export type TArticleDetailClientProps = {
-  slug: string;
+  params: Promise<{ slug: string }>;
 };
 
-export function ArticleDetailClient({ slug }: TArticleDetailClientProps) {
+export function ArticleDetailClient({ params }: TArticleDetailClientProps) {
+  const { slug } = use(params);
   const { data: article, isLoading, error } = useArticle({ idOrSlug: slug, isAdmin: false });
 
   if (isLoading) {

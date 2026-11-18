@@ -7,6 +7,7 @@ export * from "./components/article-markdown-renderer";
 export * from "./components/markdown-editor/markdown-editor";
 export * from "./components/public-articles-container";
 export * from "./components/tiptap-editor/tiptap-editor";
+export * from "./constants";
 export * from "./hooks/use-ai-article-assistant";
 export * from "./hooks/use-article";
 export * from "./hooks/use-articles";

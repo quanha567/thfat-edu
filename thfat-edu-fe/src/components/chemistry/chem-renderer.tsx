@@ -14,33 +14,72 @@ export type TChemRendererProps = {
 };
 
 /**
+ * Utility to collapse redundant backslashes before LaTeX command letters or symbols. e.g. \\\ce ->
+ * \ce, \\ce -> \ce, \\frac -> \frac
+ */
+export function cleanMathBackslashes(text: string): string {
+  if (!text) return "";
+
+  return text.replace(/\\{2,}([a-zA-Z$%_&#{}])/g, (_, char) => `\\${char}`);
+}
+
+/**
  * Normalizes bare LaTeX symbols and chemical expressions into KaTeX math blocks so teachers can
- * write either `\rightarrow` or `$\rightarrow$` seamlessly.
+ * write either `\rightarrow` or `$\rightarrow$` seamlessly without accidental line breaks.
  */
 export function preprocessChemContent(raw: string): string {
   if (!raw) return "";
 
-  // 1. Protect all existing KaTeX math segments ($...$ and $$...$$) from any regex mutation
+  // 1. Convert standard LaTeX delimiters \( ... \) and \[ ... \] into $ ... $ and $$ ... $$
+  let res = raw
+    .replace(/\\\[([\s\S]*?)\\\]/g, (_m, inner) => `$$${inner.trim()}$$`)
+    .replace(/\\\(([\s\S]*?)\\\)/g, (_m, inner) => `$${inner.trim()}$`);
+
+  // 2. Normalize redundant/escaped backslashes before LaTeX command names or symbols
+  // (e.g. \\\ce -> \ce, \\ce -> \ce, \\rightarrow -> \rightarrow, \\Delta -> \Delta)
+  res = cleanMathBackslashes(res);
+
+  // 3. Protect all existing KaTeX math segments ($...$ and $$...$$) from any regex mutation
   const mathBlocks: string[] = [];
-  let res = raw.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g, (match) => {
+  res = res.replace(/\$\$[\s\S]*?\$\$|\$[^$\n]+\$/g, (match) => {
+    let math = match;
+
+    // For inline math ($...$), strip any stray \\ line breaks that disrupt inline paragraph flow
+    if (!math.startsWith("$$") && !math.includes("\\begin{")) {
+      const inner = math.slice(1, -1);
+      const cleanedInner = inner
+        .replace(/^\\{2,}\s*/, "")
+        .replace(/\s*\\{2,}$/, "")
+        .replace(/\\{2,}(?=\s|$)/g, " ")
+        .trim();
+
+      math = `$${cleanedInner}$`;
+    }
+
     const idx = mathBlocks.length;
-    mathBlocks.push(match);
+    mathBlocks.push(math);
 
     return `___MATH_PROTECTED_${idx}___`;
   });
 
-  // 2. Auto-wrap bare \ce{...} outside of $ (supporting 1 level of nested braces e.g. \ce{Cu^{2+}})
+  // 4. Auto-wrap bare \ce{...}, \frac{...}{...}, and \sqrt{...} outside of $ (supporting 1 level of nested braces)
   res = res.replace(/\\ce\{((?:[^{}]|\{[^{}]*\})*)\}/g, (_m, inner) => `$\\ce{${inner}}$`);
-
-  // 3. Auto-wrap bare arrows and symbols: \rightarrow, \rightleftharpoons, \uparrow, \downarrow, \Delta
   res = res.replace(
-    /\\(rightarrow|rightleftharpoons|leftarrow|uparrow|downarrow|Delta|approx|le|ge|times|div|cdot)\b/g,
+    /\\frac\{((?:[^{}]|\{[^{}]*\})*)\}\{((?:[^{}]|\{[^{}]*\})*)\}/g,
+    (_m, num, den) => `$\\frac{${num}}{${den}}$`,
+  );
+  res = res.replace(/\\sqrt\{((?:[^{}]|\{[^{}]*\})*)\}/g, (_m, inner) => `$\\sqrt{${inner}}$`);
+
+  // 5. Auto-wrap bare arrows and symbols: \rightarrow, \rightleftharpoons, \uparrow, \downarrow, \Delta
+  res = res.replace(
+    /\\(rightarrow|rightleftharpoons|leftarrow|uparrow|downarrow|Delta|approx|le|ge|times|div|cdot|pm)\b/g,
     (_m, sym) => `$\\${sym}$`,
   );
 
-  // 4. Restore protected math blocks
+  // 6. Restore protected math blocks (using function callback to prevent $$ from being treated as replace escape)
   for (let i = 0; i < mathBlocks.length; i++) {
-    res = res.replace(`___MATH_PROTECTED_${i}___`, mathBlocks[i] ?? "");
+    const block = mathBlocks[i] ?? "";
+    res = res.replace(`___MATH_PROTECTED_${i}___`, () => block);
   }
 
   return res;

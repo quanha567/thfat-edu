@@ -2,6 +2,7 @@ export type TNavigationItem = {
   label: string;
   href: string;
   active?: boolean;
+  isResourceDropdown?: boolean;
   children?: Array<{
     label: string;
     href: string;
@@ -11,7 +12,18 @@ export type TNavigationItem = {
 export type THomeStat = {
   value: string;
   label: string;
+  subLabel?: string;
   iconName: "GraduationCap" | "Users" | "Trophy";
+  iconSrc?: string;
+  countUp?: {
+    end: number;
+    decimals?: number;
+    suffix?: string;
+    prefix?: string;
+    useDotSeparator?: boolean;
+    countdownFrom?: number;
+    finalText?: string;
+  };
 };
 
 export type TFeatureItem = {
@@ -21,6 +33,7 @@ export type TFeatureItem = {
   iconName: "FileText" | "BarChart3" | "Target" | "Award";
   accent: "blue" | "purple" | "rose" | "amber";
   href: string;
+  imageSrc?: string;
 };
 
 export type TLeaderboardStudent = {
@@ -30,6 +43,7 @@ export type TLeaderboardStudent = {
   school: string;
   score: number;
   avatarText: string;
+  avatarUrl?: string;
 };
 
 export type TExamMetric = {
@@ -40,47 +54,63 @@ export type TExamMetric = {
 
 export const HOME_NAV_LINKS: TNavigationItem[] = [
   { label: "Trang chủ", href: "/", active: true },
-  { label: "Bài viết", href: "/articles" },
-  { label: "Giới thiệu", href: "/about" },
-  { label: "Vinh danh", href: "/leaderboard" },
+  { label: "Bảng xếp hạng", href: "/leaderboard" },
   { label: "Thi thử", href: "/exams" },
   {
     label: "Tài nguyên",
-    href: "/resources",
-    children: [
-      { label: "Cấu trúc đề thi & Công thức Hóa học", href: "/resources/formulas" },
-      { label: "Bộ đề thi thử V-SAT có giải thích", href: "/resources/past-papers" },
-      { label: "Mẹo làm bài & Chiến lược đạt điểm 9+", href: "/resources/tips" },
-    ],
+    href: "/articles",
+    isResourceDropdown: true,
   },
 ];
 
 export const HOME_STATS: THomeStat[] = [
   {
     value: "96.8%",
-    label: "Học viên đạt điểm 8+ sau 3 tháng",
+    label: "Học viên đạt điểm",
+    subLabel: "8+ sau 3 tháng",
     iconName: "GraduationCap",
+    iconSrc: "/images/home/stat-cap-3d.png",
+    countUp: {
+      end: 96.8,
+      decimals: 1,
+      suffix: "%",
+    },
   },
   {
     value: "15.000+",
-    label: "Câu hỏi ôn luyện chất lượng",
+    label: "Học sinh tin tưởng",
     iconName: "Users",
+    iconSrc: "/images/home/stat-users-3d.png",
+    countUp: {
+      end: 15000,
+      decimals: 0,
+      suffix: "+",
+      useDotSeparator: true,
+    },
   },
   {
     value: "Top đầu",
     label: "Thí sinh đạt điểm cao",
     iconName: "Trophy",
+    iconSrc: "/images/home/stat-trophy-3d.png",
+    countUp: {
+      end: 1,
+      prefix: "Top ",
+      countdownFrom: 50,
+      finalText: "Top đầu",
+    },
   },
 ];
 
 export const HOME_FEATURES: TFeatureItem[] = [
   {
     id: "v-sat-exam",
-    title: "Thi thử chuẩn V-SAT",
+    title: "Thi thử V-SAT",
     description: "Đề thi bám sát cấu trúc và định dạng mới nhất",
     iconName: "FileText",
     accent: "blue",
     href: "/exams",
+    imageSrc: "/images/home/feature-exam-3d.png",
   },
   {
     id: "performance-analytics",
@@ -89,6 +119,7 @@ export const HOME_FEATURES: TFeatureItem[] = [
     iconName: "BarChart3",
     accent: "purple",
     href: "/analytics",
+    imageSrc: "/images/home/feature-analytics-3d.png",
   },
   {
     id: "topic-practice",
@@ -97,6 +128,7 @@ export const HOME_FEATURES: TFeatureItem[] = [
     iconName: "Target",
     accent: "rose",
     href: "/practice",
+    imageSrc: "/images/home/feature-target-3d.png",
   },
   {
     id: "student-honor",
@@ -105,6 +137,7 @@ export const HOME_FEATURES: TFeatureItem[] = [
     iconName: "Award",
     accent: "amber",
     href: "/leaderboard",
+    imageSrc: "/images/home/feature-trophy-3d.png",
   },
 ];
 
@@ -114,9 +147,9 @@ export const HOME_ABOUT_DATA = {
   subtitle: "Kiến tạo tương lai",
   description:
     "ThFat Edu mang đến giải pháp luyện thi V-SAT hiện đại, ứng dụng công nghệ tiên tiến, giúp học sinh ôn luyện hiệu quả, đánh giá chính xác và chinh phục ước mơ đại học.",
-  ctaText: "Khám phá thêm",
+  ctaText: "Tìm hiểu thêm",
   ctaHref: "/about",
-  imageSrc: "/images/home/chemistry-flask-3d.jpg",
+  imageSrc: "/images/home/chemistry-flask-3d.png",
 };
 
 export const HOME_LEADERBOARD_DATA = {
@@ -131,6 +164,7 @@ export const HOME_LEADERBOARD_DATA = {
       school: "THPT Chuyên Lý Tự Trọng",
       score: 29.8,
       avatarText: "MA",
+      avatarUrl: "/images/home/avatar-student-1.png",
     },
     {
       id: "std-2",
@@ -139,6 +173,7 @@ export const HOME_LEADERBOARD_DATA = {
       school: "THPT Phan Ngọc Hiển",
       score: 29.6,
       avatarText: "GH",
+      avatarUrl: "/images/home/avatar-student-2.png",
     },
     {
       id: "std-3",
@@ -147,13 +182,14 @@ export const HOME_LEADERBOARD_DATA = {
       school: "THPT Châu Văn Liêm",
       score: 29.4,
       avatarText: "TV",
+      avatarUrl: "/images/home/avatar-student-3.png",
     },
   ] satisfies TLeaderboardStudent[],
 };
 
 export const HOME_EXAM_INFO_DATA = {
   tagline: "Thông tin kỳ thi V-SAT",
-  title: "Nắm vững cấu trúc – Tự tin làm bài",
+  title: "Cấu trúc đề thi đánh giá đầu vào V-SAT",
   ctaText: "Tìm hiểu chi tiết",
   ctaHref: "/exam-structure",
   metrics: [
@@ -163,13 +199,13 @@ export const HOME_EXAM_INFO_DATA = {
       iconName: "Calendar",
     },
     {
-      label: "60 – 90 phút",
+      label: "60 đến 90 phút",
       detail: "Thời gian làm bài",
       iconName: "Clock",
     },
     {
       label: "4 dạng câu hỏi",
-      detail: "Đúng/Sai, Ghép hợp, MCQs, Trả lời ngắn",
+      detail: "Đúng/sai, ghép đôi, nhiều lựa chọn, trả lời ngắn",
       iconName: "CheckSquare",
     },
     {
@@ -181,16 +217,17 @@ export const HOME_EXAM_INFO_DATA = {
 };
 
 export const HOME_CTA_DATA = {
-  title: "Sẵn sàng chinh phục\nkỳ thi V-SAT?",
-  description: "Bắt đầu luyện tập ngay hôm nay để đạt kết quả tốt nhất!",
-  ctaText: "Thi thử ngay",
+  title: "Kiểm tra năng lực với\nđề thi thử V-SAT",
+  description: "Làm quen với cấu trúc câu hỏi, áp lực thời gian và hệ thống chấm điểm tự động.",
+  ctaText: "Làm bài thi thử",
   ctaHref: "/exams",
   imageSrc: "/images/home/rocket-3d.jpg",
 };
 
 export const HOME_FOOTER_LINKS = [
-  { label: "Giới thiệu", href: "/about" },
-  { label: "Vinh danh", href: "/leaderboard" },
-  { label: "Câu hỏi thường gặp", href: "/faq" },
+  { label: "Trang chủ", href: "/" },
+  { label: "Bảng xếp hạng", href: "/leaderboard" },
+  { label: "Thi thử", href: "/exams" },
+  { label: "Tài nguyên", href: "/articles" },
   { label: "Liên hệ", href: "/contact" },
 ];

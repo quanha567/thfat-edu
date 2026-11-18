@@ -25,11 +25,11 @@ export function UserStatusBadge({ isActive, deletedAt, className }: TUserStatusB
     return (
       <div
         className={cn(
-          "border-border bg-muted/40 inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium text-rose-700 dark:text-rose-400",
+          "border-border bg-muted/40 inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium text-error-600 dark:text-error-400",
           className,
         )}
       >
-        <span className="size-1.5 shrink-0 rounded-full bg-rose-500" />
+        <span className="size-1.5 shrink-0 rounded-full bg-error-500" />
         <span>Đã khóa</span>
       </div>
     );
@@ -42,7 +42,7 @@ export function UserStatusBadge({ isActive, deletedAt, className }: TUserStatusB
         className,
       )}
     >
-      <span className="size-1.5 shrink-0 rounded-full bg-emerald-500" />
+      <span className="size-1.5 shrink-0 rounded-full bg-success-500" />
       <span>Hoạt động</span>
     </div>
   );

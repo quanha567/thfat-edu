@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArticleCard, useArticles } from "@/features/articles";
-import { ArrowRight, Newspaper } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export function ArticlesPreviewSection() {
@@ -19,15 +19,11 @@ export function ArticlesPreviewSection() {
   }
 
   return (
-    <section className="bg-background border-t border-border/60 py-16 md:py-20">
+    <section className="bg-background border-border/60 border-t py-16 md:py-20">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-10 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
           <div className="space-y-2">
-            <span className="text-primary-600 dark:text-primary-400 flex items-center gap-1.5 text-xs font-bold tracking-wider uppercase">
-              <Newspaper className="size-4" />
-              Bản tin ThFat Edu
-            </span>
-            <h2 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+            <h2 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl">
               Tin tức & Cẩm nang ôn thi
             </h2>
             <p className="text-muted-foreground text-xs sm:text-sm">
@@ -35,7 +31,12 @@ export function ArticlesPreviewSection() {
             </p>
           </div>
 
-          <Button asChild variant="outline" size="sm" className="gap-1.5 self-start text-xs font-semibold sm:self-auto">
+          <Button
+            asChild
+            variant="outline"
+            size="sm"
+            className="gap-1.5 self-start text-xs font-semibold sm:self-auto"
+          >
             <Link href="/articles">
               Xem tất cả bài viết
               <ArrowRight className="size-3.5" />
@@ -46,7 +47,7 @@ export function ArticlesPreviewSection() {
         {isLoading ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {["preview-skel-1", "preview-skel-2", "preview-skel-3"].map((key) => (
-              <div key={key} className="space-y-3 rounded-xl border border-border p-4">
+              <div key={key} className="border-border space-y-3 rounded-xl border p-4">
                 <Skeleton className="aspect-video w-full rounded-lg" />
                 <Skeleton className="h-5 w-3/4" />
                 <Skeleton className="h-4 w-full" />

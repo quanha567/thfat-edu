@@ -33,11 +33,11 @@ export function LoginCard() {
     <div className="flex w-full max-w-[440px] flex-col items-center">
       {/* Shadcn Card container */}
       <Card className="border-border/80 bg-card w-full rounded-2xl p-8 shadow-xl shadow-neutral-200/50 sm:p-10 dark:shadow-none">
-        <CardHeader className="p-0 pb-6 text-left">
+        <CardHeader className="flex flex-col gap-1.5 p-0 pb-6 text-left">
           <CardTitle className="text-h2 text-card-foreground font-bold tracking-tight">
             Đăng nhập
           </CardTitle>
-          <CardDescription className="text-body-sm text-muted-foreground mt-1.5">
+          <CardDescription className="text-body-sm text-muted-foreground">
             Nhập thông tin tài khoản của bạn để bắt đầu học tập
           </CardDescription>
         </CardHeader>

@@ -79,8 +79,8 @@ export function StudentExamEmptyState({
 
         <Button asChild variant="outline" className="gap-2 rounded-xl">
           <Link href="/leaderboard">
-            <Trophy className="h-4 w-4 text-amber-500" />
-            Xem Bảng vinh danh
+            <Trophy className="text-gold-500 h-4 w-4" />
+            Xem Bảng xếp hạng
           </Link>
         </Button>
       </div>

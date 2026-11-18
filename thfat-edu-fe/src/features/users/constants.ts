@@ -16,8 +16,8 @@ export const USER_ROLE_FILTER_OPTIONS: Array<{ value: TUserRoleFilter; label: st
 export const USER_STATUS_FILTER_OPTIONS: Array<{ value: TUserStatusFilter; label: string }> = [
   { value: "all", label: "Tất cả trạng thái" },
   { value: "active", label: "Đang hoạt động" },
-  { value: "inactive", label: "Đã bị khóa" },
-  { value: "deleted", label: "Đã xóa mềm" },
+  { value: "inactive", label: "Đã khóa" },
+  { value: "deleted", label: "Đã xóa" },
 ];
 
 export const DEFAULT_USER_PAGE_SIZE = 10;

@@ -60,7 +60,7 @@ export function BaseCheckbox({
                 {label && (
                   <FieldLabel
                     htmlFor={checkboxId}
-                    className="cursor-pointer font-normal text-slate-600 dark:text-slate-300"
+                    className="cursor-pointer font-normal text-foreground"
                   >
                     {label}
                   </FieldLabel>
@@ -90,7 +90,7 @@ export function BaseCheckbox({
         {label && (
           <FieldLabel
             htmlFor={checkboxId}
-            className="cursor-pointer font-normal text-slate-600 dark:text-slate-300"
+            className="cursor-pointer font-normal text-foreground"
           >
             {label}
           </FieldLabel>

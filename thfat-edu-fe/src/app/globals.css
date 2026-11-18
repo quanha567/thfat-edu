@@ -4,27 +4,49 @@
 
 /* ============================================================
    THFAT EDU — Design System Token Layer
-   Brand: Navy Blue #1C3480 ≈ oklch(0.33 0.17 263)
+   Brand: Electric Royal Cobalt Blue & Radiant Gold
    Font:  Be Vietnam Pro
    ============================================================ */
 
 /* ------------------------------------------------------------
-   PRIMITIVE TOKENS — Primary Scale (Navy Blue)
+   PRIMITIVE TOKENS — Primary Scale (Electric Royal Blue)
    --------------------------------------------------
-   Brand color (#1C3480) maps to --primary-700
+   Vibrant Royal Cobalt Blue maps to --primary-700
    ------------------------------------------------------------ */
 :root {
-  --primary-50: oklch(0.97 0.015 263);
-  --primary-100: oklch(0.93 0.03 263);
-  --primary-200: oklch(0.86 0.06 263);
-  --primary-300: oklch(0.74 0.1 263);
-  --primary-400: oklch(0.6 0.14 263);
-  --primary-500: oklch(0.48 0.17 263);
-  --primary-600: oklch(0.41 0.18 263);
-  --primary-700: oklch(0.33 0.17 263); /* ← Brand color #1C3480 */
-  --primary-800: oklch(0.27 0.14 263);
-  --primary-900: oklch(0.21 0.1 263);
-  --primary-950: oklch(0.15 0.07 263);
+  --primary-50: oklch(0.97 0.03 252);
+  --primary-100: oklch(0.93 0.06 252);
+  --primary-200: oklch(0.86 0.11 252);
+  --primary-300: oklch(0.76 0.16 252);
+  --primary-400: oklch(0.65 0.21 254);
+  --primary-500: oklch(0.57 0.24 256);
+  --primary-600: oklch(0.48 0.24 258);
+  --primary-700: oklch(0.40 0.22 258); /* ← Brand Electric Royal Blue */
+  --primary-800: oklch(0.32 0.18 258);
+  --primary-900: oklch(0.24 0.13 258);
+  --primary-950: oklch(0.16 0.09 258);
+
+  /* ----------------------------------------------------------
+     CYAN GLOW ACCENTS (Chemistry & Radiant Luminescence)
+     ---------------------------------------------------------- */
+  --cyan-300: oklch(0.85 0.14 215);
+  --cyan-400: oklch(0.78 0.17 215);
+  --cyan-500: oklch(0.70 0.19 215);
+
+  /* ----------------------------------------------------------
+     PRIMITIVE TOKENS — Gold / Amber Scale (Warm Radiant Gold)
+     ---------------------------------------------------------- */
+  --gold-50: oklch(0.98 0.03 82);
+  --gold-100: oklch(0.94 0.07 82);
+  --gold-200: oklch(0.89 0.12 82);
+  --gold-300: oklch(0.82 0.16 82);
+  --gold-400: oklch(0.75 0.19 82);
+  --gold-500: oklch(0.69 0.19 82); /* ← Radiant Gold */
+  --gold-600: oklch(0.60 0.18 82);
+  --gold-700: oklch(0.50 0.15 82);
+  --gold-800: oklch(0.40 0.12 82);
+  --gold-900: oklch(0.30 0.09 82);
+  --gold-950: oklch(0.20 0.06 82);
 
   /* ----------------------------------------------------------
      PRIMITIVE TOKENS — Neutral Scale (Gray)
@@ -107,10 +129,10 @@
   --muted: var(--neutral-100);
   --muted-foreground: var(--neutral-500);
 
-  --accent: var(--primary-100);
-  --accent-foreground: var(--primary-800);
+  --accent: var(--gold-100);
+  --accent-foreground: var(--gold-900);
 
-  --highlight: oklch(0.85 0.17 205);
+  --highlight: var(--gold-500);
   --highlight-foreground: var(--primary-950);
 
   --destructive: var(--error-500);
@@ -215,6 +237,24 @@
   --color-primary-800: var(--primary-800);
   --color-primary-900: var(--primary-900);
   --color-primary-950: var(--primary-950);
+
+  /* Cyan accents */
+  --color-cyan-300: var(--cyan-300);
+  --color-cyan-400: var(--cyan-400);
+  --color-cyan-500: var(--cyan-500);
+
+  /* Gold / Amber scale */
+  --color-gold-50: var(--gold-50);
+  --color-gold-100: var(--gold-100);
+  --color-gold-200: var(--gold-200);
+  --color-gold-300: var(--gold-300);
+  --color-gold-400: var(--gold-400);
+  --color-gold-500: var(--gold-500);
+  --color-gold-600: var(--gold-600);
+  --color-gold-700: var(--gold-700);
+  --color-gold-800: var(--gold-800);
+  --color-gold-900: var(--gold-900);
+  --color-gold-950: var(--gold-950);
 
   /* Neutral scale */
   --color-neutral-50: var(--neutral-50);
@@ -542,4 +582,35 @@ select:-webkit-autofill:active {
 .katex .mrel {
   color: #09090b !important;
   opacity: 1 !important;
+}
+
+/* ============================================================
+   INTERACTIVE BUTTON & SHIMMER ANIMATIONS
+   ============================================================ */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+  }
+  30%, 100% {
+    transform: translateX(220%) skewX(-20deg);
+  }
+}
+
+@keyframes pulse-aura {
+  0%, 100% {
+    opacity: 0.45;
+    transform: scale(0.98);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.04);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer-sweep 3.5s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.animate-pulse-aura {
+  animation: pulse-aura 2.5s ease-in-out infinite;
 }

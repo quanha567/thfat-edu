@@ -12,7 +12,7 @@ export default function StudentExamsPage() {
   return (
     <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
       <MainNavbar />
-      <main className="flex-1 bg-neutral-50/60 dark:bg-neutral-950/60">
+      <main className="flex-1 bg-neutral-50/60 pt-16 dark:bg-neutral-950/60">
         <Suspense>
           <StudentExamListContainer />
         </Suspense>

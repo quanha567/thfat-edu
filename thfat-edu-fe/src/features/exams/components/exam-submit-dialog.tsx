@@ -38,11 +38,11 @@ export function ExamSubmitDialog({
         <AlertDialogHeader>
           <div className="flex items-center gap-3">
             {hasUnanswered ? (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-amber-100 text-amber-600">
+              <div className="bg-warning-100 text-warning-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                 <AlertTriangle className="h-5 w-5" />
               </div>
             ) : (
-              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600">
+              <div className="bg-success-100 text-success-700 flex h-10 w-10 shrink-0 items-center justify-center rounded-full">
                 <CheckCircle2 className="h-5 w-5" />
               </div>
             )}
@@ -58,9 +58,9 @@ export function ExamSubmitDialog({
               {totalSubItems} ý câu hỏi.
             </p>
             {hasUnanswered && (
-              <p className="rounded-lg border border-amber-200 bg-amber-50 p-2.5 text-xs text-amber-800">
+              <p className="border-warning-200 bg-warning-50 text-warning-800 rounded-lg border p-2.5 text-xs">
                 Chú ý: Bạn vẫn còn{" "}
-                <strong className="font-bold text-amber-900">{unansweredCount}</strong> ý chưa trả
+                <strong className="text-warning-900 font-bold">{unansweredCount}</strong> ý chưa trả
                 lời. Mỗi đề thi chỉ được làm 1 lần, bạn có chắc chắn muốn nộp bài ngay bây giờ?
               </p>
             )}

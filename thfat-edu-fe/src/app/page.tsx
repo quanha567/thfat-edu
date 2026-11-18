@@ -3,7 +3,6 @@ import {
   AboutPreviewSection,
   ArticlesPreviewSection,
   CtaSection,
-  ExamInfoSection,
   FeaturesSection,
   HeroSection,
   LeaderboardPreviewSection,
@@ -12,7 +11,7 @@ import {
 
 export default function HomePage() {
   return (
-    <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
+    <div className="flex min-h-screen flex-col bg-background text-foreground selection:bg-primary-600 selection:text-white">
       {/* Shared Navigation Header */}
       <MainNavbar />
 
@@ -26,13 +25,9 @@ export default function HomePage() {
         {/* 4 Feature Highlights */}
         <FeaturesSection />
 
-        {/* Latest Articles & News */}
-        <ArticlesPreviewSection />
-
-        {/* Detailed Sections Grid */}
-        <section className="bg-background pb-20 md:pb-24">
-          <div className="mx-auto max-w-7xl space-y-10 px-4 sm:px-6 lg:px-8">
-            {/* Row 1: About ThFat Edu & Leaderboard Preview */}
+        {/* Core Spotlight: About ThFat Edu & Leaderboard Preview */}
+        <section className="bg-background pb-12 md:pb-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
               <div className="flex flex-col lg:col-span-7">
                 <AboutPreviewSection />
@@ -41,21 +36,21 @@ export default function HomePage() {
                 <LeaderboardPreviewSection />
               </div>
             </div>
+          </div>
+        </section>
 
-            {/* Row 2: Exam Structure & Ready CTA Banner */}
-            <div className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12">
-              <div className="flex flex-col lg:col-span-7">
-                <ExamInfoSection />
-              </div>
-              <div className="flex flex-col lg:col-span-5">
-                <CtaSection />
-              </div>
-            </div>
+        {/* Latest Articles & News */}
+        <ArticlesPreviewSection />
+
+        {/* Rocket CTA Banner */}
+        <section className="bg-background pb-20 md:pb-24">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+            <CtaSection />
           </div>
         </section>
       </main>
 
-      {/* Shared Footer with Bottom Wave Transition */}
+      {/* Shared Footer */}
       <MainFooter />
     </div>
   );

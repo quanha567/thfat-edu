@@ -44,7 +44,7 @@ export function ExamEditorSidebarPreviewTab({
 }: TExamEditorSidebarPreviewTabProps) {
   return (
     <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
-      <div className="border-border/60 bg-muted/20 border-b px-3.5 py-2.5 flex items-center justify-between shrink-0">
+      <div className="border-border/40 bg-muted/10 border-b px-3.5 py-2 flex items-center justify-between shrink-0">
         <div className="flex items-center gap-1.5 min-w-0">
           <Badge className="text-[11px] font-bold px-2 py-0.5 shrink-0 bg-primary text-primary-foreground shadow-2xs">
             Câu {activeQuestionNumber}
@@ -97,7 +97,7 @@ export function ExamEditorSidebarPreviewTab({
         />
       </ScrollArea>
 
-      <div className="border-border/60 bg-muted/20 border-t px-3 py-2.5 flex items-center justify-between shrink-0 text-xs">
+      <div className="border-border/40 bg-muted/10 border-t px-3 py-2 flex items-center justify-between shrink-0 text-xs">
         <Button
           type="button"
           variant="ghost"

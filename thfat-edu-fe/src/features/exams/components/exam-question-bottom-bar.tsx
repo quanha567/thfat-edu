@@ -71,7 +71,7 @@ export function ExamQuestionBottomBar({
 
         <div className="flex items-center gap-1.5 font-medium">
           <span className="border-primary-600 bg-primary-50 h-2.5 w-2.5 rounded-xs border-2 sm:h-3 sm:w-3" />
-          <span>Làm dở ({partialCount})</span>
+          <span>Làm một phần ({partialCount})</span>
         </div>
 
         <div className="flex items-center gap-1.5 font-medium">
@@ -80,10 +80,10 @@ export function ExamQuestionBottomBar({
         </div>
 
         <div className="flex items-center gap-1.5 font-medium">
-          <span className="flex h-2.5 w-2.5 items-center justify-center rounded-xs bg-amber-400 text-white sm:h-3 sm:w-3">
+          <span className="bg-warning-500 flex h-2.5 w-2.5 items-center justify-center rounded-xs text-white sm:h-3 sm:w-3">
             <Flag className="h-1.5 w-1.5 fill-current sm:h-2 sm:w-2" />
           </span>
-          <span>Cắm cờ ({flaggedCount})</span>
+          <span>Đánh dấu ({flaggedCount})</span>
         </div>
 
         <div className="hidden font-semibold text-neutral-500 md:inline">

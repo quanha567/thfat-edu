@@ -14,6 +14,7 @@ import { SectionEditorTrueFalse } from "./section-editor-true-false";
 export type TExamEditorSectionCardProps = {
   section: TQuizSection;
   sectionIndex: number;
+  startQuestionNumber?: number;
   collapsedKeys: Set<string>;
   solvingKey?: string | null;
   editorMode?: "edit" | "preview";
@@ -37,6 +38,7 @@ const SECTION_ICONS: Record<TSectionType, typeof CheckSquare2> = {
 export function ExamEditorSectionCard({
   section,
   sectionIndex,
+  startQuestionNumber = 1,
   collapsedKeys,
   solvingKey,
   editorMode = "edit",
@@ -70,19 +72,33 @@ export function ExamEditorSectionCard({
             {config?.pointsLabel}
           </Badge>
           <Badge variant="outline" className="text-xs font-medium">
-            {section.questions.length} / {config?.expectedQuestions ?? 0} câu
+            {section.sectionType === "group_mcq"
+              ? `${section.questions.reduce((acc, q) => acc + (q.subItems?.length || 1), 0)} / ${config?.expectedQuestions ?? 6} câu (${section.questions.length} chùm)`
+              : `${section.questions.length} / ${config?.expectedQuestions ?? 0} câu`}
           </Badge>
         </div>
       </div>
 
-      <div className="space-y-5">
+      <div className="space-y-3.5">
         {section.questions.map((question, qIdx) => {
           const itemKey = `${sectionIndex}-${qIdx}`;
           const isCollapsed = collapsedKeys.has(itemKey);
           const isSolving = solvingKey === itemKey;
+          const currentQuestionNumber = startQuestionNumber + qIdx;
+          const cardId = `question-card-${sectionIndex}-${qIdx}`;
+
+          let runningSubOffset = 0;
+          for (let i = 0; i < qIdx; i++) {
+            runningSubOffset += section.questions[i]?.subItems?.length || 1;
+          }
+          const currentGroupStartNum = startQuestionNumber + runningSubOffset;
+          const currentGroupEndNum =
+            currentGroupStartNum + (question.subItems?.length || 1) - 1;
+
           const commonProps = {
+            id: cardId,
             question,
-            questionNumber: qIdx + 1,
+            questionNumber: currentQuestionNumber,
             canMoveUp: qIdx > 0,
             canMoveDown: qIdx < section.questions.length - 1,
             isCollapsed,
@@ -105,7 +121,13 @@ export function ExamEditorSectionCard({
             return <SectionEditorTrueFalse key={itemKey} {...commonProps} />;
           }
           if (section.sectionType === "group_mcq") {
-            return <SectionEditorMcq key={itemKey} {...commonProps} />;
+            return (
+              <SectionEditorMcq
+                key={itemKey}
+                {...commonProps}
+                groupRange={{ start: currentGroupStartNum, end: currentGroupEndNum }}
+              />
+            );
           }
           if (section.sectionType === "matching") {
             return <SectionEditorMatching key={itemKey} {...commonProps} />;

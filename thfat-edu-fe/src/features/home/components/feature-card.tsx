@@ -1,31 +1,16 @@
 import { FadeInView } from "@/components/motion";
-import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { ArrowRight, Award, BarChart3, FileText, Target } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 
 import { type TFeatureItem } from "../constants/home.data";
 
-const ICON_MAP = {
+const FALLBACK_ICON_MAP = {
   FileText,
   BarChart3,
   Target,
   Award,
-} as const;
-
-const ACCENT_STYLES = {
-  blue: {
-    iconBg: "bg-primary-50 border-primary-100 text-primary-700",
-  },
-  purple: {
-    iconBg: "bg-primary-100/60 border-primary-200 text-primary-800",
-  },
-  rose: {
-    iconBg: "bg-error-50 border-error-100 text-error-600",
-  },
-  amber: {
-    iconBg: "bg-warning-50 border-warning-100 text-warning-700",
-  },
 } as const;
 
 type TFeatureCardProps = {
@@ -34,39 +19,49 @@ type TFeatureCardProps = {
 };
 
 export function FeatureCard({ feature, index }: TFeatureCardProps) {
-  const Icon = ICON_MAP[feature.iconName];
-  const styles = ACCENT_STYLES[feature.accent];
+  const FallbackIcon = FALLBACK_ICON_MAP[feature.iconName];
 
   return (
     <FadeInView delay={index * 0.1} className="h-full">
-      <Card className="group border-border bg-card hover:border-primary-200 relative flex h-full flex-col justify-between gap-0 rounded-2xl p-6 shadow-xs transition-all duration-300 hover:-translate-y-1 hover:shadow-md">
+      <Card className="group relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-[0_4px_20px_rgba(0,40,120,0.04)] transition-all duration-300 hover:-translate-y-1.5 hover:border-primary-200 hover:shadow-[0_12px_32px_rgba(0,60,180,0.12)] dark:border-white/10 dark:bg-neutral-900/80">
         <div>
-          <div
-            className={`mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border ${styles.iconBg} shadow-xs transition-transform group-hover:scale-105`}
-          >
-            <Icon className="h-6 w-6" />
+          {/* 3D Glossy Icon matching design */}
+          <div className="relative mb-6 h-16 w-16 transition-transform duration-300 group-hover:scale-110 sm:h-18 sm:w-18">
+            {feature.imageSrc ? (
+              <Image
+                src={feature.imageSrc}
+                alt={feature.title}
+                fill
+                className="object-contain drop-shadow-[0_8px_18px_rgba(0,50,150,0.18)]"
+                sizes="72px"
+              />
+            ) : (
+              <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-primary-50 text-primary-600">
+                <FallbackIcon className="h-6 w-6 stroke-[2]" />
+              </div>
+            )}
           </div>
 
-          <h3 className="text-h3 text-foreground group-hover:text-primary mb-2 font-semibold transition-colors">
+          {/* Title */}
+          <h3 className="text-h3 mb-2 font-bold text-neutral-900 transition-colors group-hover:text-primary-600 dark:text-white dark:group-hover:text-cyan-400">
             {feature.title}
           </h3>
 
-          <p className="text-body-sm text-muted-foreground leading-relaxed">
+          {/* Description */}
+          <p className="text-body-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
             {feature.description}
           </p>
         </div>
 
-        <div className="mt-6 flex justify-end">
-          <Button
-            asChild
-            size="icon"
-            variant="ghost"
-            className="bg-primary-50 text-primary hover:bg-primary hover:text-primary-foreground h-8 w-8 rounded-full transition-colors"
+        {/* Action Link: Khám phá → */}
+        <div className="mt-6 pt-2">
+          <Link
+            href={feature.href}
+            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary-600 transition-all duration-200 hover:gap-2.5 hover:text-primary-700 dark:text-cyan-400 dark:hover:text-cyan-300"
           >
-            <Link href={feature.href} aria-label={feature.title}>
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-          </Button>
+            <span>Khám phá</span>
+            <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-1" />
+          </Link>
         </div>
       </Card>
     </FadeInView>

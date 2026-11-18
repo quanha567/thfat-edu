@@ -17,7 +17,7 @@ export default async function AdminLayout({ children }: TAdminLayoutProps) {
   return (
     <SidebarProvider defaultOpen={defaultOpen} className="h-svh overflow-hidden">
       <AdminSidebar />
-      <SidebarInset className="bg-background flex h-full min-w-0 flex-col overflow-hidden">
+      <SidebarInset className="bg-background flex h-full min-h-0 min-w-0 flex-col overflow-hidden">
         <AdminHeader />
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto">{children}</div>
       </SidebarInset>

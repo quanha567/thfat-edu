@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import {
   Pagination,
   PaginationContent,
@@ -9,33 +8,18 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useStudentExams } from "@/features/exams/hooks/use-student-exams";
 import { type TStudentExamListItem } from "@/features/exams/types";
-import { Search } from "lucide-react";
 import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 import { useMemo } from "react";
 
-import { ExamCardSkeleton, StudentExamCard } from "./student-exam-card";
+import { StudentExamCard, ExamCardSkeleton } from "./student-exam-card";
 import { StudentExamEmptyState } from "./student-exam-empty-state";
+import { StudentExamFilterBar, type TExamFilterCounts } from "./student-exam-filter-bar";
 import { StudentExamListHero } from "./student-exam-list-hero";
 
 const PAGE_SIZE = 9;
 const SKELETON_KEYS = Array.from({ length: PAGE_SIZE }, (_, i) => `exam-skeleton-${i + 1}`);
-
-type TStatusFilter = "all" | "not_started" | "in_progress" | "submitted";
-
-type TStatusTab = {
-  value: TStatusFilter;
-  label: string;
-};
-
-const STATUS_TABS: TStatusTab[] = [
-  { value: "all", label: "Tất cả" },
-  { value: "not_started", label: "Chưa làm" },
-  { value: "in_progress", label: "Đang làm dở" },
-  { value: "submitted", label: "Đã nộp bài" },
-];
 
 function renderContent(options: {
   isLoading: boolean;
@@ -77,14 +61,23 @@ export function StudentExamListContainer() {
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 
   const { data, isLoading } = useStudentExams({ search: search || undefined, limit: 100 });
+  const allItems = data?.items ?? [];
+
+  const counts: TExamFilterCounts = useMemo(
+    () => ({
+      all: allItems.length,
+      notStarted: allItems.filter((e) => e.attemptStatus === "not_started").length,
+      inProgress: allItems.filter((e) => e.attemptStatus === "in_progress").length,
+      submitted: allItems.filter((e) => e.attemptStatus === "submitted").length,
+    }),
+    [allItems],
+  );
 
   const filteredExams = useMemo(() => {
-    const items = data?.items ?? [];
+    if (status === "all") return allItems;
 
-    if (status === "all") return items;
-
-    return items.filter((exam) => exam.attemptStatus === status);
-  }, [data?.items, status]);
+    return allItems.filter((exam) => exam.attemptStatus === status);
+  }, [allItems, status]);
 
   const totalPages = Math.ceil(filteredExams.length / PAGE_SIZE);
   const safePage = Math.min(Math.max(1, page), Math.max(1, totalPages));
@@ -112,76 +105,62 @@ export function StudentExamListContainer() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-      <div className="space-y-6">
-        <StudentExamListHero totalExams={data?.total} />
+    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8 space-y-8">
+      <StudentExamListHero totalExams={data?.total ?? allItems.length} />
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <Tabs value={status} onValueChange={handleStatusChange}>
-            <TabsList>
-              {STATUS_TABS.map((tab) => (
-                <TabsTrigger key={tab.value} value={tab.value}>
-                  {tab.label}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </Tabs>
+      <StudentExamFilterBar
+        status={status}
+        onStatusChange={handleStatusChange}
+        search={search}
+        onSearchChange={handleSearchChange}
+        counts={counts}
+        totalFiltered={filteredExams.length}
+        totalCount={allItems.length}
+        onResetFilters={handleResetFilters}
+      />
 
-          <div className="relative w-full sm:w-72">
-            <Search className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-            <Input
-              type="text"
-              placeholder="Tìm kiếm đề thi..."
-              value={search}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="bg-white pl-9"
-            />
-          </div>
-        </div>
+      {renderContent({
+        isLoading,
+        exams: paginatedExams,
+        hasActiveFilter: status !== "all" || Boolean(search),
+        onResetFilters: handleResetFilters,
+      })}
 
-        {renderContent({
-          isLoading,
-          exams: paginatedExams,
-          hasActiveFilter: status !== "all" || !!search,
-          onResetFilters: handleResetFilters,
-        })}
+      {totalPages > 1 && (
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={() => handlePageChange(safePage - 1)}
+                aria-disabled={safePage === 1}
+                className={safePage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+              />
+            </PaginationItem>
 
-        {totalPages > 1 && (
-          <Pagination>
-            <PaginationContent>
-              <PaginationItem>
-                <PaginationPrevious
-                  onClick={() => handlePageChange(safePage - 1)}
-                  aria-disabled={safePage === 1}
-                  className={safePage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                />
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <PaginationItem key={pageNum}>
+                <PaginationLink
+                  onClick={() => handlePageChange(pageNum)}
+                  isActive={pageNum === safePage}
+                  className="cursor-pointer"
+                >
+                  {pageNum}
+                </PaginationLink>
               </PaginationItem>
+            ))}
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                <PaginationItem key={pageNum}>
-                  <PaginationLink
-                    onClick={() => handlePageChange(pageNum)}
-                    isActive={pageNum === safePage}
-                    className="cursor-pointer"
-                  >
-                    {pageNum}
-                  </PaginationLink>
-                </PaginationItem>
-              ))}
-
-              <PaginationItem>
-                <PaginationNext
-                  onClick={() => handlePageChange(safePage + 1)}
-                  aria-disabled={safePage === totalPages}
-                  className={
-                    safePage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
-                  }
-                />
-              </PaginationItem>
-            </PaginationContent>
-          </Pagination>
-        )}
-      </div>
+            <PaginationItem>
+              <PaginationNext
+                onClick={() => handlePageChange(safePage + 1)}
+                aria-disabled={safePage === totalPages}
+                className={
+                  safePage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
+                }
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      )}
     </div>
   );
 }

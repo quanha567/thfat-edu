@@ -11,14 +11,12 @@ export function StatsBar() {
         <FadeInView
           yOffset={30}
           duration={0.6}
-          className="from-primary-800/80 via-primary-700/70 to-primary-800/80 shadow-primary-950/50 relative overflow-hidden rounded-2xl border border-white/20 bg-gradient-to-r p-6 text-white shadow-2xl backdrop-blur-2xl transition-all duration-300 hover:border-white/30 sm:rounded-3xl sm:p-8"
+          className="relative overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-r from-[#1462e0]/85 via-[#1a6ef2]/80 to-[#1975ff]/85 p-6 text-white shadow-[0_20px_50px_rgba(8,40,140,0.35)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 sm:rounded-3xl sm:p-7"
         >
-          {/* Top Edge Specular Reflection (Glass highlight) */}
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-
-          {/* Background Ambient Radial Glow inside capsule */}
-          <div className="bg-highlight/15 pointer-events-none absolute -top-10 left-1/4 h-32 w-80 rounded-full blur-2xl" />
-          <div className="bg-primary-400/25 pointer-events-none absolute right-1/4 -bottom-10 h-32 w-80 rounded-full blur-2xl" />
+          {/* Top Edge Specular Reflection */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+          {/* Ambient inner soft cyan glow */}
+          <div className="pointer-events-none absolute -top-10 left-1/4 h-32 w-72 rounded-full bg-cyan-400/20 blur-3xl" />
 
           <div className="relative z-10 grid grid-cols-1 gap-6 divide-y divide-white/20 sm:grid-cols-3 sm:gap-0 sm:divide-x sm:divide-y-0">
             {HOME_STATS.map((stat, idx) => (
@@ -28,7 +26,7 @@ export function StatsBar() {
         </FadeInView>
       </div>
 
-      {/* Organic Curved Wave Transition (Nét uốn lượn lớn) */}
+      {/* Organic Curved Wave Transition */}
       <div className="pointer-events-none relative -z-10 -mt-10 w-full overflow-hidden leading-none sm:-mt-14">
         <svg
           viewBox="0 0 1440 180"
@@ -37,28 +35,15 @@ export function StatsBar() {
           className="block h-24 w-full sm:h-36 md:h-48"
           preserveAspectRatio="none"
         >
-          {/* Top Hero Deep Blue Extension */}
-          <path
-            d="M0 0H1440V65C1220 140 940 160 720 115C480 65 240 120 0 80V0Z"
-            fill="var(--primary-800)"
-          />
+          {/* Top Hero Blue Extension (Seamlessly matches Hero bottom) */}
+          <path d="M0 0H1440V65C1220 140 940 160 720 115C480 65 240 120 0 80V0Z" fill="#0f3d99" />
 
-          {/* Luminous Cyan Wave Glow Contour (Nét uốn lượn viền phát sáng) */}
+          {/* Delicate single curve contour */}
           <path
             d="M0 80C240 120 480 65 720 115C940 160 1220 140 1440 65"
-            stroke="var(--color-highlight)"
-            strokeWidth="3.5"
+            stroke="rgba(255,255,255,0.25)"
+            strokeWidth="1.5"
             strokeLinecap="round"
-            opacity="0.9"
-          />
-
-          {/* Soft Primary 300 Secondary Contour */}
-          <path
-            d="M0 84C240 124 480 69 720 119C940 164 1220 144 1440 69"
-            stroke="var(--color-primary-300)"
-            strokeWidth="2"
-            strokeLinecap="round"
-            opacity="0.6"
           />
 
           {/* Background entering the next section */}

@@ -32,7 +32,7 @@ export const EXAM_STATUS_CONFIG: Record<
 > = {
   published: {
     label: "Đang hoạt động",
-    dotClass: "bg-emerald-500",
+    dotClass: "bg-success-500",
     badgeClass: "text-foreground",
   },
   archived: {
@@ -42,7 +42,7 @@ export const EXAM_STATUS_CONFIG: Record<
   },
   draft: {
     label: "Bản nháp",
-    dotClass: "bg-amber-500",
+    dotClass: "bg-warning-500",
     badgeClass: "text-foreground",
   },
 };

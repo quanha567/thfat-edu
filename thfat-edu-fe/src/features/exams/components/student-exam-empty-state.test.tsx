@@ -10,7 +10,7 @@ describe("StudentExamEmptyState", () => {
     expect(html).toContain("Phòng thi đang chuẩn bị đề mới");
     expect(html).toContain("Đọc bài viết ôn tập");
     expect(html).toContain("/articles");
-    expect(html).toContain("Xem Bảng vinh danh");
+    expect(html).toContain("Xem Bảng xếp hạng");
     expect(html).toContain("/leaderboard");
   });
 

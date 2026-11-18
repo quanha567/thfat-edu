@@ -119,7 +119,7 @@ export function ExamQuestionStrip({
               >
                 {q.index}
                 {isFlagged && (
-                  <span className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-amber-400 text-white shadow-xs">
+                  <span className="bg-warning-500 absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full text-white shadow-xs">
                     <Flag className="h-2 w-2 fill-current" />
                   </span>
                 )}

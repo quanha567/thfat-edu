@@ -35,7 +35,7 @@ export const VSAT_SECTION_CONFIG: Record<
   }
 > = {
   true_false: {
-    title: "Phần I: Câu hỏi Đúng / Sai",
+    title: "Phần I: Câu hỏi đúng / sai",
     sectionType: "true_false",
     expectedQuestions: 9,
     pointsLabel: "54.00 điểm (Tối đa 6đ/câu)",
@@ -45,11 +45,11 @@ export const VSAT_SECTION_CONFIG: Record<
     title: "Phần II: Câu hỏi trắc nghiệm dạng nhóm",
     sectionType: "group_mcq",
     expectedQuestions: 6,
-    pointsLabel: "36.00 điểm (1.5đ/tiểu mục)",
+    pointsLabel: "36.00 điểm (6đ/câu)",
     description: "Nhóm câu hỏi chung ngữ cảnh, mỗi câu có 4 lựa chọn (A, B, C, D).",
   },
   matching: {
-    title: "Phần III: Câu hỏi ghép hợp",
+    title: "Phần III: Câu hỏi ghép đôi",
     sectionType: "matching",
     expectedQuestions: 5,
     pointsLabel: "30.00 điểm (1.5đ/tiểu mục)",
@@ -91,7 +91,7 @@ export function createEmptySubItem(options: {
       content: "",
       options: ["", "", "", ""],
       correctAnswer: "A",
-      points: "1.50",
+      points: "6.00",
       explanation: "",
     };
   }
@@ -139,7 +139,7 @@ export function createEmptyQuestion(options: {
     return {
       orderIndex,
       contextContent: "",
-      subItems: [0, 1, 2, 3].map((idx) =>
+      subItems: [0, 1, 2].map((idx) =>
         createEmptySubItem({ sectionType, orderIndex: idx, label: `Câu ${idx + 1}` }),
       ),
     };

@@ -16,18 +16,18 @@ export function LoginHero() {
 
       {/* Top Header / Brand */}
       <div className="relative z-10">
-        <BrandLogo slogan="Học Hóa · Học Thật · Truyền Cảm Hứng" />
+        <BrandLogo size="lg" theme="dark" />
       </div>
 
       {/* Center Headline & Value Proposition */}
       <div className="relative z-10 my-auto py-12">
         <h1 className="text-h1 xl:text-display font-extrabold tracking-tight text-white">
-          Bứt phá điểm số
-          <span className="text-highlight mt-1 block">Chinh phục môn Hóa</span>
+          Học chắc bản chất
+          <span className="text-highlight mt-1 block">Vững vàng môn Hóa</span>
         </h1>
         <p className="text-body text-primary-100/90 mt-4 max-w-lg leading-relaxed">
-          Hệ thống luyện thi V-SAT môn Hóa học với ngân hàng câu hỏi chất lượng, bài giảng chuyên
-          sâu và lộ trình học tối ưu, giúp bạn tự tin chinh phục kỳ thi.
+          Nền tảng thi thử trực tuyến mô phỏng sát đề thi V-SAT, hỗ trợ theo dõi tiến độ và chấm
+          điểm tức thì.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export function LoginHero() {
           </div>
           <div>
             <div className="text-h2 font-bold text-white">96.8%</div>
-            <div className="text-caption text-primary-200/90">Học viên đạt điểm 8+ sau 3 tháng</div>
+            <div className="text-caption text-primary-200/90">Học viên đạt điểm 8 trở lên</div>
           </div>
         </div>
 
@@ -49,9 +49,7 @@ export function LoginHero() {
           </div>
           <div>
             <div className="text-h2 font-bold text-white">15.000+</div>
-            <div className="text-caption text-primary-200/90">
-              Câu hỏi & phân tích theo năng lực
-            </div>
+            <div className="text-caption text-primary-200/90">Lượt làm bài thi thử</div>
           </div>
         </div>
       </div>

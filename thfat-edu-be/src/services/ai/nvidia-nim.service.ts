@@ -165,17 +165,18 @@ Do NOT summarize, do NOT skip any questions, do NOT solve the questions.
 Schema for each question:
 {
   "orderIndex": 1,
-  "contextContent": "Đoạn văn dẫn chung hoặc tiêu đề câu (vd: Câu 1. Cho các phát biểu sau...)",
+  "contextContent": "Đoạn văn dẫn chung hoặc ngữ cảnh bài đọc dùng chung cho các câu hỏi",
   "imageUrl": null, // If question contains [HÌNH_ẢNH: IMAGE_PAGE_X_Y], set to "IMAGE_PAGE_X_Y", else null
-  "options": ["A. ...", "B. ..."], // Cho Phần II hoặc Phần III (ở cấp câu hỏi)
+  "options": null, // Dành riêng cho Phần III (danh sách lựa chọn đích ở cột B)
   "subItems": [
     {
       "orderIndex": 1,
-      "label": "1", // hoặc "A", "B", "a)", "b)"
+      "label": "Câu 10", // hoặc "1", "a"
       "content": "Nội dung câu hỏi con hoặc phát biểu",
-      "options": null, // Để null đối với Phần I, III, IV để tránh trùng lặp dữ liệu
+      "options": ["...", "...", "...", "..."], // Bắt buộc cho Phần II (4 phương án sạch không tiền tố A, B, C, D). null cho Phần I, III, IV
       "correctAnswer": null,
-      "points": "1.50",
+      "points": "6.00",
+      "points": "1.50", // "1.50" cho Phần I và III; "6.00" cho Phần II và IV
       "explanation": null
     }
   ]
@@ -188,6 +189,7 @@ CRITICAL RULES FOR CHEMISTRY & MATH (KaTeX):
    Examples: $\\Delta_r H_{298}^0$, $10^{-3}$, $x^2 + y = 5$, $\\alpha$, $\\beta$, $\\frac{a}{b}$.
 3. DO NOT wrap ordinary Vietnamese words or letter labels in math mode!
    Examples: Write "chất A", "dung dịch B", "thí nghiệm 1", "kim loại M" (NEVER write "$A$", "$B$", "$M$").
+4. SINGLE BACKSLASH ONLY: Always output chemical formulas with a single LaTeX backslash: "$\\ce{...}". NEVER output multiple backslashes (like "\\\\ce" or "\\\\\\ce"), as "\\\\" creates accidental line breaks in KaTeX!
 
 CRITICAL RULES FOR MARKDOWN & LAYOUT:
 1. Preserve clean Markdown formatting in contextContent and content.
@@ -207,9 +209,23 @@ EXAM SECTION RULES:
   * "contextContent": ONLY contains the introductory sentence (e.g. "Cho các phát biểu sau về hợp chất X:").
   * NEVER dump a "| Phát biểu | Đúng | Sai |" table into contextContent.
   * "subItems": Must have exactly 4 subItems corresponding to statements a, b, c, d (or 1, 2, 3, 4), with each subItem.content containing that single statement.
+  * "subItems": Must have exactly 4 subItems corresponding to statements a, b, c, d (or 1, 2, 3, 4), with each subItem.content containing that single statement and "points": "1.50".
 
-- If this is Phần II (Trắc nghiệm):
-  * Extract ALL multiple choice questions with their "options" array ["A. ...", "B. ...", "C. ...", "D. ..."].
+- If this is Phần II (Trắc nghiệm phương án nhiều lựa chọn / Chùm câu hỏi theo ngữ cảnh):
+  * DETECT COMMON PASSAGES: Look for reading passages, background text, or preambles (e.g. "Đọc nội dung sau và trả lời các câu hỏi từ X đến Y").
+  * GROUP all child questions sharing the same passage into ONE question object:
+    - "contextContent": Put ONLY the shared reading passage / background text here (e.g. "Đọc nội dung sau và trả lời các câu hỏi từ 10 đến 12.\n\nChất hữu cơ A và B là đồng phân..."). DO NOT append any individual question sentence or question options into contextContent!
+    - "subItems": Array of child questions belonging to this passage (e.g. Câu 10, Câu 11, Câu 12):
+      * "orderIndex": 1, 2, 3...
+      * "label": "Câu 10", "Câu 11", "Câu 12" (or "10", "11", "12")
+      * "content": ONLY the specific question sentence for this child question (e.g. "Mỗi mắt xích trong polymer X có bao nhiêu nguyên tử carbon?" or "Cho chất hữu cơ B tác dụng với lượng dư dung dịch bromine.\nHiện tượng quan sát được là:"). NEVER duplicate the shared reading passage in content!
+      * "options": Array of EXACTLY 4 choices for this child question. Strip the "A.", "B.", "C.", "D." prefix (e.g. ["2", "3", "4", "5"] or ["Có kết tủa trắng xuất hiện.", ...]).
+      * "correctAnswer": "A", "B", "C", or "D" (or null if not specified).
+      * "points": "6.00"
+  * If a multiple-choice question is standalone (no shared passage with other questions):
+    - "contextContent": Leave empty or put any general preamble.
+    - "subItems": Exactly 1 child question with its specific content and 4 clean options.
+    - "subItems": Exactly 1 child question with its specific content, 4 clean options, and "points": "6.00".
 
 - If this is Phần III (Ghép hợp / Matching):
   * "contextContent": ONLY contains the general background passage or preamble (e.g. "Câu 16: (ThFat) Cho các phát biểu sau về các chất khí:").
@@ -220,9 +236,11 @@ EXAM SECTION RULES:
     - "label": "1", "2", "3", "4"
     - "content": The statement/requirement text from Column A / Column 1.
     - "correctAnswer": null
+    - "points": "1.50"
 
 - If this is Phần IV (Tự luận ngắn):
   * Extract all calculation and short answer questions.
+  * Extract all calculation and short answer questions, each with "points": "6.00".
 
 - Output ONLY valid JSON starting with {"questions": [ ... ]}.`;
 

@@ -1,5 +1,6 @@
 import { MainFooter, MainNavbar } from "@/components/layout";
 import { type Metadata } from "next";
+import { Suspense } from "react";
 
 import { ArticleDetailClient } from "./article-detail-client";
 
@@ -16,14 +17,16 @@ export async function generateMetadata({ params }: TArticlePageProps): Promise<M
   };
 }
 
-export default async function ArticlePage({ params }: TArticlePageProps) {
-  const { slug } = await params;
-
+export default function ArticlePage({ params }: TArticlePageProps) {
   return (
     <div className="bg-background text-foreground selection:bg-primary-600 flex min-h-screen flex-col selection:text-white">
-      <MainNavbar />
-      <main className="flex-1 bg-neutral-50/60 dark:bg-neutral-950/60">
-        <ArticleDetailClient slug={slug} />
+      <Suspense fallback={<div className="h-16" />}>
+        <MainNavbar />
+      </Suspense>
+      <main className="flex-1 bg-neutral-50/60 pt-16 dark:bg-neutral-950/60">
+        <Suspense>
+          <ArticleDetailClient params={params} />
+        </Suspense>
       </main>
       <MainFooter />
     </div>
