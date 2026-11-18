@@ -3,3 +3,7 @@ auto = "disable"
 
 [install.cache]
 dir = "/tmp/bun-cache"
+
+[install.security]
+scanner = "@socketsecurity/bun-security-scanner"
+
