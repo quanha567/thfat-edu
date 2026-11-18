@@ -1,6 +1,0 @@
-[install]
-auto = "disable"
-
-[install.cache]
-dir = "/tmp/bun-cache"
-

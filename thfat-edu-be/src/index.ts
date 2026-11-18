@@ -1,7 +1,3 @@
-process.env.BUN_RUNTIME_TRANSPILER_CACHE_PATH = "0";
-process.env.BUN_INSTALL_CACHE_DIR = "/tmp/bun-cache";
-process.env.TMPDIR = "/tmp";
-
 import { Elysia } from "elysia";
 
 import { corsPlugin } from "./config/cors";
@@ -46,11 +42,7 @@ export type App = typeof app;
 
 const port = Number(env.PORT) || 3001;
 
-if (
-  !process.env.VERCEL &&
-  process.env.NODE_ENV !== "test" &&
-  (import.meta as { main?: boolean }).main
-) {
+if (!process.env.VERCEL && process.env.NODE_ENV !== "test") {
   app.listen(port);
   console.info(`🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`);
 }
