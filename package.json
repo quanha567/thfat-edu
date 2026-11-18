@@ -44,5 +44,8 @@
     "oxfmt": "^0.76.0",
     "oxlint": "^1.90.0",
     "typescript": "^5.9.3"
+  },
+  "overrides": {
+    "jose": "4.15.9"
   }
 }

@@ -34,5 +34,8 @@
   "devDependencies": {
     "bun-types": "latest",
     "drizzle-kit": "^0.31.11"
+  },
+  "overrides": {
+    "jose": "4.15.9"
   }
 }
