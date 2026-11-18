@@ -1,6 +1,5 @@
-import { describe, expect, it } from "vitest";
-
 import { queryKeys } from "@/lib/query-keys";
+import { describe, expect, it } from "vitest";
 
 import { LEADERBOARD_TIMEFRAME_LABELS, PODIUM_COLORS } from "../constants/leaderboard.constants";
 import { useLeaderboard } from "./use-leaderboard";

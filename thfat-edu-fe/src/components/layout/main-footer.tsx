@@ -10,7 +10,7 @@ export function MainFooter() {
       {/* Decorative subtle molecular background watermarks */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden opacity-30">
         <svg
-          className="absolute -bottom-8 left-4 h-48 w-48 text-primary-300"
+          className="text-primary-300 absolute -bottom-8 left-4 h-48 w-48"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
@@ -26,7 +26,7 @@ export function MainFooter() {
         </svg>
 
         <svg
-          className="absolute -bottom-10 right-8 h-56 w-56 text-primary-200"
+          className="text-primary-200 absolute right-8 -bottom-10 h-56 w-56"
           viewBox="0 0 100 100"
           fill="none"
           stroke="currentColor"
@@ -50,7 +50,7 @@ export function MainFooter() {
               <div key={link.label} className="flex items-center gap-4 sm:gap-6">
                 <Link
                   href={link.href}
-                  className="font-medium transition-colors hover:text-primary-600 dark:hover:text-cyan-400"
+                  className="hover:text-primary-600 font-medium transition-colors dark:hover:text-cyan-400"
                 >
                   {link.label}
                 </Link>
@@ -67,7 +67,7 @@ export function MainFooter() {
               asChild
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 hover:text-primary-600 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
+              className="hover:text-primary-600 h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
             >
               <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
@@ -80,7 +80,7 @@ export function MainFooter() {
               asChild
               variant="outline"
               size="icon"
-              className="h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 hover:text-primary-600 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
+              className="hover:text-primary-600 h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
             >
               <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
                 <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">

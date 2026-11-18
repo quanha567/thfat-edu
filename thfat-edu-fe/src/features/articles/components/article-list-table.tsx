@@ -132,7 +132,7 @@ export function ArticleListTable() {
       <TableRow key={item.id}>
         <TableCell>
           <div className="flex items-center gap-3">
-            <div className="relative size-10 shrink-0 overflow-hidden rounded-md border border-border bg-muted">
+            <div className="border-border bg-muted relative size-10 shrink-0 overflow-hidden rounded-md border">
               <Image
                 src={item.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
                 alt={item.title}
@@ -142,7 +142,7 @@ export function ArticleListTable() {
               />
             </div>
             <div className="flex min-w-0 flex-col">
-              <span className="font-semibold text-foreground text-sm line-clamp-1">
+              <span className="text-foreground line-clamp-1 text-sm font-semibold">
                 {item.title}
               </span>
               <span className="text-muted-foreground text-xs">
@@ -163,7 +163,7 @@ export function ArticleListTable() {
         </TableCell>
         <TableCell>{getStatusBadge(item.status)}</TableCell>
         <TableCell>
-          <span className="flex items-center gap-1 text-xs text-muted-foreground font-medium">
+          <span className="text-muted-foreground flex items-center gap-1 text-xs font-medium">
             <Eye className="size-3.5" />
             {item.viewCount}
           </span>
@@ -178,7 +178,7 @@ export function ArticleListTable() {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 text-destructive/80 hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive/80 hover:text-destructive hover:bg-destructive/10 size-8"
               onClick={() => setDeleteConfirmId(item.id)}
               title="Xóa bài viết"
             >
@@ -272,7 +272,7 @@ export function ArticleListTable() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t border-border px-4 py-3">
+            <div className="border-border flex items-center justify-between border-t px-4 py-3">
               <span className="text-muted-foreground text-xs">
                 Trang {page} / {totalPages} (Tổng số {total} bài viết)
               </span>

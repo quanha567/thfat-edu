@@ -56,7 +56,7 @@ export function ExamEditorSidebarIndexTab({
   }, [sections]);
 
   return (
-    <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
+    <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <ExamEditorSidebarProgress
         percentComplete={percentComplete}
         errorCount={errorCount}
@@ -65,7 +65,7 @@ export function ExamEditorSidebarIndexTab({
         onExpandAll={onExpandAll}
       />
 
-      <ScrollArea className="flex-1 min-h-0 px-3.5 py-2.5">
+      <ScrollArea className="min-h-0 flex-1 px-3.5 py-2.5">
         <div className="space-y-3">
           {sections.map((section, sIdx) => (
             <ExamEditorSidebarSectionGroup
@@ -81,10 +81,10 @@ export function ExamEditorSidebarIndexTab({
         </div>
       </ScrollArea>
 
-      <div className="border-border/40 bg-muted/10 border-t px-3.5 py-2 flex items-center justify-between shrink-0 text-xs">
-        <div className="flex items-center gap-1.5 text-muted-foreground min-w-0">
+      <div className="border-border/40 bg-muted/10 flex shrink-0 items-center justify-between border-t px-3.5 py-2 text-xs">
+        <div className="text-muted-foreground flex min-w-0 items-center gap-1.5">
           <span className="text-[11px]">Đang chọn:</span>
-          <span className="px-2 py-0.5 rounded-md bg-primary/10 text-primary border border-primary/20 font-bold text-xs font-mono">
+          <span className="bg-primary/10 text-primary border-primary/20 rounded-md border px-2 py-0.5 font-mono text-xs font-bold">
             Câu {activeQuestionNumber}
           </span>
         </div>
@@ -94,7 +94,7 @@ export function ExamEditorSidebarIndexTab({
           variant="ghost"
           size="xs"
           onClick={onSwitchToPreview}
-          className="text-primary hover:text-primary hover:bg-primary/10 h-7 px-2 text-xs font-semibold gap-1 rounded cursor-pointer"
+          className="text-primary hover:text-primary hover:bg-primary/10 h-7 cursor-pointer gap-1 rounded px-2 text-xs font-semibold"
         >
           <Eye className="size-3.5" />
           <span>Xem trước câu này</span>

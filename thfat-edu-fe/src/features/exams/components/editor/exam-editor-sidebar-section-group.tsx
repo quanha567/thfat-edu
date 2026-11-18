@@ -48,18 +48,16 @@ export function ExamEditorSidebarSectionGroup({
   const { part, name } = parseSectionTitle(section.title);
 
   return (
-    <div className="space-y-2 border-b border-border/30 pb-3 last:border-b-0 last:pb-0">
-      <div className="flex items-center justify-between text-xs px-0.5">
-        <div className="flex items-center gap-1.5 min-w-0">
-          {part ? (
-            <span className="font-bold text-primary text-xs shrink-0">{part}:</span>
-          ) : null}
-          <span className="truncate font-semibold text-foreground text-xs" title={section.title}>
+    <div className="border-border/30 space-y-2 border-b pb-3 last:border-b-0 last:pb-0">
+      <div className="flex items-center justify-between px-0.5 text-xs">
+        <div className="flex min-w-0 items-center gap-1.5">
+          {part ? <span className="text-primary shrink-0 text-xs font-bold">{part}:</span> : null}
+          <span className="text-foreground truncate text-xs font-semibold" title={section.title}>
             {name}
           </span>
         </div>
 
-        <span className="text-muted-foreground text-[11px] font-medium shrink-0">
+        <span className="text-muted-foreground shrink-0 text-[11px] font-medium">
           {section.sectionType === "group_mcq"
             ? `${section.questions.reduce((acc, q) => acc + (q.subItems?.length || 1), 0)} câu (${section.questions.length} chùm)`
             : `${section.questions.length} câu`}
@@ -144,7 +142,7 @@ export function ExamEditorSidebarSectionGroup({
                 >
                   {questionNumber}
                   {isErr && !isActive && (
-                    <span className="absolute -top-1 -right-1 size-1.5 rounded-full bg-destructive" />
+                    <span className="bg-destructive absolute -top-1 -right-1 size-1.5 rounded-full" />
                   )}
                 </button>
               );

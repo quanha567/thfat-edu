@@ -133,7 +133,7 @@ export function MatchingTable({
                           }`}
                         >
                           <Flag
-                            className={`h-4 w-4 ${isFlagged ? "fill-current text-warning-500" : ""}`}
+                            className={`h-4 w-4 ${isFlagged ? "text-warning-500 fill-current" : ""}`}
                           />
                         </button>
                       </td>

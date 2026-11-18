@@ -16,30 +16,30 @@ export type TArticleMarkdownRendererProps = {
 
 const ARTICLE_MARKDOWN_COMPONENTS: Components = {
   h1: ({ children }) => (
-    <h1 className="mt-8 mb-4 font-black tracking-tight text-foreground text-2xl sm:text-3xl">
+    <h1 className="text-foreground mt-8 mb-4 text-2xl font-black tracking-tight sm:text-3xl">
       {children}
     </h1>
   ),
   h2: ({ children }) => (
-    <h2 className="mt-6 mb-3 border-b border-border pb-2 font-bold tracking-tight text-foreground text-xl sm:text-2xl">
+    <h2 className="border-border text-foreground mt-6 mb-3 border-b pb-2 text-xl font-bold tracking-tight sm:text-2xl">
       {children}
     </h2>
   ),
   h3: ({ children }) => (
-    <h3 className="mt-5 mb-2 font-bold text-foreground text-lg sm:text-xl">{children}</h3>
+    <h3 className="text-foreground mt-5 mb-2 text-lg font-bold sm:text-xl">{children}</h3>
   ),
   p: ({ children }) => (
-    <p className="my-3 leading-relaxed text-foreground/90 text-base">{children}</p>
+    <p className="text-foreground/90 my-3 text-base leading-relaxed">{children}</p>
   ),
   ul: ({ children }) => (
-    <ul className="my-3 list-disc space-y-1.5 pl-6 text-foreground/90">{children}</ul>
+    <ul className="text-foreground/90 my-3 list-disc space-y-1.5 pl-6">{children}</ul>
   ),
   ol: ({ children }) => (
-    <ol className="my-3 list-decimal space-y-1.5 pl-6 text-foreground/90">{children}</ol>
+    <ol className="text-foreground/90 my-3 list-decimal space-y-1.5 pl-6">{children}</ol>
   ),
   li: ({ children }) => <li className="leading-relaxed">{children}</li>,
   blockquote: ({ children }) => (
-    <blockquote className="my-4 border-l-4 border-primary bg-primary/5 py-2.5 px-4 italic text-muted-foreground">
+    <blockquote className="border-primary bg-primary/5 text-muted-foreground my-4 border-l-4 px-4 py-2.5 italic">
       {children}
     </blockquote>
   ),
@@ -47,37 +47,37 @@ const ARTICLE_MARKDOWN_COMPONENTS: Components = {
     const isInline = !className?.includes("language-");
     if (isInline) {
       return (
-        <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs sm:text-sm text-foreground">
+        <code className="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-xs sm:text-sm">
           {children}
         </code>
       );
     }
 
     return (
-      <div className="my-4 overflow-x-auto rounded-xl border border-border bg-muted/70 p-4">
-        <code className="font-mono text-xs sm:text-sm text-foreground">{children}</code>
+      <div className="border-border bg-muted/70 my-4 overflow-x-auto rounded-xl border p-4">
+        <code className="text-foreground font-mono text-xs sm:text-sm">{children}</code>
       </div>
     );
   },
   table: ({ children }) => (
-    <div className="my-4 overflow-x-auto rounded-xl border border-border shadow-xs">
+    <div className="border-border my-4 overflow-x-auto rounded-xl border shadow-xs">
       <table className="w-full border-collapse text-left text-sm">{children}</table>
     </div>
   ),
   thead: ({ children }) => (
-    <thead className="border-b border-border bg-muted/80 font-semibold">{children}</thead>
+    <thead className="border-border bg-muted/80 border-b font-semibold">{children}</thead>
   ),
   tbody: ({ children }) => (
-    <tbody className="divide-y divide-border bg-background">{children}</tbody>
+    <tbody className="divide-border bg-background divide-y">{children}</tbody>
   ),
   tr: ({ children }) => <tr className="hover:bg-muted/40 transition-colors">{children}</tr>,
   th: ({ children }) => (
-    <th className="border-r border-border px-4 py-2.5 font-semibold text-foreground last:border-r-0">
+    <th className="border-border text-foreground border-r px-4 py-2.5 font-semibold last:border-r-0">
       {children}
     </th>
   ),
   td: ({ children }) => (
-    <td className="border-r border-border px-4 py-2.5 text-foreground last:border-r-0">
+    <td className="border-border text-foreground border-r px-4 py-2.5 last:border-r-0">
       {children}
     </td>
   ),

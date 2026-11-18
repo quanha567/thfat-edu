@@ -42,11 +42,15 @@ export function SectionEditorMcqItem({
     onChange({ options: updatedOptions });
   };
 
-  const displayLabel = subItem.label || (questionNumber ? `Câu ${questionNumber}` : `Câu ${index + 1}`);
+  const displayLabel =
+    subItem.label || (questionNumber ? `Câu ${questionNumber}` : `Câu ${index + 1}`);
 
   if (editorMode === "preview") {
     return (
-      <div id={id} className="border-border/40 bg-muted/10 space-y-2 rounded-lg border p-2 sm:px-2.5">
+      <div
+        id={id}
+        className="border-border/40 bg-muted/10 space-y-2 rounded-lg border p-2 sm:px-2.5"
+      >
         <div className="flex items-start gap-2.5">
           <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 inline-flex h-6 shrink-0 items-center justify-center rounded-md border px-2 font-mono text-xs font-bold shadow-2xs">
             {displayLabel}
@@ -103,7 +107,10 @@ export function SectionEditorMcqItem({
   }
 
   return (
-    <div id={id} className="group/item border-border/40 bg-muted/10 hover:border-border hover:bg-muted/20 space-y-2 rounded-lg border p-2 transition-all sm:px-2.5">
+    <div
+      id={id}
+      className="group/item border-border/40 bg-muted/10 hover:border-border hover:bg-muted/20 space-y-2 rounded-lg border p-2 transition-all sm:px-2.5"
+    >
       <div className="flex items-start gap-2.5">
         <span className="bg-primary/10 text-primary border-primary/20 mt-0.5 inline-flex h-6 shrink-0 items-center justify-center rounded-md border px-2 font-mono text-xs font-bold shadow-2xs">
           {displayLabel}

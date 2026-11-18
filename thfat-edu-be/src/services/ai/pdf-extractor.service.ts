@@ -117,7 +117,10 @@ async function convertRawImageToBase64(imgData: TImageRawData): Promise<string |
   }
 }
 
-async function fetchPageImageBase64(page: pdfjs.PDFPageProxy, imgName: string): Promise<string | null> {
+async function fetchPageImageBase64(
+  page: pdfjs.PDFPageProxy,
+  imgName: string,
+): Promise<string | null> {
   try {
     const rawImg = await new Promise<TImageRawData | null>((resolve) => {
       page.objs.get(imgName, (obj: unknown) => {

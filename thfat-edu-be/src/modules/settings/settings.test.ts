@@ -4,7 +4,11 @@ import { Elysia } from "elysia";
 
 import { errorHandlerPlugin, UnauthorizedError } from "../../middlewares/error-handler";
 import { type AuthService } from "../auth/auth.service";
-import { DEFAULT_EXAM_SETTINGS, type TExamSettings, type TUpdateExamSettingsInput } from "./settings.model";
+import {
+  DEFAULT_EXAM_SETTINGS,
+  type TExamSettings,
+  type TUpdateExamSettingsInput,
+} from "./settings.model";
 import { settingsRoutes } from "./settings.routes";
 import { type SettingsService } from "./settings.service";
 

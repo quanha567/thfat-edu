@@ -80,37 +80,37 @@ export function ExamEditorSidebar({
   };
 
   return (
-    <div className="border-border/70 bg-card rounded-xl border shadow-xs h-[calc(100vh-9.5rem)] flex flex-col overflow-hidden">
+    <div className="border-border/70 bg-card flex h-[calc(100vh-9.5rem)] flex-col overflow-hidden rounded-xl border shadow-xs">
       <Tabs
         value={activeTab}
         onValueChange={(v) => setActiveTab(v as "index" | "preview")}
-        className="flex flex-col flex-1 h-full min-h-0 gap-0 overflow-hidden"
+        className="flex h-full min-h-0 flex-1 flex-col gap-0 overflow-hidden"
       >
-        <div className="border-border/40 bg-muted/15 border-b p-1.5 shrink-0">
-          <TabsList className="grid w-full grid-cols-2 bg-muted/60 p-0.5 rounded-lg h-8">
+        <div className="border-border/40 bg-muted/15 shrink-0 border-b p-1.5">
+          <TabsList className="bg-muted/60 grid h-8 w-full grid-cols-2 rounded-lg p-0.5">
             <TabsTrigger
               value="index"
-              className="flex items-center justify-center gap-1.5 text-xs font-semibold rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-2xs transition-all cursor-pointer"
+              className="data-[state=active]:bg-background data-[state=active]:text-primary flex cursor-pointer items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all data-[state=active]:shadow-2xs"
             >
               <ListOrdered className="size-3.5" />
               <span>Mục lục</span>
-              <span className="rounded bg-muted px-1.5 py-0.2 text-[10px] font-bold text-muted-foreground">
+              <span className="bg-muted py-0.2 text-muted-foreground rounded px-1.5 text-[10px] font-bold">
                 {totalQuestions}
               </span>
               {hasErrors && (
-                <span className="bg-destructive size-1.5 rounded-full animate-pulse ml-0.5" />
+                <span className="bg-destructive ml-0.5 size-1.5 animate-pulse rounded-full" />
               )}
             </TabsTrigger>
             <TabsTrigger
               value="preview"
-              className="flex items-center justify-center gap-1.5 text-xs font-semibold rounded-md data-[state=active]:bg-background data-[state=active]:text-primary data-[state=active]:shadow-2xs transition-all cursor-pointer"
+              className="data-[state=active]:bg-background data-[state=active]:text-primary flex cursor-pointer items-center justify-center gap-1.5 rounded-md text-xs font-semibold transition-all data-[state=active]:shadow-2xs"
             >
               <Eye className="size-3.5" />
               <span>Xem trước</span>
               {resolvedQuestionNumber ? (
                 <Badge
                   variant="secondary"
-                  className="h-4 px-1.5 text-[10px] font-bold bg-primary/10 text-primary border-0"
+                  className="bg-primary/10 text-primary h-4 border-0 px-1.5 text-[10px] font-bold"
                 >
                   Câu {resolvedQuestionNumber}
                 </Badge>
@@ -119,7 +119,10 @@ export function ExamEditorSidebar({
           </TabsList>
         </div>
 
-        <TabsContent value="index" className="flex flex-col flex-1 min-h-0 overflow-hidden m-0 outline-none">
+        <TabsContent
+          value="index"
+          className="m-0 flex min-h-0 flex-1 flex-col overflow-hidden outline-none"
+        >
           <ExamEditorSidebarIndexTab
             sections={sections}
             errorQuestionKeys={errorQuestionKeys}
@@ -133,7 +136,10 @@ export function ExamEditorSidebar({
           />
         </TabsContent>
 
-        <TabsContent value="preview" className="flex flex-col flex-1 min-h-0 overflow-hidden m-0 outline-none">
+        <TabsContent
+          value="preview"
+          className="m-0 flex min-h-0 flex-1 flex-col overflow-hidden outline-none"
+        >
           <ExamEditorSidebarPreviewTab
             activeQuestion={activeQuestion}
             activeSectionTitle={activeSectionTitle}

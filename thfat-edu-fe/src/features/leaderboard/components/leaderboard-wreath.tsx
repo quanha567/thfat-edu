@@ -12,15 +12,18 @@ const WREATH_THEMES = {
     leafGradId: "gold-leaf-grad",
     leafColors: ["#FDE68A", "#F59E0B", "#D97706"],
     ringBorder: "border-gold-400 ring-2 ring-gold-300/60 shadow-[0_0_16px_rgba(251,191,36,0.4)]",
-    badgeBg: "bg-gradient-to-b from-gold-300 via-gold-400 to-gold-600 text-primary-950 shadow-[0_2px_6px_rgba(217,119,6,0.5)]",
+    badgeBg:
+      "bg-gradient-to-b from-gold-300 via-gold-400 to-gold-600 text-primary-950 shadow-[0_2px_6px_rgba(217,119,6,0.5)]",
   },
   2: {
     crownColor: "#CBD5E1",
     crownGlow: "drop-shadow(0 2px 6px rgba(203, 213, 225, 0.7))",
     leafGradId: "silver-leaf-grad",
     leafColors: ["#F8FAFC", "#CBD5E1", "#94A3B8"],
-    ringBorder: "border-neutral-300 ring-2 ring-neutral-200/60 shadow-[0_0_14px_rgba(148,163,184,0.35)]",
-    badgeBg: "bg-gradient-to-b from-neutral-200 via-neutral-300 to-neutral-500 text-neutral-900 shadow-[0_2px_6px_rgba(100,116,139,0.5)]",
+    ringBorder:
+      "border-neutral-300 ring-2 ring-neutral-200/60 shadow-[0_0_14px_rgba(148,163,184,0.35)]",
+    badgeBg:
+      "bg-gradient-to-b from-neutral-200 via-neutral-300 to-neutral-500 text-neutral-900 shadow-[0_2px_6px_rgba(100,116,139,0.5)]",
   },
   3: {
     crownColor: "#D97706",
@@ -28,7 +31,8 @@ const WREATH_THEMES = {
     leafGradId: "bronze-leaf-grad",
     leafColors: ["#FED7AA", "#D97706", "#9A3412"],
     ringBorder: "border-gold-600 ring-2 ring-gold-500/60 shadow-[0_0_14px_rgba(234,88,12,0.35)]",
-    badgeBg: "bg-gradient-to-b from-gold-400 via-gold-600 to-gold-800 text-gold-50 shadow-[0_2px_6px_rgba(180,83,9,0.5)]",
+    badgeBg:
+      "bg-gradient-to-b from-gold-400 via-gold-600 to-gold-800 text-gold-50 shadow-[0_2px_6px_rgba(180,83,9,0.5)]",
   },
 } as const;
 

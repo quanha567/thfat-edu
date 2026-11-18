@@ -38,7 +38,7 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
           asChild
           variant="ghost"
           size="sm"
-          className="gap-1.5 text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground gap-1.5"
         >
           <Link href="/articles">
             <ArrowLeft className="size-4" />
@@ -51,40 +51,40 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
       <div className="space-y-4">
         {article.category && (
           <Link href={`/articles?category=${article.category.slug}`}>
-            <Badge variant="secondary" className="font-semibold text-xs">
+            <Badge variant="secondary" className="text-xs font-semibold">
               {article.category.name}
             </Badge>
           </Link>
         )}
 
-        <h1 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl md:text-4xl">
+        <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl md:text-4xl">
           {article.title}
         </h1>
 
         {article.excerpt && (
-          <p className="text-muted-foreground text-base sm:text-lg leading-relaxed font-normal">
+          <p className="text-muted-foreground text-base leading-relaxed font-normal sm:text-lg">
             {article.excerpt}
           </p>
         )}
 
         {/* Metadata Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-4 border-y border-border py-3 text-xs sm:text-sm">
+        <div className="border-border flex flex-wrap items-center justify-between gap-4 border-y py-3 text-xs sm:text-sm">
           <div className="flex items-center gap-3">
-            <Avatar className="size-9 border border-border">
+            <Avatar className="border-border size-9 border">
               {article.author?.avatarUrl && (
                 <AvatarImage src={article.author.avatarUrl} alt={article.author.fullName} />
               )}
-              <AvatarFallback className="font-semibold text-xs">{authorInitials}</AvatarFallback>
+              <AvatarFallback className="text-xs font-semibold">{authorInitials}</AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <span className="font-semibold text-foreground text-xs sm:text-sm">
+              <span className="text-foreground text-xs font-semibold sm:text-sm">
                 {article.author?.fullName ?? "Quản trị viên ThFat Edu"}
               </span>
               <span className="text-muted-foreground text-[11px] sm:text-xs">Tác giả bài viết</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-muted-foreground text-xs">
+          <div className="text-muted-foreground flex items-center gap-4 text-xs">
             <span className="flex items-center gap-1.5">
               <Calendar className="size-3.5" />
               {publishedDate}
@@ -98,7 +98,7 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
       </div>
 
       {/* Featured Thumbnail */}
-      <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border bg-muted shadow-sm">
+      <div className="border-border bg-muted relative aspect-video w-full overflow-hidden rounded-2xl border shadow-sm">
         <Image
           src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
           alt={article.title}

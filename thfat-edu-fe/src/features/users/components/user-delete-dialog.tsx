@@ -50,8 +50,8 @@ export function UserDeleteDialog({
             {isDelete ? (
               <>
                 Tài khoản <strong className="text-foreground">{user.fullName}</strong> ({user.email}
-                ) sẽ bị tạm xóa và vô hiệu hóa quyền đăng nhập. Toàn bộ
-                lịch sử làm bài và dữ liệu học tập vẫn được bảo toàn trong hệ thống.
+                ) sẽ bị tạm xóa và vô hiệu hóa quyền đăng nhập. Toàn bộ lịch sử làm bài và dữ liệu
+                học tập vẫn được bảo toàn trong hệ thống.
               </>
             ) : (
               <>

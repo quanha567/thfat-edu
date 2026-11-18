@@ -101,7 +101,7 @@ export function ArticleSidebarSettings({
             <Button
               type="submit"
               disabled={isPending}
-              className="w-full gap-1.5 shadow-2xs text-xs font-semibold"
+              className="w-full gap-1.5 text-xs font-semibold shadow-2xs"
             >
               {isPending && <Loader2 className="size-3.5 animate-spin" />}
               {!isPending && status === "published" && <Send className="size-3.5" />}
@@ -133,7 +133,7 @@ export function ArticleSidebarSettings({
           </div>
 
           {thumbnailUrl && !imageError ? (
-            <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border bg-muted">
+            <div className="border-border bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
               <Image
                 src={thumbnailUrl}
                 alt="Ảnh bìa bài viết"
@@ -144,7 +144,7 @@ export function ArticleSidebarSettings({
               />
             </div>
           ) : (
-            <div className="flex aspect-video w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-border/80 bg-muted/40 p-4 text-center">
+            <div className="border-border/80 bg-muted/40 flex aspect-video w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed p-4 text-center">
               <ImageIcon className="text-muted-foreground/60 size-8" />
               <span className="text-muted-foreground text-xs">
                 {imageError ? "Không thể tải ảnh từ URL này" : "Chưa có ảnh bìa"}

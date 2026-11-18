@@ -67,11 +67,21 @@ export function CategoryListTable() {
     if (isLoading) {
       return ["skel-1", "skel-2", "skel-3", "skel-4"].map((key) => (
         <TableRow key={key}>
-          <TableCell><Skeleton className="h-5 w-32" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-24" /></TableCell>
-          <TableCell className="text-center"><Skeleton className="mx-auto h-5 w-10" /></TableCell>
-          <TableCell><Skeleton className="h-5 w-20" /></TableCell>
-          <TableCell className="text-right"><Skeleton className="ml-auto h-5 w-14" /></TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-32" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-24" />
+          </TableCell>
+          <TableCell className="text-center">
+            <Skeleton className="mx-auto h-5 w-10" />
+          </TableCell>
+          <TableCell>
+            <Skeleton className="h-5 w-20" />
+          </TableCell>
+          <TableCell className="text-right">
+            <Skeleton className="ml-auto h-5 w-14" />
+          </TableCell>
         </TableRow>
       ));
     }
@@ -81,7 +91,9 @@ export function CategoryListTable() {
         <TableRow>
           <TableCell colSpan={5} className="py-12 text-center">
             <p className="text-muted-foreground text-sm font-medium">
-              {search ? "Không tìm thấy chuyên mục phù hợp." : "Chưa có chuyên mục nào. Hãy tạo chuyên mục đầu tiên!"}
+              {search
+                ? "Không tìm thấy chuyên mục phù hợp."
+                : "Chưa có chuyên mục nào. Hãy tạo chuyên mục đầu tiên!"}
             </p>
           </TableCell>
         </TableRow>
@@ -92,11 +104,9 @@ export function CategoryListTable() {
       <TableRow key={cat.id}>
         <TableCell>
           <div className="flex flex-col">
-            <span className="font-semibold text-foreground text-sm">{cat.name}</span>
+            <span className="text-foreground text-sm font-semibold">{cat.name}</span>
             {cat.description && (
-              <span className="text-muted-foreground line-clamp-1 text-xs">
-                {cat.description}
-              </span>
+              <span className="text-muted-foreground line-clamp-1 text-xs">{cat.description}</span>
             )}
           </div>
         </TableCell>
@@ -106,7 +116,7 @@ export function CategoryListTable() {
           </Badge>
         </TableCell>
         <TableCell className="text-center">
-          <Badge variant="secondary" className="font-semibold text-xs">
+          <Badge variant="secondary" className="text-xs font-semibold">
             {cat.articleCount ?? 0}
           </Badge>
         </TableCell>
@@ -118,7 +128,7 @@ export function CategoryListTable() {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground size-8"
               onClick={() => handleOpenEdit(cat)}
               title="Chỉnh sửa"
             >
@@ -127,7 +137,7 @@ export function CategoryListTable() {
             <Button
               variant="ghost"
               size="icon"
-              className="size-8 text-destructive/80 hover:text-destructive hover:bg-destructive/10"
+              className="text-destructive/80 hover:text-destructive hover:bg-destructive/10 size-8"
               onClick={() => setDeleteConfirmId(cat.id)}
               title="Xóa chuyên mục"
             >
@@ -171,19 +181,13 @@ export function CategoryListTable() {
                   <TableHead className="w-[12%] text-right">Thao tác</TableHead>
                 </TableRow>
               </TableHeader>
-              <TableBody>
-                {renderTableBody()}
-              </TableBody>
+              <TableBody>{renderTableBody()}</TableBody>
             </Table>
           </div>
         </CardContent>
       </Card>
 
-      <CategoryDialog
-        open={dialogOpen}
-        onOpenChange={setDialogOpen}
-        category={selectedCategory}
-      />
+      <CategoryDialog open={dialogOpen} onOpenChange={setDialogOpen} category={selectedCategory} />
 
       <AlertDialog
         open={Boolean(deleteConfirmId)}
@@ -193,7 +197,8 @@ export function CategoryListTable() {
           <AlertDialogHeader>
             <AlertDialogTitle>Xác nhận xóa chuyên mục?</AlertDialogTitle>
             <AlertDialogDescription>
-              Hành động này sẽ xóa chuyên mục khỏi hệ thống. Các bài viết trực thuộc chuyên mục này sẽ được chuyển về trạng thái không phân loại (chuyên mục trống).
+              Hành động này sẽ xóa chuyên mục khỏi hệ thống. Các bài viết trực thuộc chuyên mục này
+              sẽ được chuyển về trạng thái không phân loại (chuyên mục trống).
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

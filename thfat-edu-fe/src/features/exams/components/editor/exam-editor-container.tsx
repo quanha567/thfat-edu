@@ -63,7 +63,10 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
   }, [state.sections]);
 
   const activeQuestionNumber =
-    typeof activeSIdx === "number" && !isNaN(activeSIdx) && typeof activeQIdx === "number" && !isNaN(activeQIdx)
+    typeof activeSIdx === "number" &&
+    !isNaN(activeSIdx) &&
+    typeof activeQIdx === "number" &&
+    !isNaN(activeQIdx)
       ? (sectionOffsets[activeSIdx] ?? 0) + activeQIdx + 1
       : 1;
 
@@ -161,7 +164,7 @@ export function ExamEditorContainer({ exam }: TExamEditorContainerProps) {
             ))}
           </div>
 
-          <aside className="sticky top-[4.5rem] self-start hidden xl:col-span-4 xl:block 2xl:col-span-4">
+          <aside className="sticky top-[4.5rem] hidden self-start xl:col-span-4 xl:block 2xl:col-span-4">
             <ExamEditorSidebar
               sections={state.sections}
               errorQuestionKeys={errorKeys}

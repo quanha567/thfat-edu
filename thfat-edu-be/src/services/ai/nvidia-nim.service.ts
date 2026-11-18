@@ -284,9 +284,9 @@ EXAM SECTION RULES:
     const rawImageUrl = input.question.imageUrl?.trim();
     const hasValidImage = Boolean(
       rawImageUrl &&
-        (rawImageUrl.startsWith("http://") ||
-          rawImageUrl.startsWith("https://") ||
-          rawImageUrl.startsWith("data:image/")),
+      (rawImageUrl.startsWith("http://") ||
+        rawImageUrl.startsWith("https://") ||
+        rawImageUrl.startsWith("data:image/")),
     );
 
     const model = hasValidImage
@@ -332,12 +332,13 @@ ${input.question.contextContent}
 Danh sách các ý / tiểu mục cần giải:
 ${JSON.stringify(input.question.subItems, null, 2)}`;
 
-    const userContent: TNimMessage["content"] = hasValidImage && rawImageUrl
-      ? [
-          { type: "text", text: userPromptText },
-          { type: "image_url", image_url: { url: rawImageUrl } },
-        ]
-      : userPromptText;
+    const userContent: TNimMessage["content"] =
+      hasValidImage && rawImageUrl
+        ? [
+            { type: "text", text: userPromptText },
+            { type: "image_url", image_url: { url: rawImageUrl } },
+          ]
+        : userPromptText;
 
     let rawResponse: string;
     try {

@@ -4,9 +4,23 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { ChevronDown, ChevronUp, Clock, ExternalLink, FileText, SlidersHorizontal, Trophy } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Clock,
+  ExternalLink,
+  FileText,
+  SlidersHorizontal,
+  Trophy,
+} from "lucide-react";
 import { useState } from "react";
 
 import { type TExamStatus } from "../../types";
@@ -69,7 +83,7 @@ export function ExamEditorOverviewCard({
           variant="ghost"
           size="xs"
           onClick={() => setIsExpanded((prev) => !prev)}
-          className="text-muted-foreground hover:text-foreground h-7 gap-1 text-xs font-semibold cursor-pointer"
+          className="text-muted-foreground hover:text-foreground h-7 cursor-pointer gap-1 text-xs font-semibold"
         >
           {isExpanded ? "Thu gọn" : "Chỉnh sửa"}
           {isExpanded ? <ChevronUp className="size-3.5" /> : <ChevronDown className="size-3.5" />}
@@ -170,7 +184,7 @@ export function ExamEditorOverviewCard({
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:underline inline-flex items-center gap-0.5 text-[11px] font-normal"
+                    className="text-primary inline-flex items-center gap-0.5 text-[11px] font-normal hover:underline"
                   >
                     Mở PDF <ExternalLink className="size-2.5" />
                   </a>
@@ -195,7 +209,7 @@ export function ExamEditorOverviewCard({
                 onChange={(e) => onChange("description", e.target.value)}
                 placeholder="Ghi chú về nguồn đề, mục tiêu ôn tập..."
                 rows={1}
-                className="field-sizing-content bg-muted/15 border-border/50 min-h-[34px] resize-none text-xs"
+                className="bg-muted/15 border-border/50 field-sizing-content min-h-[34px] resize-none text-xs"
               />
             </div>
           </div>

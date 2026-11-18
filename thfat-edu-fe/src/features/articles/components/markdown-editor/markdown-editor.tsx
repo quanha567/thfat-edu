@@ -62,8 +62,8 @@ export function MarkdownEditor({
         onValueChange={(val) => setActiveTab(val as "write" | "preview")}
         className="w-full"
       >
-        <div className="flex flex-wrap items-center justify-between border-b border-border bg-muted/20 px-3 py-1.5">
-          <TabsList className="h-8 bg-muted/60 p-0.5">
+        <div className="border-border bg-muted/20 flex flex-wrap items-center justify-between border-b px-3 py-1.5">
+          <TabsList className="bg-muted/60 h-8 p-0.5">
             <TabsTrigger value="write" className="h-7 gap-1.5 px-3 text-xs">
               <PenLine className="size-3.5" />
               <span>Soạn thảo</span>
@@ -77,9 +77,9 @@ export function MarkdownEditor({
           {isStreaming && (
             <Badge
               variant="outline"
-              className="animate-pulse gap-1.5 border-primary/40 bg-primary/10 text-primary font-medium text-xs"
+              className="border-primary/40 bg-primary/10 text-primary animate-pulse gap-1.5 text-xs font-medium"
             >
-              <Sparkles className="size-3 text-primary animate-spin" />
+              <Sparkles className="text-primary size-3 animate-spin" />
               <span>AI đang gõ bài viết...</span>
             </Badge>
           )}
@@ -104,12 +104,12 @@ export function MarkdownEditor({
 
         <TabsContent
           value="preview"
-          className="m-0 min-h-[420px] p-4 sm:p-6 focus-visible:outline-none"
+          className="m-0 min-h-[420px] p-4 focus-visible:outline-none sm:p-6"
         >
           {value.trim() ? (
             <ArticleMarkdownRenderer content={value} />
           ) : (
-            <div className="flex h-64 flex-col items-center justify-center text-muted-foreground text-sm">
+            <div className="text-muted-foreground flex h-64 flex-col items-center justify-center text-sm">
               Chưa có nội dung để xem trước.
             </div>
           )}

@@ -57,7 +57,9 @@ describe("quizzes-import.service > normalizeQuestionMarkdown & cleanMathBackslas
     expect(stripOptionPrefix("A. 2")).toBe("2");
     expect(stripOptionPrefix("B. Có kết tủa trắng xuất hiện.")).toBe("Có kết tủa trắng xuất hiện.");
     expect(stripOptionPrefix("c. 4")).toBe("4");
-    expect(stripOptionPrefix("D. Không có hiện tượng gì xảy ra.")).toBe("Không có hiện tượng gì xảy ra.");
+    expect(stripOptionPrefix("D. Không có hiện tượng gì xảy ra.")).toBe(
+      "Không có hiện tượng gì xảy ra.",
+    );
   });
 
   it("groupMcqFlatRawItems groups flattened questions sharing the same passage", () => {

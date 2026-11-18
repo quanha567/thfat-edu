@@ -1,9 +1,6 @@
 import { type Static, t } from "elysia";
 
-export const ScorePolicySchema = t.Union([
-  t.Literal("highest"),
-  t.Literal("latest"),
-]);
+export const ScorePolicySchema = t.Union([t.Literal("highest"), t.Literal("latest")]);
 export type TScorePolicy = Static<typeof ScorePolicySchema>;
 
 export const ShowExplanationPolicySchema = t.Union([

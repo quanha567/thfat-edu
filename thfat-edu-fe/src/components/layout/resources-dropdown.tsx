@@ -46,11 +46,7 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
     }
 
     if (articles.length === 0) {
-      return (
-        <div className="py-6 text-center text-xs text-white/60">
-          Chưa có bài viết nào
-        </div>
-      );
+      return <div className="py-6 text-center text-xs text-white/60">Chưa có bài viết nào</div>;
     }
 
     return (
@@ -66,11 +62,8 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
               asChild
               className="group cursor-pointer rounded-lg p-2.5 text-white/90 transition-colors hover:bg-white/10 focus:bg-white/10 focus:text-white"
             >
-              <Link
-                href={`/articles/${article.slug}`}
-                className="flex w-full flex-col gap-1"
-              >
-                <span className="line-clamp-2 text-xs font-semibold leading-snug text-white/95 transition-colors group-hover:text-primary-300">
+              <Link href={`/articles/${article.slug}`} className="flex w-full flex-col gap-1">
+                <span className="group-hover:text-primary-300 line-clamp-2 text-xs leading-snug font-semibold text-white/95 transition-colors">
                   {article.title}
                 </span>
                 <div className="flex items-center gap-2 text-[10px] text-white/60">
@@ -111,7 +104,7 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
       >
         <DropdownMenuLabel className="flex items-center justify-between px-2.5 py-1.5 text-xs font-semibold text-white/80">
           <span className="flex items-center gap-1.5">
-            <Newspaper className="h-3.5 w-3.5 text-primary-300" />
+            <Newspaper className="text-primary-300 h-3.5 w-3.5" />
             <span>Bài viết mới nhất</span>
           </span>
           <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70">
@@ -127,12 +120,9 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
 
         <DropdownMenuItem
           asChild
-          className="cursor-pointer rounded-lg p-2 text-center text-xs font-semibold text-primary-300 hover:bg-white/10 focus:bg-white/10 focus:text-primary-200"
+          className="text-primary-300 focus:text-primary-200 cursor-pointer rounded-lg p-2 text-center text-xs font-semibold hover:bg-white/10 focus:bg-white/10"
         >
-          <Link
-            href={href}
-            className="flex w-full items-center justify-center gap-1.5 py-1"
-          >
+          <Link href={href} className="flex w-full items-center justify-center gap-1.5 py-1">
             <span>Xem tất cả bài viết</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>

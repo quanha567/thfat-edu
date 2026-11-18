@@ -33,7 +33,7 @@ export type TSectionEditorMcqProps = {
 function getBadgeLabel(
   groupRange: { start: number; end: number } | undefined,
   subItemsLength: number,
-  questionNumber: number
+  questionNumber: number,
 ): string {
   if (groupRange) {
     if (groupRange.start === groupRange.end) {
@@ -140,7 +140,9 @@ export function SectionEditorMcq({
           <p className="line-clamp-1 italic">
             {hasContent ? question.contextContent : "Chưa có nội dung ngữ cảnh..."}
           </p>
-          <span className="shrink-0 font-medium">{question.subItems.length} câu hỏi trong chùm</span>
+          <span className="shrink-0 font-medium">
+            {question.subItems.length} câu hỏi trong chùm
+          </span>
         </button>
       ) : (
         <div className="space-y-2.5">
@@ -155,7 +157,9 @@ export function SectionEditorMcq({
 
           <div className="border-border/40 space-y-2 border-t pt-2">
             <div className="flex items-center justify-between px-0.5">
-              <span className="text-foreground text-xs font-semibold">Danh sách câu hỏi trong chùm:</span>
+              <span className="text-foreground text-xs font-semibold">
+                Danh sách câu hỏi trong chùm:
+              </span>
               <div className="flex items-center gap-2">
                 <span className="text-muted-foreground text-[11px] font-medium">
                   {question.subItems.length} câu hỏi

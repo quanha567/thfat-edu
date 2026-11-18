@@ -70,22 +70,20 @@ export function AiArticleAssistant({
   };
 
   return (
-    <Card className="border-primary/30 bg-gradient-to-r from-primary/5 via-background to-primary/5 shadow-xs">
+    <Card className="border-primary/30 from-primary/5 via-background to-primary/5 bg-gradient-to-r shadow-xs">
       <button
         type="button"
         onClick={() => setIsOpen((prev) => !prev)}
-        className="flex w-full cursor-pointer items-center justify-between p-3.5 sm:px-4 text-left transition-colors hover:bg-primary/5 rounded-t-xl"
+        className="hover:bg-primary/5 flex w-full cursor-pointer items-center justify-between rounded-t-xl p-3.5 text-left transition-colors sm:px-4"
       >
         <div className="flex items-center gap-2.5">
-          <div className="flex size-7 items-center justify-center rounded-lg bg-primary/10 text-primary">
+          <div className="bg-primary/10 text-primary flex size-7 items-center justify-center rounded-lg">
             <Sparkles className="size-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-semibold text-foreground text-sm">
-                Trợ lý viết bài AI
-              </span>
-              <Badge variant="secondary" className="font-medium text-[10px]">
+              <span className="text-foreground text-sm font-semibold">Trợ lý viết bài AI</span>
+              <Badge variant="secondary" className="text-[10px] font-medium">
                 NVIDIA Nemotron 3
               </Badge>
             </div>
@@ -95,16 +93,16 @@ export function AiArticleAssistant({
           </div>
         </div>
 
-        <span className="flex size-8 items-center justify-center text-muted-foreground">
+        <span className="text-muted-foreground flex size-8 items-center justify-center">
           {isOpen ? <ChevronUp className="size-4" /> : <ChevronDown className="size-4" />}
         </span>
       </button>
 
       {isOpen && (
-        <CardContent className="space-y-4 border-t border-border/60 p-4 pt-3.5">
+        <CardContent className="border-border/60 space-y-4 border-t p-4 pt-3.5">
           {/* Step 1: Raw Idea Input */}
           <div className="space-y-1.5">
-            <Label htmlFor="ai-topic" className="font-semibold text-xs text-foreground">
+            <Label htmlFor="ai-topic" className="text-foreground text-xs font-semibold">
               Bước 1: Nhập chủ đề hoặc ý tưởng bài viết
             </Label>
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -140,15 +138,15 @@ export function AiArticleAssistant({
 
           {/* Step 2: Refined Prompt & Generation */}
           {(refinedPrompt || isStreaming) && (
-            <div className="space-y-3 rounded-xl border border-border/80 bg-background/80 p-3.5">
+            <div className="border-border/80 bg-background/80 space-y-3 rounded-xl border p-3.5">
               <div className="flex items-center justify-between">
                 <Label
                   htmlFor="ai-refined-prompt"
-                  className="font-semibold text-xs text-foreground"
+                  className="text-foreground text-xs font-semibold"
                 >
                   Bước 2: Dàn ý và yêu cầu chi tiết (có thể chỉnh sửa trước khi tạo)
                 </Label>
-                <span className="text-[11px] text-muted-foreground">
+                <span className="text-muted-foreground text-[11px]">
                   Chuẩn hóa cấu trúc sư phạm và công thức KaTeX
                 </span>
               </div>

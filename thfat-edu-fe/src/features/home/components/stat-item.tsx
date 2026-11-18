@@ -11,12 +11,12 @@ type TStatItemProps = {
 export function StatItem({ stat, isFirst }: TStatItemProps) {
   return (
     <div
-      className={`flex items-center gap-3.5 sm:gap-5 py-3 sm:py-0 ${
+      className={`flex items-center gap-3.5 py-3 sm:gap-5 sm:py-0 ${
         isFirst ? "sm:pr-6" : "sm:px-6"
       }`}
     >
       {/* 3D Glossy Icon */}
-      <div className="relative h-12 w-12 sm:h-14 sm:w-14 shrink-0 transition-transform duration-300 hover:scale-110">
+      <div className="relative h-12 w-12 shrink-0 transition-transform duration-300 hover:scale-110 sm:h-14 sm:w-14">
         {stat.iconSrc ? (
           <Image
             src={stat.iconSrc}
@@ -30,10 +30,10 @@ export function StatItem({ stat, isFirst }: TStatItemProps) {
 
       {/* Metric & Label */}
       <div className="space-y-0.5">
-        <p className="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-white drop-shadow-sm font-sans">
+        <p className="font-sans text-2xl font-extrabold tracking-tight text-white drop-shadow-sm sm:text-3xl lg:text-4xl">
           <AnimatedCounter value={stat.value} countUp={stat.countUp} />
         </p>
-        <p className="text-xs sm:text-sm font-medium text-white/90 leading-snug">
+        <p className="text-xs leading-snug font-medium text-white/90 sm:text-sm">
           {stat.label}
           {stat.subLabel && (
             <>

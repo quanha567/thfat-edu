@@ -4,12 +4,12 @@ import { BrandLogo } from "@/components/brand";
 import { Button } from "@/components/ui/button";
 import { HOME_NAV_LINKS } from "@/features/home/constants/home.data";
 import { Menu } from "lucide-react";
+import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
 import { MobileNavSheet, type TMobileNavHandle } from "./mobile-nav-sheet";
 import { NavbarAuthAction } from "./navbar-auth-action";
 import { NavbarItem } from "./navbar-item";
-import { usePathname } from "next/navigation";
 
 export function MainNavbar() {
   const pathname = usePathname();
@@ -34,7 +34,7 @@ export function MainNavbar() {
 
   return (
     <header
-      className={`fixed top-0 inset-x-0 z-50 w-full transition-all duration-300 ${
+      className={`fixed inset-x-0 top-0 z-50 w-full transition-all duration-300 ${
         isTransparent
           ? "border-b border-transparent bg-transparent"
           : "border-b border-white/10 bg-[#061845]/95 shadow-md backdrop-blur-md"

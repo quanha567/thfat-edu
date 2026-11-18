@@ -29,7 +29,7 @@ export function UserStatusBadge({ isActive, deletedAt, className }: TUserStatusB
           className,
         )}
       >
-        <span className="size-1.5 shrink-0 rounded-full bg-error-500" />
+        <span className="bg-error-500 size-1.5 shrink-0 rounded-full" />
         <span>Đã khóa</span>
       </div>
     );
@@ -42,7 +42,7 @@ export function UserStatusBadge({ isActive, deletedAt, className }: TUserStatusB
         className,
       )}
     >
-      <span className="size-1.5 shrink-0 rounded-full bg-success-500" />
+      <span className="bg-success-500 size-1.5 shrink-0 rounded-full" />
       <span>Hoạt động</span>
     </div>
   );

@@ -16,7 +16,14 @@ export function BrandLogoEmblem({ className = "", size = 44 }: TBrandLogoEmblemP
     >
       <defs>
         {/* Main 3D Metallic Blue Gradient */}
-        <linearGradient id="tf-blue-primary" x1="20" y1="20" x2="170" y2="180" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="tf-blue-primary"
+          x1="20"
+          y1="20"
+          x2="170"
+          y2="180"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#00c6ff" />
           <stop offset="30%" stopColor="#0072ff" />
           <stop offset="70%" stopColor="#0052d4" />
@@ -24,20 +31,41 @@ export function BrandLogoEmblem({ className = "", size = 44 }: TBrandLogoEmblemP
         </linearGradient>
 
         {/* Specular Highlight along Top Edges */}
-        <linearGradient id="tf-blue-highlight" x1="40" y1="20" x2="160" y2="80" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="tf-blue-highlight"
+          x1="40"
+          y1="20"
+          x2="160"
+          y2="80"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#80d0ff" stopOpacity="0.9" />
           <stop offset="50%" stopColor="#0099ff" stopOpacity="0.4" />
           <stop offset="100%" stopColor="#0044cc" stopOpacity="0" />
         </linearGradient>
 
         {/* Shading Depth Gradient */}
-        <linearGradient id="tf-blue-dark" x1="50" y1="100" x2="150" y2="190" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="tf-blue-dark"
+          x1="50"
+          y1="100"
+          x2="150"
+          y2="190"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#003d99" />
           <stop offset="100%" stopColor="#00184d" />
         </linearGradient>
 
         {/* Golden Swoosh & Star Gradient */}
-        <linearGradient id="tf-gold-grad" x1="80" y1="180" x2="180" y2="30" gradientUnits="userSpaceOnUse">
+        <linearGradient
+          id="tf-gold-grad"
+          x1="80"
+          y1="180"
+          x2="180"
+          y2="30"
+          gradientUnits="userSpaceOnUse"
+        >
           <stop offset="0%" stopColor="#f59e0b" />
           <stop offset="40%" stopColor="#fbbf24" />
           <stop offset="75%" stopColor="#f59e0b" />
@@ -53,7 +81,14 @@ export function BrandLogoEmblem({ className = "", size = 44 }: TBrandLogoEmblemP
         </radialGradient>
 
         {/* Drop shadow filter for 3D depth */}
-        <filter id="tf-emboss" x="-10%" y="-10%" width="125%" height="125%" filterUnits="userSpaceOnUse">
+        <filter
+          id="tf-emboss"
+          x="-10%"
+          y="-10%"
+          width="125%"
+          height="125%"
+          filterUnits="userSpaceOnUse"
+        >
           <feDropShadow dx="1" dy="3" stdDeviation="2.5" floodColor="#001433" floodOpacity="0.35" />
         </filter>
       </defs>

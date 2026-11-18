@@ -46,16 +46,16 @@ export function StudentExamEmptyState({
   }
 
   return (
-    <div className="relative flex min-h-[420px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed border-primary-200/80 bg-gradient-to-b from-primary-50/40 via-white to-primary-50/20 p-8 text-center shadow-xs sm:p-14 dark:border-primary-900/40 dark:from-primary-950/20 dark:via-neutral-900/60 dark:to-primary-950/10">
+    <div className="border-primary-200/80 from-primary-50/40 to-primary-50/20 dark:border-primary-900/40 dark:from-primary-950/20 dark:to-primary-950/10 relative flex min-h-[420px] flex-col items-center justify-center overflow-hidden rounded-2xl border border-dashed bg-gradient-to-b via-white p-8 text-center shadow-xs sm:p-14 dark:via-neutral-900/60">
       {/* Decorative background blur glow */}
-      <div className="pointer-events-none absolute -top-16 left-1/2 h-48 w-72 -translate-x-1/2 rounded-full bg-primary-400/10 blur-3xl" />
+      <div className="bg-primary-400/10 pointer-events-none absolute -top-16 left-1/2 h-48 w-72 -translate-x-1/2 rounded-full blur-3xl" />
 
       {/* Modern Badge Icon */}
-      <div className="relative flex h-20 w-20 items-center justify-center rounded-3xl border border-primary-200 bg-white text-primary-600 shadow-lg shadow-primary-500/10 dark:border-primary-800 dark:bg-neutral-800 dark:text-primary-400">
+      <div className="border-primary-200 text-primary-600 shadow-primary-500/10 dark:border-primary-800 dark:text-primary-400 relative flex h-20 w-20 items-center justify-center rounded-3xl border bg-white shadow-lg dark:bg-neutral-800">
         <FlaskConical className="h-10 w-10 animate-pulse duration-1000" />
         <span className="absolute -top-1 -right-1 flex h-4 w-4">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-primary-400 opacity-75" />
-          <span className="relative inline-flex h-4 w-4 rounded-full bg-primary-500" />
+          <span className="bg-primary-400 absolute inline-flex h-full w-full animate-ping rounded-full opacity-75" />
+          <span className="bg-primary-500 relative inline-flex h-4 w-4 rounded-full" />
         </span>
       </div>
 

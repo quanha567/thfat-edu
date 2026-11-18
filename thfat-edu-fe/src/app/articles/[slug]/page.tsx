@@ -184,12 +184,12 @@ export default function ArticlePage({ params }: TArticlePageProps) {
         <Suspense
           fallback={
             <div className="mx-auto max-w-4xl px-4 py-8">
-              <div className="h-8 w-2/3 animate-pulse rounded bg-muted" />
-              <div className="mt-4 h-4 w-1/3 animate-pulse rounded bg-muted" />
+              <div className="bg-muted h-8 w-2/3 animate-pulse rounded" />
+              <div className="bg-muted mt-4 h-4 w-1/3 animate-pulse rounded" />
               <div className="mt-8 space-y-3">
-                <div className="h-4 w-full animate-pulse rounded bg-muted" />
-                <div className="h-4 w-full animate-pulse rounded bg-muted" />
-                <div className="h-4 w-4/5 animate-pulse rounded bg-muted" />
+                <div className="bg-muted h-4 w-full animate-pulse rounded" />
+                <div className="bg-muted h-4 w-full animate-pulse rounded" />
+                <div className="bg-muted h-4 w-4/5 animate-pulse rounded" />
               </div>
             </div>
           }

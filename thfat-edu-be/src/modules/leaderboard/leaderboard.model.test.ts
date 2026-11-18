@@ -1,4 +1,5 @@
 import { describe, expect, it } from "bun:test";
+
 import { Value } from "@sinclair/typebox/value";
 
 import { leaderboardQuerySchema } from "./leaderboard.model";
@@ -33,8 +34,6 @@ describe("leaderboard.model", () => {
   });
 
   it("rejects invalid timeframe filter", () => {
-    expect(
-      Value.Check(leaderboardQuerySchema, { timeframe: "invalid_timeframe" }),
-    ).toBe(false);
+    expect(Value.Check(leaderboardQuerySchema, { timeframe: "invalid_timeframe" })).toBe(false);
   });
 });

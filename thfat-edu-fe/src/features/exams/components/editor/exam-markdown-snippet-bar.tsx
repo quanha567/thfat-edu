@@ -8,7 +8,7 @@ export type TExamMarkdownSnippetBarProps = {
 
 export function ExamMarkdownSnippetBar({ onInsertSnippet }: TExamMarkdownSnippetBarProps) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-1.5 border-b border-border/30 bg-muted/25 px-2.5 py-1">
+    <div className="border-border/30 bg-muted/25 flex flex-wrap items-center justify-between gap-1.5 border-b px-2.5 py-1">
       <span className="text-muted-foreground text-[11px] font-medium">Chèn tại con trỏ:</span>
 
       <div className="flex flex-wrap items-center gap-1">

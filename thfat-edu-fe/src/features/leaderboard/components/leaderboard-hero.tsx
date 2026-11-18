@@ -24,7 +24,7 @@ export function LeaderboardHero({ timeframe, onTimeframeChange }: TLeaderboardHe
           <h1 className="text-2xl font-black tracking-tight text-white sm:text-3xl">
             Bảng <span className="text-cyan-300">Xếp Hạng</span>
           </h1>
-          <p className="max-w-xl text-xs font-normal text-primary-100/80 sm:text-sm">
+          <p className="text-primary-100/80 max-w-xl text-xs font-normal sm:text-sm">
             Danh sách thí sinh có điểm số cao nhất trong các kỳ thi thử V-SAT môn Hóa học.
           </p>
         </div>

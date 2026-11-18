@@ -33,7 +33,7 @@ export function ExamEditorHeader({
   };
 
   return (
-    <header className="sticky top-0 z-20 flex h-14 w-full shrink-0 items-center justify-between border-b border-border bg-background px-4 shadow-xs md:px-6 lg:px-8">
+    <header className="border-border bg-background sticky top-0 z-20 flex h-14 w-full shrink-0 items-center justify-between border-b px-4 shadow-xs md:px-6 lg:px-8">
       <div className="flex min-w-0 items-center gap-3">
         <Tooltip>
           <TooltipTrigger asChild>
@@ -58,14 +58,14 @@ export function ExamEditorHeader({
           {isDirty ? (
             <Badge
               variant="outline"
-              className="border-warning-500/30 bg-warning-500/10 text-[11px] font-medium text-warning-700 dark:text-warning-400"
+              className="border-warning-500/30 bg-warning-500/10 text-warning-700 dark:text-warning-400 text-[11px] font-medium"
             >
               Chưa lưu thay đổi
             </Badge>
           ) : (
             <Badge
               variant="outline"
-              className="border-success-500/30 bg-success-500/10 text-[11px] font-medium text-success-700 dark:text-success-400"
+              className="border-success-500/30 bg-success-500/10 text-success-700 dark:text-success-400 text-[11px] font-medium"
             >
               <Check className="mr-1 size-3" />
               Đã lưu
@@ -75,7 +75,7 @@ export function ExamEditorHeader({
       </div>
 
       <div className="flex shrink-0 items-center gap-2">
-        <div className="flex items-center rounded-lg bg-muted/60 p-0.5 text-xs font-semibold">
+        <div className="bg-muted/60 flex items-center rounded-lg p-0.5 text-xs font-semibold">
           <button
             type="button"
             onClick={() => onToggleEditorMode("edit")}

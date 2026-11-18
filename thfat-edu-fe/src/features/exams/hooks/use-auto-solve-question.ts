@@ -19,9 +19,7 @@ export function useAutoSolveQuestion(
     if (!targetSection || !targetQuestion) return;
 
     const hasContext = Boolean(targetQuestion.contextContent?.trim());
-    const hasSubItemContent = targetQuestion.subItems.some((item) =>
-      Boolean(item.content?.trim()),
-    );
+    const hasSubItemContent = targetQuestion.subItems.some((item) => Boolean(item.content?.trim()));
 
     if (!hasContext && !hasSubItemContent) {
       toast.warning("Vui lòng nhập nội dung đề bài trước khi yêu cầu AI giải.");

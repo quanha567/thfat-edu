@@ -10,10 +10,9 @@ export type TTimeframe = "this_week" | "this_month" | "all_time";
 
 const baseLeaderboardQuerySchema = t.Object({
   timeframe: t.Optional(
-    t.Union(
-      [t.Literal("this_week"), t.Literal("this_month"), t.Literal("all_time")],
-      { default: "all_time" },
-    ),
+    t.Union([t.Literal("this_week"), t.Literal("this_month"), t.Literal("all_time")], {
+      default: "all_time",
+    }),
   ),
   page: t.Optional(t.Numeric({ default: 1, minimum: 1 })),
   limit: t.Optional(t.Numeric({ default: 20, minimum: 1, maximum: 50 })),

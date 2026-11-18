@@ -31,7 +31,7 @@ export function StudentRow({ student, isLast }: TStudentRowProps) {
         !isLast ? "border-b border-neutral-100 dark:border-white/5" : ""
       }`}
     >
-      <div className="flex items-center gap-3 min-w-0">
+      <div className="flex min-w-0 items-center gap-3">
         {/* Rank Number Badge */}
         <div
           className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-black ${badge.bg}`}
@@ -40,7 +40,7 @@ export function StudentRow({ student, isLast }: TStudentRowProps) {
         </div>
 
         {/* Student Avatar Photo */}
-        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full ring-2 ring-neutral-100 bg-neutral-100 dark:ring-white/10 dark:bg-neutral-800">
+        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-100 ring-2 ring-neutral-100 dark:bg-neutral-800 dark:ring-white/10">
           {student.avatarUrl ? (
             <Image
               src={student.avatarUrl}
@@ -50,7 +50,7 @@ export function StudentRow({ student, isLast }: TStudentRowProps) {
               className="h-full w-full rounded-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-primary-100 text-xs font-bold text-primary-700 dark:bg-primary-950 dark:text-cyan-300">
+            <div className="bg-primary-100 text-primary-700 dark:bg-primary-950 flex h-full w-full items-center justify-center text-xs font-bold dark:text-cyan-300">
               {student.avatarText || "TF"}
             </div>
           )}
