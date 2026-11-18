@@ -1,2 +1,5 @@
-[install.security]
-scanner = "@socketsecurity/bun-security-scanner"
+[install]
+auto = "disable"
+
+[install.cache]
+dir = "/tmp/bun-cache"
