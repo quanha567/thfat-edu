@@ -1,3 +1,7 @@
+process.env.BUN_RUNTIME_TRANSPILER_CACHE_PATH = "0";
+process.env.BUN_INSTALL_CACHE_DIR = "/tmp/bun-cache";
+process.env.TMPDIR = "/tmp";
+
 import { Elysia } from "elysia";
 
 import { corsPlugin } from "./config/cors";

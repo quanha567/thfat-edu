@@ -1,12 +1,14 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
+  "bunVersion": "1.x",
   "git": {
     "deploymentEnabled": false
   },
   "services": {
     "thfat-edu-be": {
       "root": "thfat-edu-be",
-      "framework": "elysia"
+      "framework": "elysia",
+      "bunVersion": "1.x"
     },
     "thfat-edu-fe": {
       "root": "thfat-edu-fe",
