@@ -72,6 +72,7 @@ function formatUserDetail({
     email: user.email,
     fullName: user.fullName,
     avatarUrl: user.avatarUrl,
+    gender: user.gender,
     role: user.role,
     isActive: user.isActive,
     createdAt: user.createdAt.toISOString(),
@@ -244,6 +245,7 @@ export class UsersService {
         fullName: data.fullName,
         role: data.role,
         avatarUrl: data.avatarUrl ?? null,
+        gender: data.gender ?? null,
         firebaseUid,
         isActive: true,
       })
@@ -336,6 +338,7 @@ export class UsersService {
         ...(data.fullName ? { fullName: data.fullName } : {}),
         ...(data.role ? { role: data.role } : {}),
         ...(data.avatarUrl !== undefined ? { avatarUrl: data.avatarUrl } : {}),
+        ...(data.gender !== undefined ? { gender: data.gender } : {}),
         ...(data.isActive !== undefined ? { isActive: data.isActive } : {}),
         updatedAt: new Date(),
       })

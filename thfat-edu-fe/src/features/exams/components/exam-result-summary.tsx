@@ -60,7 +60,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
               <p className="text-xs font-bold tracking-wider text-neutral-900 uppercase">
                 Hệ Thống Giáo Dục ThFat Edu
               </p>
-              <p className="text-[11px] text-neutral-500">Ban Khảo Thí & Đánh Giá Năng Lực</p>
+              <p className="text-xxs text-neutral-500">Ban Khảo Thí & Đánh Giá Năng Lực</p>
             </div>
           </div>
 
@@ -129,7 +129,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
             <div className="flex items-center gap-2.5 rounded-lg border border-neutral-200/50 bg-white p-3">
               <Clock className="h-4 w-4 shrink-0 text-neutral-400" />
               <div>
-                <p className="text-[11px] text-neutral-500">Thời gian làm bài</p>
+                <p className="text-xxs text-neutral-500">Thời gian làm bài</p>
                 <p className="font-semibold text-neutral-800">{timeFormatted}</p>
               </div>
             </div>
@@ -137,7 +137,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
             <div className="flex items-center gap-2.5 rounded-lg border border-neutral-200/50 bg-white p-3">
               <CheckCircle2 className="text-success-600 h-4 w-4 shrink-0" />
               <div>
-                <p className="text-[11px] text-neutral-500">Số câu đã trả lời</p>
+                <p className="text-xxs text-neutral-500">Số câu đã trả lời</p>
                 <p className="font-semibold text-neutral-800">
                   {result.totalAnswered} / {result.totalSubItems} ý
                 </p>
@@ -155,7 +155,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
             </div>
             <div className="text-left">
               <p className="font-mono text-xs font-bold text-neutral-800">{certCode}</p>
-              <p className="text-[11px] text-neutral-500">Mã xác thực điện tử ThFat Edu</p>
+              <p className="text-xxs text-neutral-500">Mã xác thực điện tử ThFat Edu</p>
             </div>
           </div>
 
@@ -164,7 +164,7 @@ export function ExamResultSummary({ result }: TExamResultSummaryProps) {
             <ShieldCheck className="text-success-600 h-4 w-4" />
             <div>
               <p className="font-semibold">Đã xác thực bởi Hội đồng Khảo thí</p>
-              <p className="text-success-700/80 text-[10px]">Kết quả được ghi nhận vào hệ thống</p>
+              <p className="text-success-700/80 text-xxs">Kết quả được ghi nhận vào hệ thống</p>
             </div>
           </div>
         </div>

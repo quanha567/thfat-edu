@@ -119,7 +119,7 @@ export function ExamCreatePreviewCard({
             >
               <div className="bg-muted/30 flex items-center justify-between rounded-md px-3 py-2">
                 <span className="text-foreground text-xs font-bold">{sec.title}</span>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-muted-foreground text-xxs">
                   {sec.questions.length} câu hỏi
                 </span>
               </div>
@@ -130,7 +130,7 @@ export function ExamCreatePreviewCard({
                   className="border-border bg-card space-y-2 rounded-lg border p-3 text-xs"
                 >
                   <div className="flex items-start gap-2">
-                    <span className="bg-primary-100 text-primary-800 shrink-0 rounded px-2 py-0.5 text-[11px] font-bold">
+                    <span className="bg-primary-100 text-primary-800 text-xxs shrink-0 rounded px-2 py-0.5 font-bold">
                       Câu {qIdx + 1}
                     </span>
                     <div className="text-foreground flex-1 font-medium">

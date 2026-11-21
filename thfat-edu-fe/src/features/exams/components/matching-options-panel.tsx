@@ -32,7 +32,7 @@ export function MatchingOptionsPanel({
   return (
     <div className="rounded-xl border border-neutral-200 bg-neutral-50/80 p-3.5 shadow-2xs">
       <div className="mb-2.5 flex items-center gap-1.5 border-b border-neutral-200/80 pb-2">
-        <span className="bg-primary-700 flex h-5 w-5 items-center justify-center rounded-full text-[10px] font-bold text-white">
+        <span className="bg-primary-700 text-xxs flex h-5 w-5 items-center justify-center rounded-full font-bold text-white">
           B
         </span>
         <h4 className="text-xs font-bold text-neutral-800">{title}</h4>
@@ -53,7 +53,7 @@ export function MatchingOptionsPanel({
               className={`flex items-start gap-2.5 rounded-lg border p-2.5 text-xs transition-all ${cardStyle}`}
             >
               <span
-                className={`flex h-5 w-5 shrink-0 items-center justify-center rounded-md text-[11px] font-bold transition-colors ${
+                className={`text-xxs flex h-5 w-5 shrink-0 items-center justify-center rounded-md font-bold transition-colors ${
                   isHighlighted || isAssigned
                     ? "bg-primary-600 text-white"
                     : "bg-neutral-100 text-neutral-700"
@@ -66,7 +66,7 @@ export function MatchingOptionsPanel({
                 <ChemRenderer content={opt.content || opt.raw} />
 
                 {isAssigned && assignedList && (
-                  <div className="text-primary-700 mt-1 flex flex-wrap items-center gap-1 text-[11px] font-medium">
+                  <div className="text-primary-700 text-xxs mt-1 flex flex-wrap items-center gap-1 font-medium">
                     <span>Đã ghép với:</span>
                     <span className="bg-primary-100/80 py-0.2 rounded px-1.5 font-semibold">
                       Ý {assignedList.join(", ")}

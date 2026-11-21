@@ -38,6 +38,7 @@ export type TLeaderboardItem = {
   userId: string;
   fullName: string;
   avatarUrl: string | null;
+  gender?: "male" | "female" | "other" | null;
   schoolName: string | null;
   totalScore: number;
   totalExams: number;

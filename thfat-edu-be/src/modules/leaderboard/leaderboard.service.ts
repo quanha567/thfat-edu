@@ -13,6 +13,7 @@ type TRankedUserRow = {
   user_id: string;
   full_name: string;
   avatar_url: string | null;
+  gender?: string | null;
   school_name: string | null;
   total_score: string | number;
   total_exams: string | number;
@@ -48,6 +49,7 @@ function mapRowToLeaderboardItem(row: TRankedUserRow): TLeaderboardItem {
     userId: row.user_id,
     fullName: row.full_name,
     avatarUrl: row.avatar_url,
+    gender: (row.gender as "male" | "female" | "other") || null,
     schoolName: row.school_name,
     totalScore: Number(row.total_score),
     totalExams: Number(row.total_exams),
@@ -134,7 +136,7 @@ export class LeaderboardService {
       ),
       ranked_users AS (
         SELECT DENSE_RANK() OVER (ORDER BY ag.total_score DESC, ag.total_duration_seconds ASC) AS rank,
-          ag.user_id, u.full_name, u.avatar_url, sp.school_name,
+          ag.user_id, u.full_name, u.avatar_url, u.gender, sp.school_name,
           ag.total_score, ag.total_exams, ag.total_duration_seconds
         FROM aggregated_scores ag
         JOIN users u ON u.id = ag.user_id
@@ -181,7 +183,7 @@ export class LeaderboardService {
       ),
       ranked_users AS (
         SELECT DENSE_RANK() OVER (ORDER BY ub.best_score DESC, ub.best_duration ASC) AS rank,
-          ub.user_id, u.full_name, u.avatar_url, sp.school_name,
+          ub.user_id, u.full_name, u.avatar_url, u.gender, sp.school_name,
           ub.best_score AS total_score, 1 AS total_exams, ub.best_duration::integer AS total_duration_seconds
         FROM user_best_attempt ub
         JOIN users u ON u.id = ub.user_id

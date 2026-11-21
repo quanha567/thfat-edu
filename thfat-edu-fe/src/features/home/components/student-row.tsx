@@ -1,4 +1,4 @@
-import Image from "next/image";
+import { BaseAvatar } from "@/components/base";
 
 import { type TLeaderboardStudent } from "../constants/home.data";
 
@@ -40,21 +40,12 @@ export function StudentRow({ student, isLast }: TStudentRowProps) {
         </div>
 
         {/* Student Avatar Photo */}
-        <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full bg-neutral-100 ring-2 ring-neutral-100 dark:bg-neutral-800 dark:ring-white/10">
-          {student.avatarUrl ? (
-            <Image
-              src={student.avatarUrl}
-              alt={student.name}
-              width={36}
-              height={36}
-              className="h-full w-full rounded-full object-cover"
-            />
-          ) : (
-            <div className="bg-primary-100 text-primary-700 dark:bg-primary-950 flex h-full w-full items-center justify-center text-xs font-bold dark:text-cyan-300">
-              {student.avatarText || "TF"}
-            </div>
-          )}
-        </div>
+        <BaseAvatar
+          src={student.avatarUrl}
+          name={student.name}
+          size="md"
+          className="h-9 w-9 shrink-0 ring-2 ring-neutral-100 dark:ring-white/10"
+        />
 
         {/* Name and School */}
         <div className="min-w-0">

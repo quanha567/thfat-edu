@@ -1,4 +1,4 @@
-import { getAvatarGradient, getInitials } from "@/components/base";
+import { getAvatarGradient, getDefaultAvatar, getInitials } from "@/components/base";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Table,
@@ -107,7 +107,16 @@ export function LeaderboardTable({ items, currentUserId }: TLeaderboardTableProp
                   <TableCell>
                     <div className="flex items-center gap-3">
                       <Avatar className="border-border h-9 w-9 border shadow-2xs">
-                        <AvatarImage src={item.avatarUrl ?? undefined} alt={item.fullName} />
+                        {(item.avatarUrl || getDefaultAvatar(item.fullName, item.gender)) && (
+                          <AvatarImage
+                            src={
+                              item.avatarUrl ||
+                              getDefaultAvatar(item.fullName, item.gender) ||
+                              undefined
+                            }
+                            alt={item.fullName}
+                          />
+                        )}
                         <AvatarFallback
                           className={`bg-gradient-to-br ${getAvatarGradient(item.fullName)} text-xs font-bold text-white shadow-inner ring-1 ring-white/20 select-none`}
                         >
@@ -119,7 +128,7 @@ export function LeaderboardTable({ items, currentUserId }: TLeaderboardTableProp
                           {item.fullName}
                         </p>
                         {isMe && (
-                          <span className="bg-primary-100 text-primary-700 inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-bold">
+                          <span className="bg-primary-100 text-primary-700 text-xxs inline-flex items-center rounded-full px-2 py-0.5 font-bold">
                             Bạn
                           </span>
                         )}

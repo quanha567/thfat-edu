@@ -57,7 +57,7 @@ export function ExamEditorOverviewBar({
             <span>{totalPoints} điểm</span>
           </div>
 
-          <Badge variant={currentStatus.variant} className="text-[11px] font-semibold">
+          <Badge variant={currentStatus.variant} className="text-xxs font-semibold">
             {currentStatus.label}
           </Badge>
 

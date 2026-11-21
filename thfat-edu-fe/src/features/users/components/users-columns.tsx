@@ -1,7 +1,7 @@
 "use client";
 
+import { BaseAvatar } from "@/components/base";
 import { DataTableRowActions } from "@/components/data-table";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { type ColumnDef } from "@tanstack/react-table";
 import { format, parseISO } from "date-fns";
 import { KeyRound, Lock, Pencil, RotateCcw, Trash2, Unlock } from "lucide-react";
@@ -33,21 +33,10 @@ export function createUserColumns({
       header: "Họ và tên / Email",
       cell: ({ row }) => {
         const user = row.original;
-        const initials = user.fullName
-          .split(" ")
-          .map((n) => n[0])
-          .slice(-2)
-          .join("")
-          .toUpperCase();
 
         return (
           <div className="flex items-center gap-3">
-            <Avatar className="h-9 w-9">
-              <AvatarImage src={user.avatarUrl ?? undefined} alt={user.fullName} />
-              <AvatarFallback className="bg-muted text-muted-foreground text-xs font-semibold">
-                {initials || "U"}
-              </AvatarFallback>
-            </Avatar>
+            <BaseAvatar src={user.avatarUrl} name={user.fullName} gender={user.gender} size="md" />
             <div className="flex flex-col">
               <span className="text-foreground line-clamp-1 text-sm font-semibold">
                 {user.fullName}
@@ -77,7 +66,7 @@ export function createUserColumns({
                 {sp.studentCode ? `Mã: ${sp.studentCode}` : "Chưa có mã HS"}
                 {sp.grade ? ` • Khối ${sp.grade}` : ""}
               </div>
-              <div className="text-muted-foreground max-w-[200px] truncate text-[11px]">
+              <div className="text-muted-foreground text-xxs max-w-[200px] truncate">
                 {sp.schoolName ?? "Chưa có trường"}
               </div>
             </div>
@@ -92,7 +81,7 @@ export function createUserColumns({
               <div className="text-foreground font-medium">
                 {tp.teacherCode ? `Mã: ${tp.teacherCode}` : "Chưa có mã GV"}
               </div>
-              <div className="text-muted-foreground max-w-[200px] truncate text-[11px]">
+              <div className="text-muted-foreground text-xxs max-w-[200px] truncate">
                 {tp.department ?? "Chưa có bộ môn"}
               </div>
             </div>

@@ -83,7 +83,7 @@ export function ExamEditorSidebarIndexTab({
 
       <div className="border-border/40 bg-muted/10 flex shrink-0 items-center justify-between border-t px-3.5 py-2 text-xs">
         <div className="text-muted-foreground flex min-w-0 items-center gap-1.5">
-          <span className="text-[11px]">Đang chọn:</span>
+          <span className="text-xxs">Đang chọn:</span>
           <span className="bg-primary/10 text-primary border-primary/20 rounded-md border px-2 py-0.5 font-mono text-xs font-bold">
             Câu {activeQuestionNumber}
           </span>

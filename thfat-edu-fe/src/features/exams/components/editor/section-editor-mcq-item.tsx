@@ -83,7 +83,7 @@ export function SectionEditorMcqItem({
               >
                 <span
                   className={cn(
-                    "flex size-5 shrink-0 items-center justify-center rounded-full text-[11px] font-bold",
+                    "flex size-5 shrink-0 items-center justify-center rounded-full text-xxs font-bold",
                     isSelected
                       ? "bg-success-600 text-white shadow-2xs"
                       : "bg-muted text-muted-foreground border border-border/40",

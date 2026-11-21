@@ -49,3 +49,4 @@ Always read and adhere to [CODING_STANDARDS.md](file:///d:/projects/thfat-edu/CO
   - Push `"use client"` down to interactive leaf components; keep pages/layouts RSC by default.
 - **Custom Hooks**: Put React Query operations inside dedicated `use-<action>.ts` hooks in `features/<feature>/hooks/`. Components must not call the raw API directly.
 - **State Segregation**: React Query for server data, Zustand only for global UI states, `nuqs` for query/search parameters.
+- **Typography Scale**: Never use arbitrary font sizes like `text-[10px]` or `text-[11px]`. Use standard Tailwind classes (`text-xs`, `text-sm`, `text-base`...) or `text-xxs` (0.6875rem / 11px) for micro-badges/tags. Readable text must be at least `text-xs`.

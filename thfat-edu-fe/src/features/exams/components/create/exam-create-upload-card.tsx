@@ -100,7 +100,7 @@ export function ExamCreateUploadCard({
               </div>
               <div className="min-w-0">
                 <p className="text-foreground truncate text-xs font-bold">{selectedFile.name}</p>
-                <p className="text-muted-foreground text-[11px]">
+                <p className="text-muted-foreground text-xxs">
                   PDF Document · {(selectedFile.size / 1024).toFixed(0)} KB
                 </p>
               </div>

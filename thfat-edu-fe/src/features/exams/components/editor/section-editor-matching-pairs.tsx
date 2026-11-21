@@ -40,7 +40,7 @@ export function SectionEditorMatchingPairs({
     <div className="border-border/60 bg-muted/10 space-y-2 rounded-lg border p-3">
       <div className="border-border/40 flex items-center justify-between border-b pb-2">
         <div className="flex items-center gap-1.5">
-          <span className="bg-primary/20 text-primary flex size-4 items-center justify-center rounded-full text-[10px] font-bold">
+          <span className="bg-primary/20 text-primary text-xxs flex size-4 items-center justify-center rounded-full font-bold">
             A
           </span>
           <span className="text-foreground text-xs font-semibold">

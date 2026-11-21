@@ -41,13 +41,13 @@ export function ExamEditorSidebarPreviewTab({
     <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
       <div className="border-border/40 bg-muted/10 flex shrink-0 items-center justify-between border-b px-3.5 py-2">
         <div className="flex min-w-0 items-center gap-1.5">
-          <Badge className="bg-primary text-primary-foreground shrink-0 px-2 py-0.5 text-[11px] font-bold shadow-2xs">
+          <Badge className="bg-primary text-primary-foreground text-xxs shrink-0 px-2 py-0.5 font-bold shadow-2xs">
             Câu {activeQuestionNumber}
           </Badge>
           {activeSectionTitle && (
             <Badge
               variant="outline"
-              className="border-border/70 bg-background/60 max-w-[140px] truncate text-[10px] font-medium"
+              className="border-border/70 bg-background/60 text-xxs max-w-[140px] truncate font-medium"
             >
               {activeSectionTitle}
             </Badge>
@@ -66,7 +66,7 @@ export function ExamEditorSidebarPreviewTab({
           >
             <ChevronLeft className="size-3.5" />
           </Button>
-          <span className="text-muted-foreground px-1 font-mono text-[11px] font-medium tabular-nums">
+          <span className="text-muted-foreground text-xxs px-1 font-mono font-medium tabular-nums">
             {currentIndex >= 0 ? currentIndex + 1 : 0}/{totalQuestions}
           </span>
           <Button

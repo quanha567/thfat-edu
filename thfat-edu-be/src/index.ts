@@ -4,6 +4,7 @@ import { corsPlugin } from "./config/cors";
 import { scalarDocsPlugin } from "./config/docs";
 import { env } from "./config/env";
 import { errorHandlerPlugin } from "./middlewares/error-handler";
+import { analyticsRoutes } from "./modules/analytics";
 import { articlesRoutes } from "./modules/articles";
 import { attemptsRoutes } from "./modules/attempts";
 import { authRoutes } from "./modules/auth";
@@ -26,6 +27,7 @@ export const app = new Elysia()
   .use(settingsRoutes)
   .use(articlesRoutes)
   .use(leaderboardRoutes)
+  .use(analyticsRoutes)
   .group("/api", (group) =>
     group
       .use(healthRoutes)
@@ -35,7 +37,8 @@ export const app = new Elysia()
       .use(usersRoutes)
       .use(settingsRoutes)
       .use(articlesRoutes)
-      .use(leaderboardRoutes),
+      .use(leaderboardRoutes)
+      .use(analyticsRoutes),
   );
 
 export type App = typeof app;

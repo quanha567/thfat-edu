@@ -71,7 +71,7 @@ export function ExamEditorOverviewCard({
               <span className="text-foreground max-w-xs truncate font-medium">• {title}</span>
               <span>• {durationMinutes}p</span>
               <span>• {totalPoints}đ</span>
-              <Badge variant={currentStatus.variant} className="text-[10px]">
+              <Badge variant={currentStatus.variant} className="text-xxs">
                 {currentStatus.label}
               </Badge>
             </div>
@@ -184,7 +184,7 @@ export function ExamEditorOverviewCard({
                     href={pdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary inline-flex items-center gap-0.5 text-[11px] font-normal hover:underline"
+                    className="text-primary text-xxs inline-flex items-center gap-0.5 font-normal hover:underline"
                   >
                     Mở PDF <ExternalLink className="size-2.5" />
                   </a>

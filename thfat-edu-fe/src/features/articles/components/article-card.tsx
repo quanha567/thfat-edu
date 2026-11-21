@@ -34,7 +34,7 @@ export function ArticleCard({ article }: TArticleCardProps) {
           <div className="absolute top-3 left-3">
             <Badge
               variant="secondary"
-              className="bg-background/90 text-foreground text-[11px] font-semibold shadow-2xs backdrop-blur-xs"
+              className="bg-background/90 text-foreground text-xxs font-semibold shadow-2xs backdrop-blur-xs"
             >
               {article.category.name}
             </Badge>

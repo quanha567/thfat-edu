@@ -57,7 +57,7 @@ export function ExamEditorSidebarSectionGroup({
           </span>
         </div>
 
-        <span className="text-muted-foreground shrink-0 text-[11px] font-medium">
+        <span className="text-muted-foreground text-xxs shrink-0 font-medium">
           {section.sectionType === "group_mcq"
             ? `${section.questions.reduce((acc, q) => acc + (q.subItems?.length || 1), 0)} câu (${section.questions.length} chùm)`
             : `${section.questions.length} câu`}

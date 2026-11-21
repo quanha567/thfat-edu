@@ -66,7 +66,7 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
                 <span className="group-hover:text-primary-300 line-clamp-2 text-xs leading-snug font-semibold text-white/95 transition-colors">
                   {article.title}
                 </span>
-                <div className="flex items-center gap-2 text-[10px] text-white/60">
+                <div className="text-xxs flex items-center gap-2 text-white/60">
                   {article.category && (
                     <span className="rounded bg-white/15 px-1.5 py-0.5 font-medium text-white/85">
                       {article.category.name}
@@ -107,7 +107,7 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
             <Newspaper className="text-primary-300 h-3.5 w-3.5" />
             <span>Bài viết mới nhất</span>
           </span>
-          <span className="rounded-full bg-white/10 px-2 py-0.5 text-[10px] font-medium text-white/70">
+          <span className="text-xxs rounded-full bg-white/10 px-2 py-0.5 font-medium text-white/70">
             5 bài mới
           </span>
         </DropdownMenuLabel>

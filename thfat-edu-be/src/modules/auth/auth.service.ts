@@ -1,11 +1,11 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
 
-import { verifyFirebaseIdToken } from "../../config/firebase";
+import { updateFirebaseUser, verifyFirebaseIdToken } from "../../config/firebase";
 import { type Database, db } from "../../db";
 import { sessions, studentProfiles, teacherProfiles, users } from "../../db/schema";
 import { ForbiddenError, UnauthorizedError } from "../../middlewares/error-handler";
 import { SESSION_COOKIE_MAX_AGE } from "./auth.cookie";
-import { type TUserResponse } from "./auth.model";
+import { type TUpdateMeBody, type TUserResponse } from "./auth.model";
 
 declare const Bun:
   | {
@@ -152,7 +152,15 @@ export class AuthService {
         .where(eq(studentProfiles.userId, user.id))
         .limit(1);
 
-      studentProfile = profile ?? null;
+      studentProfile = profile
+        ? {
+            studentCode: profile.studentCode,
+            grade: profile.grade,
+            schoolName: profile.schoolName,
+            dateOfBirth: profile.dateOfBirth ? String(profile.dateOfBirth).slice(0, 10) : null,
+            parentPhone: profile.parentPhone,
+          }
+        : null;
     } else if (user.role === "teacher") {
       const [profile] = await this.database
         .select()
@@ -160,7 +168,13 @@ export class AuthService {
         .where(eq(teacherProfiles.userId, user.id))
         .limit(1);
 
-      teacherProfile = profile ?? null;
+      teacherProfile = profile
+        ? {
+            teacherCode: profile.teacherCode,
+            department: profile.department,
+            bio: profile.bio,
+          }
+        : null;
     }
 
     return {
@@ -168,11 +182,117 @@ export class AuthService {
       email: user.email,
       fullName: user.fullName,
       avatarUrl: user.avatarUrl,
+      gender: user.gender,
       role: user.role,
       isActive: user.isActive,
       studentProfile,
       teacherProfile,
     };
+  }
+
+  public async updateMe({
+    userId,
+    data,
+  }: {
+    userId: string;
+    data: TUpdateMeBody;
+  }): Promise<TUserResponse> {
+    const [dbUser] = await this.database
+      .select()
+      .from(users)
+      .where(and(eq(users.id, userId), isNull(users.deletedAt)))
+      .limit(1);
+
+    if (!dbUser) {
+      throw new UnauthorizedError("Không tìm thấy thông tin người dùng.");
+    }
+
+    if (dbUser.firebaseUid && (data.fullName || data.avatarUrl !== undefined)) {
+      try {
+        await updateFirebaseUser({
+          uid: dbUser.firebaseUid,
+          displayName: data.fullName ?? dbUser.fullName,
+          photoUrl:
+            data.avatarUrl === null ? "" : (data.avatarUrl ?? dbUser.avatarUrl ?? undefined),
+        });
+      } catch (error) {
+        console.warn(
+          `[AuthService] Failed to sync profile update to Firebase: ${(error as Error).message}`,
+        );
+      }
+    }
+
+    await this.database
+      .update(users)
+      .set({
+        ...(data.fullName ? { fullName: data.fullName } : {}),
+        ...(data.avatarUrl !== undefined ? { avatarUrl: data.avatarUrl } : {}),
+        ...(data.gender !== undefined ? { gender: data.gender } : {}),
+        updatedAt: new Date(),
+      })
+      .where(eq(users.id, userId));
+
+    if (dbUser.role === "student" && data.studentProfile) {
+      const sp = data.studentProfile;
+
+      const [existingStudentProfile] = await this.database
+        .select()
+        .from(studentProfiles)
+        .where(eq(studentProfiles.userId, userId))
+        .limit(1);
+
+      if (existingStudentProfile) {
+        await this.database
+          .update(studentProfiles)
+          .set({
+            ...(sp.studentCode !== undefined ? { studentCode: sp.studentCode } : {}),
+            ...(sp.grade !== undefined ? { grade: sp.grade } : {}),
+            ...(sp.schoolName !== undefined ? { schoolName: sp.schoolName } : {}),
+            ...(sp.dateOfBirth !== undefined ? { dateOfBirth: sp.dateOfBirth } : {}),
+            ...(sp.parentPhone !== undefined ? { parentPhone: sp.parentPhone } : {}),
+            updatedAt: new Date(),
+          })
+          .where(eq(studentProfiles.userId, userId));
+      } else {
+        await this.database.insert(studentProfiles).values({
+          userId,
+          studentCode: sp.studentCode ?? null,
+          grade: sp.grade ?? null,
+          schoolName: sp.schoolName ?? null,
+          dateOfBirth: sp.dateOfBirth ?? null,
+          parentPhone: sp.parentPhone ?? null,
+        });
+      }
+    } else if (dbUser.role === "teacher" && data.teacherProfile) {
+      const tp = data.teacherProfile;
+
+      const [existingTeacherProfile] = await this.database
+        .select()
+        .from(teacherProfiles)
+        .where(eq(teacherProfiles.userId, userId))
+        .limit(1);
+
+      if (existingTeacherProfile) {
+        await this.database
+          .update(teacherProfiles)
+          .set({
+            ...(tp.teacherCode !== undefined ? { teacherCode: tp.teacherCode } : {}),
+            ...(tp.department !== undefined ? { department: tp.department } : {}),
+            ...(tp.bio !== undefined ? { bio: tp.bio } : {}),
+            updatedAt: new Date(),
+          })
+          .where(eq(teacherProfiles.userId, userId));
+      } else {
+        await this.database.insert(teacherProfiles).values({
+          userId,
+          teacherCode: tp.teacherCode ?? null,
+          department: tp.department ?? null,
+          bio: tp.bio ?? null,
+        });
+      }
+    }
+
+    return this.getUserWithProfile(userId);
   }
 }
 

@@ -4,6 +4,7 @@ export * from "./leaderboard-pagination";
 export * from "./leaderboard-pedestal";
 export * from "./leaderboard-pinned-bar";
 export * from "./leaderboard-podium";
+export * from "./leaderboard-ribbons";
 export * from "./leaderboard-skeleton";
 export * from "./leaderboard-table";
 export * from "./leaderboard-wreath";

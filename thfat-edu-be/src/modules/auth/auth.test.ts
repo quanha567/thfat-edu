@@ -45,6 +45,24 @@ describe("Auth Module (Routes & HTTP Contract)", () => {
         teacherProfile: null,
       };
     },
+    updateMe: async ({
+      userId,
+      data,
+    }: {
+      userId: string;
+      data: { fullName?: string; avatarUrl?: string | null };
+    }) => {
+      return {
+        id: userId,
+        email: "student@thfat.edu.vn",
+        fullName: data.fullName ?? "Em Học Sinh",
+        avatarUrl: data.avatarUrl ?? null,
+        role: "student" as const,
+        isActive: true,
+        studentProfile: null,
+        teacherProfile: null,
+      };
+    },
     logout: async () => {},
   } as unknown as AuthService;
 
@@ -105,5 +123,33 @@ describe("Auth Module (Routes & HTTP Contract)", () => {
     expect(response.status).toBe(200);
     const body = (await response.json()) as { message: string };
     expect(body.message).toBe("Đăng xuất thành công");
+  });
+
+  it("should return 403 for PATCH /auth/me when unauthenticated", async () => {
+    const response = await testApp.handle(
+      new Request("http://localhost/auth/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName: "Tên Mới" }),
+      }),
+    );
+    expect(response.status).toBe(403);
+  });
+
+  it("should return 200 for PATCH /auth/me with valid cookie", async () => {
+    const response = await testApp.handle(
+      new Request("http://localhost/auth/me", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Cookie: "session_token=mock-session-token-xyz",
+        },
+        body: JSON.stringify({ fullName: "Nguyễn Văn Test" }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as { fullName: string };
+    expect(body.fullName).toBe("Nguyễn Văn Test");
   });
 });

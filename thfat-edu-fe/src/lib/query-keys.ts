@@ -46,4 +46,9 @@ export const queryKeys = {
     quiz: (quizId: string, params?: Record<string, unknown>) =>
       [...queryKeys.leaderboard.all, "quiz", quizId, params] as const,
   },
+  analytics: {
+    all: ["analytics"] as const,
+    dashboard: (timeRange?: string) =>
+      [...queryKeys.analytics.all, "dashboard", timeRange] as const,
+  },
 } as const;

@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { BaseAvatar } from "@/components/base";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Calendar, Eye } from "lucide-react";
@@ -25,10 +25,6 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
         month: "long",
         year: "numeric",
       });
-
-  const authorInitials = article.author?.fullName
-    ? article.author.fullName.slice(0, 2).toUpperCase()
-    : "AD";
 
   return (
     <article className="mx-auto max-w-4xl space-y-8 pb-16">
@@ -70,17 +66,17 @@ export function ArticleDetailView({ article }: TArticleDetailViewProps) {
         {/* Metadata Bar */}
         <div className="border-border flex flex-wrap items-center justify-between gap-4 border-y py-3 text-xs sm:text-sm">
           <div className="flex items-center gap-3">
-            <Avatar className="border-border size-9 border">
-              {article.author?.avatarUrl && (
-                <AvatarImage src={article.author.avatarUrl} alt={article.author.fullName} />
-              )}
-              <AvatarFallback className="text-xs font-semibold">{authorInitials}</AvatarFallback>
-            </Avatar>
+            <BaseAvatar
+              src={article.author?.avatarUrl}
+              name={article.author?.fullName}
+              size="md"
+              className="border-border size-9 border"
+            />
             <div className="flex flex-col">
               <span className="text-foreground text-xs font-semibold sm:text-sm">
                 {article.author?.fullName ?? "Quản trị viên ThFat Edu"}
               </span>
-              <span className="text-muted-foreground text-[11px] sm:text-xs">Tác giả bài viết</span>
+              <span className="text-muted-foreground text-xxs sm:text-xs">Tác giả bài viết</span>
             </div>
           </div>
 

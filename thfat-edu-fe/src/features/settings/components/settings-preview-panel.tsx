@@ -176,7 +176,7 @@ export function SettingsPreviewPanel({ control }: TSettingsPreviewPanelProps) {
             </div>
           </div>
 
-          <div className="border-border bg-muted/40 text-muted-foreground rounded-md border p-2.5 text-[11px]">
+          <div className="border-border bg-muted/40 text-muted-foreground text-xxs rounded-md border p-2.5">
             Lưu ý: Các đề thi đã thiết lập quy chế riêng sẽ ưu tiên cấu hình cụ thể của đề đó.
           </div>
         </CardContent>

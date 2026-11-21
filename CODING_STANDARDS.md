@@ -391,7 +391,17 @@ export function useLogin() {
   - In Next.js 16 App Router, keep pages and layout containers as React Server Components (RSC) by default.
   - Only mark leaf interactive components with `"use client"`. Do not mark an entire 500+ line page as client-rendered if 80% of it is static display.
 
-### 5.6 Accessibility & Performance
+### 5.6 Typography & Font Size Standards
+
+- **Strict Type Scale**:
+  - Use standard Tailwind typography classes: `text-xxs` (0.6875rem / 11px), `text-xs` (0.75rem / 12px), `text-sm` (0.875rem / 14px), `text-base` (1rem / 16px), `text-lg` (1.125rem / 18px), `text-xl` (1.25rem / 20px), `text-2xl` (1.5rem / 24px).
+  - Semantic type classes (`text-display`, `text-h1`, `text-h2`, `text-h3`, `text-body-lg`, `text-body`, `text-body-sm`, `text-label`, `text-caption`) are mapped directly to this scale.
+- **No Arbitrary Font Sizes**:
+  - Never use arbitrary values like `text-[10px]`, `text-[11px]`, `text-[13px]`, etc.
+  - Micro-UI (small badges, tags, counters, avatar indicators) must use `text-xxs`.
+  - Body text, explanations, and readable descriptions must be at least `text-xs` (12px) for WCAG 2.1 AA legibility.
+
+### 5.7 Accessibility & Performance
 
 - **WCAG 2.1 AA Compliance**:
   - Always provide accessible labels (`aria-label`, `aria-labelledby`, or visible text).

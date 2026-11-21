@@ -14,7 +14,7 @@ export function UsersPageContainer() {
   const { data } = useUsers({ limit: 1 });
 
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col gap-4 p-4 md:p-6 lg:px-8 lg:py-6">
+    <div className="flex h-full min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4 md:p-6 lg:px-8 lg:py-6">
       <AdminPageHeader
         title="Người dùng"
         badge={
@@ -33,7 +33,9 @@ export function UsersPageContainer() {
           </Button>
         }
       />
-      <UsersTable isCreateOpen={isCreateOpen} onCloseCreate={() => setIsCreateOpen(false)} />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <UsersTable isCreateOpen={isCreateOpen} onCloseCreate={() => setIsCreateOpen(false)} />
+      </div>
     </div>
   );
 }

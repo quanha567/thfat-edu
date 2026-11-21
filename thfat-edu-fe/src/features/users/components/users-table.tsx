@@ -100,26 +100,7 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
   };
 
   return (
-    <div className="space-y-4">
-      <UsersFilterBar
-        search={search}
-        role={role as TUserRoleFilter}
-        status={status as TUserStatusFilter}
-        onSearchChange={(val) => {
-          setSearch(val);
-          setPage(1);
-        }}
-        onRoleChange={(val) => {
-          setRole(val);
-          setPage(1);
-        }}
-        onStatusChange={(val) => {
-          setStatus(val);
-          setPage(1);
-        }}
-        onResetFilters={handleResetFilters}
-      />
-
+    <div className="flex min-h-0 flex-1 flex-col">
       <DataTable
         columns={columns}
         data={data?.items ?? []}
@@ -127,12 +108,34 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
         totalCount={data?.total ?? 0}
         pageIndex={page}
         pageSize={pageSize}
+        pageSizeOptions={[10, 20, 50]}
         onPageChange={setPage}
         onPageSizeChange={(newSize) => {
           setPageSize(newSize);
           setPage(1);
         }}
         itemName="người dùng"
+        searchValue={search}
+        searchPlaceholder="Tìm theo tên, email, mã số..."
+        onSearchChange={(val) => {
+          setSearch(val);
+          setPage(1);
+        }}
+        filters={
+          <UsersFilterBar
+            role={role as TUserRoleFilter}
+            status={status as TUserStatusFilter}
+            onRoleChange={(val) => {
+              setRole(val);
+              setPage(1);
+            }}
+            onStatusChange={(val) => {
+              setStatus(val);
+              setPage(1);
+            }}
+            onReset={handleResetFilters}
+          />
+        }
         emptyTitle="Không tìm thấy người dùng"
         emptyDescription="Thử thay đổi từ khóa tìm kiếm hoặc đặt lại các bộ lọc."
         onResetFilters={handleResetFilters}

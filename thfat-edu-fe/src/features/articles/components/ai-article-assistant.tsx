@@ -83,7 +83,7 @@ export function AiArticleAssistant({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-foreground text-sm font-semibold">Trợ lý viết bài AI</span>
-              <Badge variant="secondary" className="text-[10px] font-medium">
+              <Badge variant="secondary" className="text-xxs font-medium">
                 NVIDIA Nemotron 3
               </Badge>
             </div>
@@ -146,7 +146,7 @@ export function AiArticleAssistant({
                 >
                   Bước 2: Dàn ý và yêu cầu chi tiết (có thể chỉnh sửa trước khi tạo)
                 </Label>
-                <span className="text-muted-foreground text-[11px]">
+                <span className="text-muted-foreground text-xxs">
                   Chuẩn hóa cấu trúc sư phạm và công thức KaTeX
                 </span>
               </div>

@@ -108,7 +108,7 @@ export function SectionEditorTrueFalse({
           <div className="border-border/40 space-y-2 border-t pt-2">
             <div className="flex items-center justify-between px-0.5">
               <span className="text-foreground text-xs font-semibold">Các ý phát biểu:</span>
-              <span className="text-muted-foreground text-[11px] font-medium">
+              <span className="text-muted-foreground text-xxs font-medium">
                 {question.subItems.length} ý phát biểu
               </span>
             </div>

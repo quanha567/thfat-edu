@@ -31,7 +31,7 @@ export function ExamEditorSidebarProgress({
         <span className="text-foreground text-xs font-semibold">
           {hasErrors ? `${errorCount} câu cần kiểm tra` : "Đề thi hợp lệ"}
         </span>
-        <span className="text-muted-foreground font-mono text-[11px]">({percentComplete}%)</span>
+        <span className="text-muted-foreground text-xxs font-mono">({percentComplete}%)</span>
       </div>
 
       <div className="flex items-center gap-0.5">
@@ -40,7 +40,7 @@ export function ExamEditorSidebarProgress({
           variant="ghost"
           size="xs"
           onClick={onCollapseAll}
-          className="text-muted-foreground hover:text-foreground h-6.5 cursor-pointer gap-1 rounded px-2 text-[11px]"
+          className="text-muted-foreground hover:text-foreground text-xxs h-6.5 cursor-pointer gap-1 rounded px-2"
           title="Thu gọn tất cả câu hỏi"
         >
           <ChevronsDownUp className="size-3" />
@@ -51,7 +51,7 @@ export function ExamEditorSidebarProgress({
           variant="ghost"
           size="xs"
           onClick={onExpandAll}
-          className="text-muted-foreground hover:text-foreground h-6.5 cursor-pointer gap-1 rounded px-2 text-[11px]"
+          className="text-muted-foreground hover:text-foreground text-xxs h-6.5 cursor-pointer gap-1 rounded px-2"
           title="Mở rộng tất cả câu hỏi"
         >
           <ChevronsUpDown className="size-3" />

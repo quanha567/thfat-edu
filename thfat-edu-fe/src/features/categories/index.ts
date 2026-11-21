@@ -1,3 +1,6 @@
+export * from "./components/categories-page-container";
+export * from "./components/category-columns";
+export * from "./components/category-delete-dialog";
 export * from "./components/category-dialog";
 export * from "./components/category-list-table";
 export * from "./hooks/use-categories";

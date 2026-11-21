@@ -58,7 +58,7 @@ export function StudentExamFilterBar({
                   className="gap-1.5 px-3 py-1 text-xs font-medium sm:text-sm"
                 >
                   <span>{tab.label}</span>
-                  {tab.count > 0 && <span className="text-[11px] opacity-70">({tab.count})</span>}
+                  {tab.count > 0 && <span className="text-xxs opacity-70">({tab.count})</span>}
                 </TabsTrigger>
               ))}
             </TabsList>

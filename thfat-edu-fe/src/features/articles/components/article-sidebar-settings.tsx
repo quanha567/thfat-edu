@@ -76,7 +76,7 @@ export function ArticleSidebarSettings({
             <CardTitle className="text-sm font-semibold">Xuất bản</CardTitle>
             <Badge
               variant={getStatusBadgeVariant(status)}
-              className="text-[11px] font-semibold capitalize"
+              className="text-xxs font-semibold capitalize"
             >
               {getStatusBadgeLabel(status)}
             </Badge>

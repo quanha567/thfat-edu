@@ -68,7 +68,7 @@ export function AdminSidebar() {
       <SidebarContent className="px-2 py-3">
         {ADMIN_NAV_GROUPS.map((group) => (
           <SidebarGroup key={group.label} className="py-1.5">
-            <SidebarGroupLabel className="text-sidebar-foreground/60 px-2.5 text-[11px] font-semibold tracking-wider uppercase">
+            <SidebarGroupLabel className="text-sidebar-foreground/60 text-xxs px-2.5 font-semibold tracking-wider uppercase">
               {group.label}
             </SidebarGroupLabel>
             <SidebarGroupContent>
@@ -91,7 +91,7 @@ export function AdminSidebar() {
                         </Link>
                       </SidebarMenuButton>
                       {item.badge && (
-                        <SidebarMenuBadge className="bg-muted text-muted-foreground rounded-full px-2 py-0.5 text-[10px] font-semibold">
+                        <SidebarMenuBadge className="bg-muted text-muted-foreground text-xxs rounded-full px-2 py-0.5 font-semibold">
                           {item.badge}
                         </SidebarMenuBadge>
                       )}

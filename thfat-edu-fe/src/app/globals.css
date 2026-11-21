@@ -186,6 +186,9 @@
   --font-size-caption: 0.75rem;
   --font-weight-caption: 400;
   --line-height-caption: 1.4;
+
+  --font-size-xxs: 0.6875rem;
+  --line-height-xxs: 1rem;
   --sidebar: var(--neutral-50);
   --sidebar-foreground: var(--neutral-700);
   --sidebar-primary: var(--primary-700);
@@ -316,6 +319,8 @@
 
   /* Typography */
   --font-sans: var(--font-be-vietnam-pro), "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --text-xxs: 0.6875rem;
+  --text-xxs--line-height: 1rem;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -384,6 +389,16 @@
   font-size: var(--font-size-caption);
   font-weight: var(--font-weight-caption);
   line-height: var(--line-height-caption);
+}
+
+.text-xxs {
+  font-size: var(--font-size-xxs, 0.6875rem);
+  line-height: var(--line-height-xxs, 1rem);
+}
+
+@utility text-xxs {
+  font-size: var(--font-size-xxs, 0.6875rem);
+  line-height: var(--line-height-xxs, 1rem);
 }
 
 /* ============================================================
@@ -615,4 +630,105 @@ select:-webkit-autofill:active {
 
 .animate-pulse-aura {
   animation: pulse-aura 2.5s ease-in-out infinite;
+}
+
+/* ============================================================
+   LEADERBOARD PODIUM & CELEBRATION ANIMATIONS
+   ============================================================ */
+@keyframes float-gentle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes float-subtle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes sparkle-twinkle {
+  0%,
+  100% {
+    opacity: 0.3;
+    transform: scale(0.65) rotate(0deg);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15) rotate(90deg);
+  }
+}
+
+@keyframes ribbon-drift {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-7px) rotate(5deg);
+  }
+}
+
+@keyframes ribbon-drift-reverse {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotate(-5deg);
+  }
+}
+
+@keyframes crown-gleam {
+  0%,
+  100% {
+    filter: drop-shadow(0 2px 6px rgba(245, 158, 11, 0.5));
+  }
+  50% {
+    filter: drop-shadow(0 4px 14px rgba(251, 191, 36, 0.95))
+      drop-shadow(0 0 16px rgba(253, 224, 71, 0.8));
+  }
+}
+
+.animate-float-gentle {
+  animation: float-gentle 3.5s ease-in-out infinite;
+}
+
+.animate-float-subtle {
+  animation: float-subtle 4s ease-in-out infinite;
+}
+
+.animate-sparkle-twinkle {
+  animation: sparkle-twinkle 2.5s ease-in-out infinite;
+}
+
+.animate-ribbon-drift {
+  animation: ribbon-drift 4.5s ease-in-out infinite;
+}
+
+.animate-ribbon-drift-reverse {
+  animation: ribbon-drift-reverse 5.5s ease-in-out infinite;
+}
+
+.animate-crown-gleam {
+  animation: crown-gleam 3s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-gentle,
+  .animate-float-subtle,
+  .animate-sparkle-twinkle,
+  .animate-ribbon-drift,
+  .animate-ribbon-drift-reverse,
+  .animate-crown-gleam {
+    animation: none !important;
+  }
 }

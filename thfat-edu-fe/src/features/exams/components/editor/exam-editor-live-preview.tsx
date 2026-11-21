@@ -27,7 +27,7 @@ export function ExamEditorLivePreview({
           <Eye className="size-4" />
         </div>
         <p className="text-foreground text-xs font-semibold">Chưa chọn câu hỏi</p>
-        <p className="text-muted-foreground mt-1 text-[11px]">
+        <p className="text-muted-foreground text-xxs mt-1">
           Nhấp chuột vào bất kỳ câu hỏi nào trong mục lục để xem kết quả hiển thị trực tiếp.
         </p>
       </div>
@@ -44,7 +44,7 @@ export function ExamEditorLivePreview({
           <ChemRenderer content={question.contextContent} />
         </div>
       ) : (
-        <div className="text-muted-foreground bg-muted/10 border-border flex items-center gap-1.5 rounded-md border border-dashed p-2.5 text-[11px] italic">
+        <div className="text-muted-foreground bg-muted/10 border-border text-xxs flex items-center gap-1.5 rounded-md border border-dashed p-2.5 italic">
           <HelpCircle className="size-3.5" />
           <span>Chưa nhập nội dung ngữ cảnh đề bài...</span>
         </div>
@@ -65,7 +65,7 @@ export function ExamEditorLivePreview({
 
       {hasSubItems && sectionType === "true_false" && (
         <div className="border-border space-y-1.5 border-t pt-2.5">
-          <span className="text-muted-foreground text-[11px] font-semibold">Các ý phát biểu:</span>
+          <span className="text-muted-foreground text-xxs font-semibold">Các ý phát biểu:</span>
           <div className="space-y-1">
             {question.subItems.map((sub, idx) => {
               const isTrue = sub.correctAnswer === "Đúng" || sub.correctAnswer === "true";
@@ -79,14 +79,14 @@ export function ExamEditorLivePreview({
                     <span className="text-primary font-bold">
                       {sub.label || `${String.fromCharCode(97 + idx)})`}
                     </span>
-                    <div className="text-[11px]">
+                    <div className="text-xxs">
                       <ChemRenderer content={sub.content || "..."} />
                     </div>
                   </div>
 
                   <Badge
                     variant={isTrue ? "default" : "destructive"}
-                    className="shrink-0 px-1.5 py-0 text-[10px]"
+                    className="text-xxs shrink-0 px-1.5 py-0"
                   >
                     {isTrue ? "Đúng" : "Sai"}
                   </Badge>
@@ -104,12 +104,12 @@ export function ExamEditorLivePreview({
 
             return (
               <div key={sub.id || idx} className="space-y-1">
-                <div className="text-foreground flex items-start gap-1 text-[11px] font-semibold">
+                <div className="text-foreground text-xxs flex items-start gap-1 font-semibold">
                   <span className="shrink-0">Ý {idx + 1}:</span>
                   <ChemRenderer content={sub.content || "..."} />
                 </div>
                 {options.length > 0 && (
-                  <div className="grid grid-cols-2 gap-1 text-[11px]">
+                  <div className="text-xxs grid grid-cols-2 gap-1">
                     {options.map((optContent, optIdx) => {
                       const optKey = ["A", "B", "C", "D"][optIdx] || String(optIdx + 1);
                       const isCorrect = optKey === sub.correctAnswer;
@@ -139,16 +139,16 @@ export function ExamEditorLivePreview({
       {hasSubItems && sectionType === "matching" && (
         <div className="border-border space-y-2 border-t pt-2.5">
           <div className="space-y-1">
-            <span className="text-muted-foreground text-[11px] font-semibold">Các cặp ghép:</span>
+            <span className="text-muted-foreground text-xxs font-semibold">Các cặp ghép:</span>
             {question.subItems.map((sub, idx) => (
               <div
                 key={sub.id || idx}
-                className="bg-muted/30 border-border flex items-center justify-between rounded border px-2 py-1 text-[11px]"
+                className="bg-muted/30 border-border text-xxs flex items-center justify-between rounded border px-2 py-1"
               >
                 <div className="max-w-[200px] truncate">
                   <ChemRenderer content={sub.content || `Vế ${idx + 1}`} />
                 </div>
-                <Badge variant="secondary" className="font-mono text-[10px]">
+                <Badge variant="secondary" className="text-xxs font-mono">
                   ➜ {sub.correctAnswer || "Chưa ghép"}
                 </Badge>
               </div>
@@ -157,7 +157,7 @@ export function ExamEditorLivePreview({
 
           {question.subItems[0]?.options && question.subItems[0].options.length > 0 && (
             <div className="space-y-1 pt-1">
-              <span className="text-muted-foreground text-[11px] font-semibold">
+              <span className="text-muted-foreground text-xxs font-semibold">
                 Phương án đối chiếu:
               </span>
               <div className="grid grid-cols-1 gap-1">
@@ -167,7 +167,7 @@ export function ExamEditorLivePreview({
                   return (
                     <div
                       key={parsed.letter}
-                      className="bg-muted/20 border-border/60 flex items-center gap-1.5 rounded border px-2 py-0.5 text-[11px]"
+                      className="bg-muted/20 border-border/60 text-xxs flex items-center gap-1.5 rounded border px-2 py-0.5"
                     >
                       <span className="text-primary font-mono font-bold">{parsed.letter}.</span>
                       <div className="truncate">
@@ -184,7 +184,7 @@ export function ExamEditorLivePreview({
 
       {hasSubItems && sectionType === "short_answer" && (
         <div className="border-border space-y-1.5 border-t pt-2.5">
-          <div className="flex items-center justify-between text-[11px]">
+          <div className="text-xxs flex items-center justify-between">
             <span className="text-muted-foreground font-semibold">Đáp án chuẩn:</span>
             <Badge variant="default" className="font-mono text-xs">
               {question.subItems[0]?.correctAnswer || "Chưa nhập"}
@@ -192,7 +192,7 @@ export function ExamEditorLivePreview({
           </div>
           {question.subItems[0]?.acceptableAnswers &&
             question.subItems[0].acceptableAnswers.length > 0 && (
-              <div className="text-muted-foreground text-[10px]">
+              <div className="text-muted-foreground text-xxs">
                 Chấp nhận: {question.subItems[0].acceptableAnswers.join(", ")}
               </div>
             )}

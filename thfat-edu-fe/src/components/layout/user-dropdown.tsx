@@ -15,15 +15,7 @@ import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import type { TAuthUser, TUserRole } from "@/features/auth/types";
 import { cn } from "cn";
-import {
-  ChevronDown,
-  ChevronsUpDown,
-  FileText,
-  GraduationCap,
-  LogOut,
-  ShieldCheck,
-  Trophy,
-} from "lucide-react";
+import { ChevronDown, ChevronsUpDown, LogOut, User } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -54,9 +46,9 @@ function renderRoleBadge(role: TUserRole): ReactNode {
     return (
       <Badge
         variant="outline"
-        className="border-primary-200/80 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-300 text-[10px] font-semibold tracking-wide"
+        className="border-primary-200/80 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-300 text-xxs font-semibold tracking-wide"
       >
-        Admin
+        Quản trị viên
       </Badge>
     );
   }
@@ -65,7 +57,7 @@ function renderRoleBadge(role: TUserRole): ReactNode {
     return (
       <Badge
         variant="outline"
-        className="border-primary-200/80 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-300 text-[10px] font-semibold tracking-wide"
+        className="border-primary-200/80 bg-primary-50 text-primary-700 dark:border-primary-800 dark:bg-primary-950 dark:text-primary-300 text-xxs font-semibold tracking-wide"
       >
         Giáo viên
       </Badge>
@@ -75,7 +67,7 @@ function renderRoleBadge(role: TUserRole): ReactNode {
   return (
     <Badge
       variant="outline"
-      className="border-muted bg-muted text-muted-foreground dark:border-border text-[10px] font-semibold tracking-wide dark:bg-neutral-800 dark:text-neutral-300"
+      className="border-muted bg-muted text-muted-foreground dark:border-border text-xxs font-semibold tracking-wide dark:bg-neutral-800 dark:text-neutral-300"
     >
       Học viên
     </Badge>
@@ -97,7 +89,12 @@ function renderTrigger(
         )}
       >
         <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex size-8 shrink-0 items-center justify-center rounded-full shadow-2xs ring-2">
-          <BaseAvatar src={user.avatarUrl} name={user.fullName ?? undefined} size="default" />
+          <BaseAvatar
+            src={user.avatarUrl}
+            name={user.fullName ?? undefined}
+            gender={user.gender}
+            size="default"
+          />
         </div>
         <div className="grid flex-1 text-left text-sm leading-tight group-data-[collapsible=icon]:hidden">
           <span className="text-sidebar-foreground truncate font-semibold">
@@ -123,6 +120,7 @@ function renderTrigger(
         <BaseAvatar
           src={user.avatarUrl}
           name={user.fullName ?? undefined}
+          gender={user.gender}
           size="default"
           className="ring-1 ring-white/30"
         />
@@ -130,7 +128,7 @@ function renderTrigger(
           <span className="max-w-[120px] truncate text-xs leading-tight font-bold text-white">
             {user.fullName || "Tài khoản"}
           </span>
-          <span className="text-primary-200 text-[10px] leading-tight font-medium">
+          <span className="text-primary-200 text-xxs leading-tight font-medium">
             {getRoleLabel(user.role)}
           </span>
         </div>
@@ -149,13 +147,18 @@ function renderTrigger(
       )}
     >
       <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex size-7.5 shrink-0 items-center justify-center rounded-full shadow-2xs ring-2">
-        <BaseAvatar src={user.avatarUrl} name={user.fullName ?? undefined} size="default" />
+        <BaseAvatar
+          src={user.avatarUrl}
+          name={user.fullName ?? undefined}
+          gender={user.gender}
+          size="default"
+        />
       </div>
       <div className="hidden flex-col justify-center text-left md:flex">
         <span className="text-foreground text-xs leading-tight font-semibold">
           {user.fullName || "Admin"}
         </span>
-        <span className="text-primary-700 dark:text-primary-300 text-[10px] leading-tight font-medium">
+        <span className="text-primary-700 dark:text-primary-300 text-xxs leading-tight font-medium">
           {getRoleLabel(user.role)}
         </span>
       </div>
@@ -193,7 +196,12 @@ export function UserDropdown({
         <DropdownMenuLabel className="p-2 font-normal">
           <div className="flex items-center gap-3">
             <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex size-9 shrink-0 items-center justify-center rounded-full shadow-2xs ring-2">
-              <BaseAvatar src={user.avatarUrl} name={user.fullName ?? undefined} size="md" />
+              <BaseAvatar
+                src={user.avatarUrl}
+                name={user.fullName ?? undefined}
+                gender={user.gender}
+                size="md"
+              />
             </div>
             <div className="flex min-w-0 flex-1 flex-col space-y-0.5">
               <div className="flex items-center gap-1.5">
@@ -209,33 +217,10 @@ export function UserDropdown({
 
         <DropdownMenuSeparator className="my-1" />
 
-        {user.role === "admin" && (
-          <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
-            <Link href="/admin" className="flex w-full items-center gap-2.5">
-              <ShieldCheck className="text-primary-700 dark:text-primary-400 size-4" />
-              <span>Quản trị hệ thống</span>
-            </Link>
-          </DropdownMenuItem>
-        )}
-
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
-          <Link href="/" className="flex w-full items-center gap-2.5">
-            <GraduationCap className="text-muted-foreground size-4" />
-            <span>Trang chủ học tập</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
-          <Link href="/exams" className="flex w-full items-center gap-2.5">
-            <FileText className="text-muted-foreground size-4" />
-            <span>Kỳ thi & Luyện đề</span>
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
-          <Link href="/leaderboard" className="flex w-full items-center gap-2.5">
-            <Trophy className="text-muted-foreground size-4" />
-            <span>Bảng xếp hạng thành tích</span>
+          <Link href="/profile" className="flex w-full items-center gap-2.5">
+            <User className="text-muted-foreground size-4" />
+            <span>Thông tin cá nhân</span>
           </Link>
         </DropdownMenuItem>
 

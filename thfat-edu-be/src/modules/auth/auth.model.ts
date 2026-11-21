@@ -1,5 +1,11 @@
 import { type Static, t } from "elysia";
 
+import {
+  StudentProfileInputSchema,
+  TeacherProfileInputSchema,
+  UserGenderSchema,
+} from "../users/users.model";
+
 export const LoginBodySchema = t.Object({
   idToken: t.String({ minLength: 1, description: "Firebase ID Token" }),
 });
@@ -29,6 +35,7 @@ export const UserResponseSchema = t.Object({
   email: t.String(),
   fullName: t.String(),
   avatarUrl: t.Nullable(t.String()),
+  gender: t.Optional(t.Nullable(UserGenderSchema)),
   role: t.Union([t.Literal("student"), t.Literal("teacher"), t.Literal("admin")]),
   isActive: t.Boolean(),
   studentProfile: t.Optional(t.Nullable(StudentProfileResponseSchema)),
@@ -49,3 +56,13 @@ export const LogoutResponseSchema = t.Object({
 });
 
 export type TLogoutResponse = Static<typeof LogoutResponseSchema>;
+
+export const UpdateMeBodySchema = t.Object({
+  fullName: t.Optional(t.String({ minLength: 1 })),
+  avatarUrl: t.Optional(t.Nullable(t.String())),
+  gender: t.Optional(t.Nullable(UserGenderSchema)),
+  studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),
+  teacherProfile: t.Optional(t.Nullable(TeacherProfileInputSchema)),
+});
+
+export type TUpdateMeBody = Static<typeof UpdateMeBodySchema>;

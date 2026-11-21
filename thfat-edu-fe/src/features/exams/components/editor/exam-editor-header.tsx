@@ -58,14 +58,14 @@ export function ExamEditorHeader({
           {isDirty ? (
             <Badge
               variant="outline"
-              className="border-warning-500/30 bg-warning-500/10 text-warning-700 dark:text-warning-400 text-[11px] font-medium"
+              className="border-warning-500/30 bg-warning-500/10 text-warning-700 dark:text-warning-400 text-xxs font-medium"
             >
               Chưa lưu thay đổi
             </Badge>
           ) : (
             <Badge
               variant="outline"
-              className="border-success-500/30 bg-success-500/10 text-success-700 dark:text-success-400 text-[11px] font-medium"
+              className="border-success-500/30 bg-success-500/10 text-success-700 dark:text-success-400 text-xxs font-medium"
             >
               <Check className="mr-1 size-3" />
               Đã lưu

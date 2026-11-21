@@ -30,6 +30,7 @@ export type TUser = {
   email: string;
   fullName: string;
   avatarUrl: string | null;
+  gender?: "male" | "female" | "other" | null;
   role: TUserRole;
   isActive: boolean;
   createdAt: string;

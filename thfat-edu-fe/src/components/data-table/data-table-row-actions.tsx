@@ -12,7 +12,7 @@ import { MoreHorizontal } from "lucide-react";
 
 import { type TDataTableAction } from "./data-table.types";
 
-type TDataTableRowActionsProps<TData> = {
+export type TDataTableRowActionsProps<TData> = {
   row: TData;
   actions: TDataTableAction<TData>[];
 };
@@ -26,41 +26,43 @@ export function DataTableRowActions<TData>({ row, actions }: TDataTableRowAction
 
   if (visibleActions.length === 0) return null;
 
-  // Rule: If > 3 actions, render dropdown menu
+  // Render dropdown menu only when > 3 actions
   if (visibleActions.length > 3) {
     return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-muted-foreground hover:text-foreground size-8"
-            aria-label="Tùy chọn thao tác"
-          >
-            <MoreHorizontal className="size-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44 shadow-md">
-          {visibleActions.map((act) => {
-            const isDisabled =
-              typeof act.disabled === "function" ? act.disabled(row) : act.disabled;
+      <div className="flex items-center justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-muted-foreground hover:text-foreground size-8"
+              aria-label="Tùy chọn thao tác"
+            >
+              <MoreHorizontal className="size-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-44 shadow-md">
+            {visibleActions.map((act) => {
+              const isDisabled =
+                typeof act.disabled === "function" ? act.disabled(row) : act.disabled;
 
-            return (
-              <DropdownMenuItem
-                key={act.id}
-                disabled={isDisabled}
-                onClick={() => act.onClick(row)}
-                className={`cursor-pointer gap-2 text-xs font-medium ${
-                  act.variant === "destructive" ? "text-destructive focus:text-destructive" : ""
-                }`}
-              >
-                {act.icon}
-                <span>{act.label}</span>
-              </DropdownMenuItem>
-            );
-          })}
-        </DropdownMenuContent>
-      </DropdownMenu>
+              return (
+                <DropdownMenuItem
+                  key={act.id}
+                  disabled={isDisabled}
+                  onClick={() => act.onClick(row)}
+                  className={`cursor-pointer gap-2 text-xs font-medium ${
+                    act.variant === "destructive" ? "text-destructive focus:text-destructive" : ""
+                  }`}
+                >
+                  {act.icon}
+                  <span>{act.label}</span>
+                </DropdownMenuItem>
+              );
+            })}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     );
   }
 

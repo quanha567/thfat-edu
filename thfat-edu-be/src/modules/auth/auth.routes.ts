@@ -6,6 +6,8 @@ import {
   LoginBodySchema,
   LogoutResponseSchema,
   type TLoginBody,
+  type TUpdateMeBody,
+  UpdateMeBodySchema,
   UserResponseSchema,
 } from "./auth.model";
 import { AuthService } from "./auth.service";
@@ -28,6 +30,11 @@ type TGetCurrentUserHandlerOptions = {
   sessionToken: string;
 };
 
+type TUpdateMeHandlerOptions = {
+  authService: AuthService;
+  sessionToken: string;
+  body: TUpdateMeBody;
+};
 type TLogoutHandlerOptions = {
   authService: AuthService;
   sessionToken: string;
@@ -52,6 +59,16 @@ const getCurrentUserRouteConfig = {
     tags: ["Auth"],
     summary: "Lấy thông tin người dùng hiện tại",
     description: "Lấy thông tin người dùng từ HttpOnly session cookie",
+  },
+};
+
+const updateMeRouteConfig = {
+  body: UpdateMeBodySchema,
+  response: UserResponseSchema,
+  detail: {
+    tags: ["Auth"],
+    summary: "Cập nhật thông tin cá nhân của người dùng hiện tại",
+    description: "Cho phép user đang đăng nhập tự cập nhật fullName, avatarUrl và hồ sơ theo role",
   },
 };
 
@@ -104,6 +121,12 @@ export async function handleGetCurrentUser({
   return user;
 }
 
+export async function handleUpdateMe({ authService, sessionToken, body }: TUpdateMeHandlerOptions) {
+  const currentUser = await authService.getCurrentUser(sessionToken);
+
+  return authService.updateMe({ userId: currentUser.id, data: body });
+}
+
 export async function handleLogout({
   authService,
   sessionToken,
@@ -129,4 +152,5 @@ export const authRoutes = new Elysia({ prefix: "/auth" })
   }))
   .post("/login", handleLogin, loginRouteConfig)
   .get("/me", handleGetCurrentUser, getCurrentUserRouteConfig)
+  .patch("/me", handleUpdateMe, updateMeRouteConfig)
   .post("/logout", handleLogout, logoutRouteConfig);

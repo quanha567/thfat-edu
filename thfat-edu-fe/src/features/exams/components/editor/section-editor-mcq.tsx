@@ -161,7 +161,7 @@ export function SectionEditorMcq({
                 Danh sách câu hỏi trong chùm:
               </span>
               <div className="flex items-center gap-2">
-                <span className="text-muted-foreground text-[11px] font-medium">
+                <span className="text-muted-foreground text-xxs font-medium">
                   {question.subItems.length} câu hỏi
                 </span>
                 {editorMode === "edit" && (

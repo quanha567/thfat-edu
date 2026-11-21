@@ -78,7 +78,7 @@ export function ExamCreateProgressCard({
 
         <div
           ref={logContainerRef}
-          className="max-h-48 space-y-1.5 overflow-y-auto rounded-lg bg-neutral-950 p-3 font-mono text-[11px] text-neutral-200 shadow-inner"
+          className="text-xxs max-h-48 space-y-1.5 overflow-y-auto rounded-lg bg-neutral-950 p-3 font-mono text-neutral-200 shadow-inner"
         >
           {logs.length === 0 ? (
             <p className="text-neutral-500 italic">Nhật ký xử lý sẽ hiển thị tại đây...</p>

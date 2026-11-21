@@ -59,7 +59,7 @@ export function createExamColumns({
           <div className="text-foreground font-medium">
             {row.original.durationMinutes} phút • {row.original.totalPoints} điểm
           </div>
-          <div className="text-muted-foreground text-[11px]">
+          <div className="text-muted-foreground text-xxs">
             {row.original.totalQuestions} câu hỏi • {row.original.totalSubItems} ý trả lời
           </div>
         </div>

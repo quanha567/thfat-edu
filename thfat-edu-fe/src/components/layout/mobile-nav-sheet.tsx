@@ -63,6 +63,7 @@ export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
                   <BaseAvatar
                     src={user.avatarUrl}
                     name={user.fullName ?? undefined}
+                    gender={user.gender}
                     size="md"
                     fallbackClassName="bg-gradient-to-tr from-primary-600 to-primary-400 text-white font-bold text-xs"
                   />

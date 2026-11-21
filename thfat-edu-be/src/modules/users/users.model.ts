@@ -7,6 +7,13 @@ export const UserRoleSchema = t.Union([
 ]);
 export type TUserRole = Static<typeof UserRoleSchema>;
 
+export const UserGenderSchema = t.Union([
+  t.Literal("male"),
+  t.Literal("female"),
+  t.Literal("other"),
+]);
+export type TUserGender = Static<typeof UserGenderSchema>;
+
 export const UserRoleFilterSchema = t.Union([
   t.Literal("all"),
   t.Literal("student"),
@@ -67,6 +74,7 @@ export const UserDetailResponseSchema = t.Object({
   email: t.String(),
   fullName: t.String(),
   avatarUrl: t.Nullable(t.String()),
+  gender: t.Optional(t.Nullable(UserGenderSchema)),
   role: UserRoleSchema,
   isActive: t.Boolean(),
   createdAt: t.String(),
@@ -103,6 +111,7 @@ export const CreateUserBodySchema = t.Object({
   password: t.String({ minLength: 6 }),
   sendResetEmail: t.Optional(t.Boolean()),
   avatarUrl: t.Optional(t.Nullable(t.String())),
+  gender: t.Optional(t.Nullable(UserGenderSchema)),
   studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),
   teacherProfile: t.Optional(t.Nullable(TeacherProfileInputSchema)),
 });
@@ -112,6 +121,7 @@ export const UpdateUserBodySchema = t.Object({
   fullName: t.Optional(t.String({ minLength: 1 })),
   role: t.Optional(UserRoleSchema),
   avatarUrl: t.Optional(t.Nullable(t.String())),
+  gender: t.Optional(t.Nullable(UserGenderSchema)),
   isActive: t.Optional(t.Boolean()),
   studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),
   teacherProfile: t.Optional(t.Nullable(TeacherProfileInputSchema)),

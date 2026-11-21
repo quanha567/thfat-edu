@@ -165,7 +165,7 @@ export function SectionEditorMatching({
               <span className="text-foreground text-xs font-semibold">
                 Cấu hình các vế ghép và phương án:
               </span>
-              <span className="text-muted-foreground text-[11px] font-medium">
+              <span className="text-muted-foreground text-xxs font-medium">
                 {question.subItems.length} vế ghép • {options.length} phương án
               </span>
             </div>

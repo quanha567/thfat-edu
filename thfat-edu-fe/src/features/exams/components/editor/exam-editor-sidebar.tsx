@@ -94,7 +94,7 @@ export function ExamEditorSidebar({
             >
               <ListOrdered className="size-3.5" />
               <span>Mục lục</span>
-              <span className="bg-muted py-0.2 text-muted-foreground rounded px-1.5 text-[10px] font-bold">
+              <span className="bg-muted py-0.2 text-muted-foreground text-xxs rounded px-1.5 font-bold">
                 {totalQuestions}
               </span>
               {hasErrors && (
@@ -110,7 +110,7 @@ export function ExamEditorSidebar({
               {resolvedQuestionNumber ? (
                 <Badge
                   variant="secondary"
-                  className="bg-primary/10 text-primary h-4 border-0 px-1.5 text-[10px] font-bold"
+                  className="bg-primary/10 text-primary text-xxs h-4 border-0 px-1.5 font-bold"
                 >
                   Câu {resolvedQuestionNumber}
                 </Badge>

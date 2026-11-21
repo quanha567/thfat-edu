@@ -1,0 +1,4 @@
+packages:
+  - "thfat-edu-fe"
+  - "thfat-edu-be"
+  - "packages/*"

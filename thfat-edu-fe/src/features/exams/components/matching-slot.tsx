@@ -135,7 +135,7 @@ export function MatchingSlot({
                 }`}
               >
                 <span
-                  className={`flex h-5 w-5 shrink-0 items-center justify-center rounded text-[11px] font-bold ${
+                  className={`text-xxs flex h-5 w-5 shrink-0 items-center justify-center rounded font-bold ${
                     isSelected ? "bg-primary-600 text-white" : "bg-neutral-200 text-neutral-700"
                   }`}
                 >

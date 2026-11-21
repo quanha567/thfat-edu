@@ -125,7 +125,7 @@ export function SectionEditorShortAnswer({
               <span className="text-foreground text-xs font-semibold">
                 Thiết lập đáp án & Lời giải:
               </span>
-              <span className="text-muted-foreground text-[11px] font-medium">1 ô trả lời</span>
+              <span className="text-muted-foreground text-xxs font-medium">1 ô trả lời</span>
             </div>
 
             {editorMode === "preview" ? (

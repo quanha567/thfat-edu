@@ -84,7 +84,7 @@ export function ExamMarkdownEditor({
     return (
       <div className={`space-y-1 ${className}`}>
         {label ? (
-          <span className="text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
+          <span className="text-muted-foreground text-xxs font-bold tracking-wider uppercase">
             {label}
           </span>
         ) : null}
@@ -141,7 +141,7 @@ export function ExamMarkdownEditor({
           rows={1}
           className="border-border/60 bg-muted/20 text-foreground placeholder:text-muted-foreground/50 hover:bg-muted/30 focus-visible:border-primary/60 focus-visible:bg-background focus-visible:ring-primary/20 field-sizing-content min-h-[34px] w-full resize-none rounded-md border px-2 py-1 text-xs font-medium transition-colors focus-visible:ring-1"
         />
-        {error ? <p className="text-destructive text-[11px] font-medium">{error}</p> : null}
+        {error ? <p className="text-destructive text-xs font-medium">{error}</p> : null}
       </div>
     );
   }
@@ -163,7 +163,7 @@ export function ExamMarkdownEditor({
       {(label || showRenderedView) && (
         <div className="border-border/35 flex items-center justify-between border-b px-3 py-1.5 text-xs">
           {label ? (
-            <span className="text-muted-foreground text-[11px] font-bold tracking-wider uppercase">
+            <span className="text-muted-foreground text-xxs font-bold tracking-wider uppercase">
               {label}
             </span>
           ) : (
@@ -174,7 +174,7 @@ export function ExamMarkdownEditor({
             <button
               type="button"
               onClick={handleStartEditing}
-              className="text-primary hover:text-primary/80 flex cursor-pointer items-center gap-1 text-[11px] font-semibold transition-colors"
+              className="text-primary hover:text-primary/80 text-xxs flex cursor-pointer items-center gap-1 font-semibold transition-colors"
             >
               <Pencil className="size-3" />
               <span>Nhấp để sửa</span>
@@ -220,7 +220,7 @@ export function ExamMarkdownEditor({
                   }
                   setIsEditing(false);
                 }}
-                className="text-muted-foreground hover:text-foreground h-6 gap-1 px-2 text-[11px] font-semibold"
+                className="text-muted-foreground hover:text-foreground text-xxs h-6 gap-1 px-2 font-semibold"
               >
                 <Check className="text-success-600 dark:text-success-400 size-3" />
                 Xong (Xem trước)
@@ -230,7 +230,7 @@ export function ExamMarkdownEditor({
         </div>
       )}
 
-      {error ? <p className="text-destructive p-2 text-[11px] font-medium">{error}</p> : null}
+      {error ? <p className="text-destructive p-2 text-xs font-medium">{error}</p> : null}
     </div>
   );
 }

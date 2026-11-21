@@ -1,4 +1,4 @@
-import { getAvatarGradient, getInitials } from "@/components/base";
+import { getAvatarGradient, getDefaultAvatar, getInitials } from "@/components/base";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Clock, Trophy } from "lucide-react";
 
@@ -18,7 +18,7 @@ export function LeaderboardPinnedBar({ myRank }: TLeaderboardPinnedBarProps) {
   }
 
   return (
-    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 mx-auto max-w-4xl px-4">
+    <div className="pointer-events-none fixed inset-x-0 bottom-4 z-40 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
       <div className="border-primary-200/80 pointer-events-auto flex items-center justify-between gap-4 rounded-2xl border bg-white/95 px-5 py-3.5 shadow-2xl backdrop-blur-md">
         <div className="flex items-center gap-3">
           <div className="bg-primary text-primary-foreground flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-sm font-extrabold shadow-md">
@@ -26,7 +26,14 @@ export function LeaderboardPinnedBar({ myRank }: TLeaderboardPinnedBarProps) {
           </div>
 
           <Avatar className="border-primary-100 h-9 w-9 border">
-            <AvatarImage src={myRank.avatarUrl ?? undefined} alt={myRank.fullName} />
+            {(myRank.avatarUrl || getDefaultAvatar(myRank.fullName, myRank.gender)) && (
+              <AvatarImage
+                src={
+                  myRank.avatarUrl || getDefaultAvatar(myRank.fullName, myRank.gender) || undefined
+                }
+                alt={myRank.fullName}
+              />
+            )}
             <AvatarFallback
               className={`bg-gradient-to-br ${getAvatarGradient(myRank.fullName)} text-xs font-bold text-white shadow-inner ring-1 ring-white/20 select-none`}
             >

@@ -21,6 +21,7 @@ export type TAuthUser = {
   email: string;
   fullName: string;
   avatarUrl: Nullable<string>;
+  gender?: Nullable<"male" | "female" | "other">;
   role: TUserRole;
   isActive: boolean;
   studentProfile?: Nullable<TStudentProfile>;

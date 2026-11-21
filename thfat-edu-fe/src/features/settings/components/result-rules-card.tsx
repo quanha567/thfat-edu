@@ -99,7 +99,7 @@ export function ResultRulesCard({ control }: TResultRulesCardProps) {
                         />
                         <span>{opt.title}</span>
                       </div>
-                      <p className="text-muted-foreground text-[11px] leading-relaxed">
+                      <p className="text-muted-foreground text-xxs leading-relaxed">
                         {opt.description}
                       </p>
                     </button>

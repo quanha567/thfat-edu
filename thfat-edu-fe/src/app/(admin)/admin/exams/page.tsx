@@ -11,7 +11,7 @@ export const metadata = {
 
 export default function AdminExamsPage() {
   return (
-    <div className="flex h-full min-h-0 flex-1 flex-col gap-4 p-4 md:p-6 lg:px-8 lg:py-6">
+    <div className="flex h-full min-h-0 flex-1 flex-col gap-4 overflow-hidden p-4 md:p-6 lg:px-8 lg:py-6">
       <AdminPageHeader
         title="Đề thi"
         actions={
@@ -23,7 +23,9 @@ export default function AdminExamsPage() {
           </Button>
         }
       />
-      <ExamListTable />
+      <div className="flex min-h-0 flex-1 flex-col">
+        <ExamListTable />
+      </div>
     </div>
   );
 }

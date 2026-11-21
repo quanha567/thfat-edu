@@ -32,3 +32,32 @@ export function useDeleteArticle() {
     },
   });
 }
+
+export function useBatchDeleteArticles() {
+  const queryClient = useQueryClient();
+
+  return useMutation<{ success: boolean }, Error, string[]>({
+    mutationFn: async (ids: string[]) => {
+      const baseUrl = getApiBaseUrl();
+      await Promise.all(
+        ids.map(async (id) => {
+          const res = await fetch(`${baseUrl}/admin/articles/${id}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+
+          if (!res.ok) {
+            const errorData = await res.json().catch(() => null);
+            throw new Error(extractApiErrorMessage(errorData, "Không thể xóa bài viết."));
+          }
+        }),
+      );
+
+      return { success: true };
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: queryKeys.articles.all });
+      queryClient.invalidateQueries({ queryKey: queryKeys.categories.all });
+    },
+  });
+}
