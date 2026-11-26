@@ -1,5 +1,16 @@
 import * as pdfjs from "pdfjs-dist/legacy/build/pdf.mjs";
+// @ts-expect-error pdfjs-dist ships no type declarations for the worker entry
+import { WorkerMessageHandler } from "pdfjs-dist/legacy/build/pdf.worker.mjs";
 import sharp from "sharp";
+
+import { createModuleLogger } from "../../config/logger";
+
+// Serverless bundles don't ship pdf.worker.mjs, so pdfjs's dynamic import of it
+// fails ("Setting up fake worker failed"). Importing it statically bundles it
+// and pre-registers the handler so pdfjs skips the dynamic import.
+Object.assign(globalThis, { pdfjsWorker: { WorkerMessageHandler } });
+
+const pdfLogger = createModuleLogger("pdf-extractor");
 
 export type TPdfExtractedPage = {
   pageNumber: number;
@@ -112,7 +123,9 @@ async function convertRawImageToBase64(imgData: TImageRawData): Promise<string |
       .toBuffer();
 
     return `data:image/png;base64,${pngBuffer.toString("base64")}`;
-  } catch {
+  } catch (error) {
+    pdfLogger.warn({ err: error, operation: "convertRawImage" }, "failed to convert PDF image");
+
     return null;
   }
 }
@@ -137,7 +150,9 @@ async function fetchPageImageBase64(
     }
 
     return await convertRawImageToBase64(rawImg);
-  } catch {
+  } catch (error) {
+    pdfLogger.warn({ err: error, operation: "fetchPageImage" }, "failed to fetch PDF page image");
+
     return null;
   }
 }
