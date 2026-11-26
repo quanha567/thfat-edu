@@ -1,6 +1,7 @@
 import { type InferInsertModel, type InferSelectModel, relations } from "drizzle-orm";
 import {
   boolean,
+  index,
   integer,
   jsonb,
   numeric,
@@ -42,43 +43,55 @@ export const quizzes = pgTable("quizzes", {
   deletedAt: timestamp("deleted_at", { withTimezone: true }),
 });
 
-export const quizSections = pgTable("quiz_sections", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  quizId: uuid("quiz_id")
-    .notNull()
-    .references(() => quizzes.id, { onDelete: "cascade" }),
-  sectionType: sectionTypeEnum("section_type").notNull(),
-  title: varchar("title", { length: 255 }).notNull(),
-  orderIndex: integer("order_index").default(0).notNull(),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const quizSections = pgTable(
+  "quiz_sections",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    quizId: uuid("quiz_id")
+      .notNull()
+      .references(() => quizzes.id, { onDelete: "cascade" }),
+    sectionType: sectionTypeEnum("section_type").notNull(),
+    title: varchar("title", { length: 255 }).notNull(),
+    orderIndex: integer("order_index").default(0).notNull(),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index("idx_quiz_sections_quiz_id").on(table.quizId)],
+);
 
-export const quizQuestions = pgTable("quiz_questions", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  sectionId: uuid("section_id")
-    .notNull()
-    .references(() => quizSections.id, { onDelete: "cascade" }),
-  orderIndex: integer("order_index").default(0).notNull(),
-  contextContent: text("context_content").notNull(),
-  imageUrl: text("image_url"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const quizQuestions = pgTable(
+  "quiz_questions",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    sectionId: uuid("section_id")
+      .notNull()
+      .references(() => quizSections.id, { onDelete: "cascade" }),
+    orderIndex: integer("order_index").default(0).notNull(),
+    contextContent: text("context_content").notNull(),
+    imageUrl: text("image_url"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index("idx_quiz_questions_section_id").on(table.sectionId)],
+);
 
-export const quizSubItems = pgTable("quiz_sub_items", {
-  id: uuid("id").defaultRandom().primaryKey(),
-  questionId: uuid("question_id")
-    .notNull()
-    .references(() => quizQuestions.id, { onDelete: "cascade" }),
-  orderIndex: integer("order_index").default(0).notNull(),
-  label: varchar("label", { length: 32 }).notNull(),
-  content: text("content").notNull(),
-  options: jsonb("options").$type<string[]>(),
-  correctAnswer: text("correct_answer"),
-  acceptableAnswers: jsonb("acceptable_answers").$type<string[]>(),
-  points: numeric("points", { precision: 4, scale: 2 }).default("1.50").notNull(),
-  explanation: text("explanation"),
-  createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
-});
+export const quizSubItems = pgTable(
+  "quiz_sub_items",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    questionId: uuid("question_id")
+      .notNull()
+      .references(() => quizQuestions.id, { onDelete: "cascade" }),
+    orderIndex: integer("order_index").default(0).notNull(),
+    label: varchar("label", { length: 32 }).notNull(),
+    content: text("content").notNull(),
+    options: jsonb("options").$type<string[]>(),
+    correctAnswer: text("correct_answer"),
+    acceptableAnswers: jsonb("acceptable_answers").$type<string[]>(),
+    points: numeric("points", { precision: 4, scale: 2 }).default("1.50").notNull(),
+    explanation: text("explanation"),
+    createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+  },
+  (table) => [index("idx_quiz_sub_items_question_id").on(table.questionId)],
+);
 
 export const quizzesRelations = relations(quizzes, ({ one, many }) => ({
   author: one(users, {

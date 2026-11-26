@@ -1,4 +1,6 @@
-import { and, eq, gt, isNull } from "drizzle-orm";
+import { createHash, randomBytes } from "node:crypto";
+
+import { and, eq, gt, isNull, lt } from "drizzle-orm";
 
 import { updateFirebaseUser, verifyFirebaseIdToken } from "../../config/firebase";
 import { createModuleLogger, setRequestUserId } from "../../config/logger";
@@ -10,18 +12,13 @@ import { type TUpdateMeBody, type TUserResponse } from "./auth.model";
 
 const authLogger = createModuleLogger("auth");
 
-declare const Bun:
-  | {
-      randomUUIDv7?: (format?: string) => string;
-    }
-  | undefined;
-
+/** Token phiên ngẫu nhiên 256 bit. Chỉ giá trị băm (SHA-256) được lưu trong DB. */
 export function generateSessionToken(): string {
-  if (typeof Bun !== "undefined" && typeof Bun?.randomUUIDv7 === "function") {
-    return Bun.randomUUIDv7();
-  }
+  return randomBytes(32).toString("base64url");
+}
 
-  return crypto.randomUUID();
+export function hashSessionToken(token: string): string {
+  return createHash("sha256").update(token).digest("hex");
 }
 
 export type TLoginOptions = {
@@ -44,9 +41,7 @@ export class AuthService {
     } catch (error) {
       authLogger.warn({ err: error, reason: "invalid_firebase_token" }, "login failed");
 
-      throw new UnauthorizedError(
-        `Firebase token không hợp lệ hoặc đã hết hạn: ${(error as Error).message}`,
-      );
+      throw new UnauthorizedError("Firebase token không hợp lệ hoặc đã hết hạn.");
     }
 
     const email = decodedToken.email.toLowerCase().trim();
@@ -76,6 +71,14 @@ export class AuthService {
     }
 
     if (!existingUser.firebaseUid || existingUser.firebaseUid !== decodedToken.uid) {
+      // Chỉ liên kết/đổi liên kết Firebase khi Firebase xác nhận chủ sở hữu email, tránh việc
+      // đăng ký Firebase bằng email chưa xác minh để chiếm tài khoản đã được cấp phép.
+      if (!decodedToken.emailVerified) {
+        authLogger.warn({ reason: "email_not_verified" }, "login failed");
+
+        throw new ForbiddenError("Email chưa được xác minh. Vui lòng xác minh email rồi thử lại.");
+      }
+
       await this.database
         .update(users)
         .set({
@@ -90,9 +93,12 @@ export class AuthService {
 
     const expiresAt = new Date(Date.now() + SESSION_COOKIE_MAX_AGE * 1000);
 
+    // Dọn phiên đã hết hạn (rẻ nhờ index expires_at) để bảng không phình mãi.
+    await this.database.delete(sessions).where(lt(sessions.expiresAt, new Date()));
+
     await this.database.insert(sessions).values({
       userId: existingUser.id,
-      sessionToken,
+      sessionToken: hashSessionToken(sessionToken),
       userAgent: userAgent || null,
       ipAddress: ipAddress || null,
       expiresAt,
@@ -113,29 +119,32 @@ export class AuthService {
       throw new UnauthorizedError("Không tìm thấy phiên đăng nhập.");
     }
 
-    const [activeSession] = await this.database
-      .select()
+    // Một truy vấn join thay cho 3 truy vấn tuần tự (session → user → user lần nữa).
+    const [row] = await this.database
+      .select({ user: users })
       .from(sessions)
-      .where(and(eq(sessions.sessionToken, sessionToken), gt(sessions.expiresAt, new Date())))
+      .innerJoin(users, eq(users.id, sessions.userId))
+      .where(
+        and(
+          eq(sessions.sessionToken, hashSessionToken(sessionToken)),
+          gt(sessions.expiresAt, new Date()),
+        ),
+      )
       .limit(1);
 
-    if (!activeSession) {
+    if (!row) {
       throw new UnauthorizedError("Phiên đăng nhập đã hết hạn hoặc không tồn tại.");
     }
 
-    const [user] = await this.database
-      .select()
-      .from(users)
-      .where(and(eq(users.id, activeSession.userId), isNull(users.deletedAt)))
-      .limit(1);
+    const { user } = row;
 
-    if (!user || !user.isActive) {
+    if (user.deletedAt || !user.isActive) {
       throw new UnauthorizedError("Tài khoản không hợp lệ hoặc đã bị vô hiệu hóa.");
     }
 
     setRequestUserId(user.id);
 
-    return this.getUserWithProfile(user.id);
+    return this.buildUserResponse(user);
   }
 
   public async logout(sessionToken: string): Promise<void> {
@@ -143,7 +152,9 @@ export class AuthService {
       return;
     }
 
-    await this.database.delete(sessions).where(eq(sessions.sessionToken, sessionToken));
+    await this.database
+      .delete(sessions)
+      .where(eq(sessions.sessionToken, hashSessionToken(sessionToken)));
   }
 
   private async getUserWithProfile(userId: string): Promise<TUserResponse> {
@@ -157,6 +168,10 @@ export class AuthService {
       throw new UnauthorizedError("Không tìm thấy thông tin người dùng.");
     }
 
+    return this.buildUserResponse(user);
+  }
+
+  private async buildUserResponse(user: typeof users.$inferSelect): Promise<TUserResponse> {
     let studentProfile = null;
     let teacherProfile = null;
 

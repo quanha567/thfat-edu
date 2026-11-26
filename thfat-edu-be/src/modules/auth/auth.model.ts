@@ -1,6 +1,7 @@
 import { type Static, t } from "elysia";
 
 import {
+  AvatarUrlSchema,
   StudentProfileInputSchema,
   TeacherProfileInputSchema,
   UserGenderSchema,
@@ -59,7 +60,7 @@ export type TLogoutResponse = Static<typeof LogoutResponseSchema>;
 
 export const UpdateMeBodySchema = t.Object({
   fullName: t.Optional(t.String({ minLength: 1 })),
-  avatarUrl: t.Optional(t.Nullable(t.String())),
+  avatarUrl: t.Optional(t.Nullable(AvatarUrlSchema)),
   gender: t.Optional(t.Nullable(UserGenderSchema)),
   studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),
   teacherProfile: t.Optional(t.Nullable(TeacherProfileInputSchema)),

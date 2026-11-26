@@ -44,7 +44,7 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
       return attemptsService.startOrResumeAttempt(id, currentUser.id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       detail: {
         tags: ["Student Exams"],
         summary: "Bắt đầu hoặc khôi phục phiên làm bài thi thử",
@@ -57,7 +57,7 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
       return attemptsService.syncAnswers(id, currentUser.id, body.answers);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       body: SyncAnswersBodySchema,
       detail: {
         tags: ["Student Exams"],
@@ -71,7 +71,7 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
       return attemptsService.submitAndGradeAttempt(id, currentUser.id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: SubmitAttemptResponseSchema,
       detail: {
         tags: ["Student Exams"],
@@ -85,7 +85,7 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
       return attemptsService.getAttemptResult(id, currentUser.id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: AttemptResultSchema,
       detail: {
         tags: ["Student Exams"],

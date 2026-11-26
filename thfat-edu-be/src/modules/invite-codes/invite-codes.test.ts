@@ -176,7 +176,7 @@ describe("Invite codes routes", () => {
 
   it("lets admin revoke a code", async () => {
     const res = await adminApp.handle(
-      new Request("http://localhost/invite-codes/code-1/revoke", {
+      new Request("http://localhost/invite-codes/22222222-2222-4222-8222-222222222222/revoke", {
         method: "POST",
         headers: adminHeaders,
       }),

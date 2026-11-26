@@ -23,7 +23,10 @@ export function useStartExam() {
 
       if (!res.ok) {
         const errorData = await res.json().catch(() => null);
-        throw new Error(extractApiErrorMessage(errorData, "Không thể bắt đầu làm bài thi."));
+        throw Object.assign(
+          new Error(extractApiErrorMessage(errorData, "Không thể bắt đầu làm bài thi.")),
+          { status: res.status },
+        );
       }
 
       return res.json();

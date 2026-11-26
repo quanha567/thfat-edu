@@ -17,7 +17,13 @@ export function LoginCard() {
   const [isEmailBusy, setIsEmailBusy] = useState(false);
 
   function handleLoginSuccess(user: TAuthUser) {
-    if (redirectUrl && redirectUrl.startsWith("/")) {
+    const isSafeRedirect =
+      redirectUrl !== null &&
+      redirectUrl.startsWith("/") &&
+      !redirectUrl.startsWith("//") &&
+      !redirectUrl.startsWith("/\\");
+
+    if (redirectUrl && isSafeRedirect) {
       router.push(redirectUrl);
 
       return;

@@ -13,7 +13,7 @@ import {
 } from "../../db/schema";
 import { AppError, BadRequestError, NotFoundError } from "../../middlewares/error-handler";
 import { SESSION_COOKIE_MAX_AGE } from "../auth/auth.cookie";
-import { generateSessionToken } from "../auth/auth.service";
+import { generateSessionToken, hashSessionToken } from "../auth/auth.service";
 import {
   DEFAULT_EXPIRES_IN_DAYS,
   type TCreateInviteCodesBody,
@@ -307,7 +307,7 @@ export class InviteCodesService {
 
         await tx.insert(sessions).values({
           userId: newUser.id,
-          sessionToken,
+          sessionToken: hashSessionToken(sessionToken),
           userAgent: clientInfo.userAgent || null,
           ipAddress: clientInfo.ipAddress || null,
           expiresAt: new Date(Date.now() + SESSION_COOKIE_MAX_AGE * 1000),

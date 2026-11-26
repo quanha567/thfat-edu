@@ -68,7 +68,7 @@ export const inviteCodesRoutes = new Elysia({ prefix: "/invite-codes" })
     "/:id/revoke",
     async ({ inviteCodesService, params: { id } }) => inviteCodesService.revoke(id),
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: InviteCodeResponseSchema,
       detail: {
         tags: ["Invite Codes"],

@@ -1,6 +1,8 @@
 import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
+import { containsPattern } from "../../db/like";
+import { examAttempts } from "../../db/schema/attempts";
 import {
   quizQuestions,
   quizSections,
@@ -8,8 +10,9 @@ import {
   quizzes,
   type TQuiz,
 } from "../../db/schema/quizzes";
-import { NotFoundError } from "../../middlewares/error-handler";
+import { ConflictError, NotFoundError } from "../../middlewares/error-handler";
 import { nvidiaNimService } from "../../services/ai/nvidia-nim.service";
+import { loadQuizCounts, loadQuizStructure } from "./quiz-structure";
 import {
   type TCreateQuizInput,
   type TQuizListQuery,
@@ -20,6 +23,8 @@ import {
   type TSolveQuestionResponse,
   type TUpdateQuizInput,
 } from "./quizzes.model";
+
+type TExecutor = Parameters<Parameters<Database["transaction"]>[0]>[0] | Database;
 
 export class QuizzesService {
   constructor(private readonly database: Database = db) {}
@@ -36,7 +41,7 @@ export class QuizzesService {
     }
 
     if (query.search) {
-      conditions.push(ilike(quizzes.title, `%${query.search.trim()}%`));
+      conditions.push(ilike(quizzes.title, containsPattern(query.search)));
     }
 
     const whereClause = and(...conditions);
@@ -66,52 +71,24 @@ export class QuizzesService {
       .limit(limit)
       .offset(offset);
 
-    const items = await Promise.all(
-      quizList.map(async (quiz) => {
-        const sections = await this.database
-          .select({ id: quizSections.id })
-          .from(quizSections)
-          .where(eq(quizSections.quizId, quiz.id));
-
-        const sectionIds = sections.map((s) => s.id);
-
-        let totalQuestions = 0;
-        let totalSubItems = 0;
-
-        if (sectionIds.length > 0) {
-          const questions = await this.database
-            .select({ id: quizQuestions.id })
-            .from(quizQuestions)
-            .where(sql`${quizQuestions.sectionId} IN ${sectionIds}`);
-
-          totalQuestions = questions.length;
-          const questionIds = questions.map((q) => q.id);
-
-          if (questionIds.length > 0) {
-            const [subItemsCount] = await this.database
-              .select({ count: sql<number>`count(*)::int` })
-              .from(quizSubItems)
-              .where(sql`${quizSubItems.questionId} IN ${questionIds}`);
-
-            totalSubItems = subItemsCount?.count ?? 0;
-          }
-        }
-
-        return {
-          id: quiz.id,
-          title: quiz.title,
-          description: quiz.description,
-          durationMinutes: quiz.durationMinutes,
-          totalPoints: quiz.totalPoints,
-          status: quiz.status,
-          pdfUrl: quiz.pdfUrl,
-          totalQuestions,
-          totalSubItems,
-          createdAt: quiz.createdAt.toISOString(),
-          updatedAt: quiz.updatedAt.toISOString(),
-        };
-      }),
+    const counts = await loadQuizCounts(
+      this.database,
+      quizList.map((quiz) => quiz.id),
     );
+
+    const items = quizList.map((quiz) => ({
+      id: quiz.id,
+      title: quiz.title,
+      description: quiz.description,
+      durationMinutes: quiz.durationMinutes,
+      totalPoints: quiz.totalPoints,
+      status: quiz.status,
+      pdfUrl: quiz.pdfUrl,
+      totalQuestions: counts.get(quiz.id)?.totalQuestions ?? 0,
+      totalSubItems: counts.get(quiz.id)?.totalSubItems ?? 0,
+      createdAt: quiz.createdAt.toISOString(),
+      updatedAt: quiz.updatedAt.toISOString(),
+    }));
 
     return {
       items,
@@ -131,67 +108,35 @@ export class QuizzesService {
       throw new NotFoundError("Không tìm thấy đề thi.");
     }
 
-    const sections = await this.database
-      .select()
-      .from(quizSections)
-      .where(eq(quizSections.quizId, id))
-      .orderBy(quizSections.orderIndex);
-
-    const fullSections = await Promise.all(
-      sections.map(async (sec) => {
-        const questions = await this.database
-          .select()
-          .from(quizQuestions)
-          .where(eq(quizQuestions.sectionId, sec.id))
-          .orderBy(quizQuestions.orderIndex);
-
-        const fullQuestions = await Promise.all(
-          questions.map(async (q) => {
-            const subItems = await this.database
-              .select()
-              .from(quizSubItems)
-              .where(eq(quizSubItems.questionId, q.id))
-              .orderBy(quizSubItems.orderIndex);
-
-            return {
-              ...q,
-              subItems,
-            };
-          }),
-        );
-
-        return {
-          ...sec,
-          questions: fullQuestions,
-        };
-      }),
-    );
+    const sections = await loadQuizStructure(this.database, id);
 
     return {
       ...quiz,
-      sections: fullSections,
+      sections,
     };
   }
 
   public async createQuiz(input: TCreateQuizInput, userId?: string): Promise<TQuiz> {
-    const [quiz] = await this.database
-      .insert(quizzes)
-      .values({
-        title: input.title,
-        description: input.description,
-        durationMinutes: input.durationMinutes,
-        totalPoints: input.totalPoints ?? "150.00",
-        status: input.status ?? "draft",
-        pdfUrl: input.pdfUrl,
-        createdBy: userId,
-      })
-      .returning();
+    return this.database.transaction(async (tx) => {
+      const [quiz] = await tx
+        .insert(quizzes)
+        .values({
+          title: input.title,
+          description: input.description,
+          durationMinutes: input.durationMinutes,
+          totalPoints: input.totalPoints ?? "150.00",
+          status: input.status ?? "draft",
+          pdfUrl: input.pdfUrl,
+          createdBy: userId,
+        })
+        .returning();
 
-    if (input.sections && input.sections.length > 0) {
-      await this.saveSections(quiz.id, input.sections);
-    }
+      if (input.sections && input.sections.length > 0) {
+        await this.saveSections(tx, quiz.id, input.sections);
+      }
 
-    return quiz;
+      return quiz;
+    });
   }
 
   public async updateQuiz(id: string, input: TUpdateQuizInput) {
@@ -204,23 +149,40 @@ export class QuizzesService {
       throw new NotFoundError("Không tìm thấy đề thi để cập nhật.");
     }
 
-    await this.database
-      .update(quizzes)
-      .set({
-        title: input.title ?? existing.title,
-        description: input.description !== undefined ? input.description : existing.description,
-        durationMinutes: input.durationMinutes ?? existing.durationMinutes,
-        totalPoints: input.totalPoints ?? existing.totalPoints,
-        status: input.status ?? existing.status,
-        pdfUrl: input.pdfUrl !== undefined ? input.pdfUrl : existing.pdfUrl,
-        updatedAt: new Date(),
-      })
-      .where(eq(quizzes.id, id));
-
     if (input.sections) {
-      await this.database.delete(quizSections).where(eq(quizSections.quizId, id));
-      await this.saveSections(id, input.sections);
+      // Thay toàn bộ cấu trúc sẽ xoá (cascade) bài làm và điểm của học sinh đã thi đề này.
+      const [attempt] = await this.database
+        .select({ id: examAttempts.id })
+        .from(examAttempts)
+        .where(eq(examAttempts.quizId, id))
+        .limit(1);
+
+      if (attempt) {
+        throw new ConflictError(
+          "Đề thi đã có học sinh làm bài nên không thể thay đổi cấu trúc câu hỏi. Hãy nhân bản thành đề mới.",
+        );
+      }
     }
+
+    await this.database.transaction(async (tx) => {
+      await tx
+        .update(quizzes)
+        .set({
+          title: input.title ?? existing.title,
+          description: input.description !== undefined ? input.description : existing.description,
+          durationMinutes: input.durationMinutes ?? existing.durationMinutes,
+          totalPoints: input.totalPoints ?? existing.totalPoints,
+          status: input.status ?? existing.status,
+          pdfUrl: input.pdfUrl !== undefined ? input.pdfUrl : existing.pdfUrl,
+          updatedAt: new Date(),
+        })
+        .where(eq(quizzes.id, id));
+
+      if (input.sections) {
+        await tx.delete(quizSections).where(eq(quizSections.quizId, id));
+        await this.saveSections(tx, id, input.sections);
+      }
+    });
 
     return this.getQuizById(id);
   }
@@ -240,10 +202,14 @@ export class QuizzesService {
     return { success: true };
   }
 
-  private async saveSections(quizId: string, sections: TQuizSectionInput[]): Promise<void> {
+  private async saveSections(
+    executor: TExecutor,
+    quizId: string,
+    sections: TQuizSectionInput[],
+  ): Promise<void> {
     await Promise.all(
       sections.map(async (sec) => {
-        const [savedSection] = await this.database
+        const [savedSection] = await executor
           .insert(quizSections)
           .values({
             quizId,
@@ -253,15 +219,19 @@ export class QuizzesService {
           })
           .returning();
 
-        await this.saveQuestions(savedSection.id, sec.questions);
+        await this.saveQuestions(executor, savedSection.id, sec.questions);
       }),
     );
   }
 
-  private async saveQuestions(sectionId: string, questions: TQuizQuestionInput[]): Promise<void> {
+  private async saveQuestions(
+    executor: TExecutor,
+    sectionId: string,
+    questions: TQuizQuestionInput[],
+  ): Promise<void> {
     await Promise.all(
       questions.map(async (q) => {
-        const [savedQuestion] = await this.database
+        const [savedQuestion] = await executor
           .insert(quizQuestions)
           .values({
             sectionId,
@@ -284,7 +254,7 @@ export class QuizzesService {
             explanation: item.explanation,
           }));
 
-          await this.database.insert(quizSubItems).values(subItemValues);
+          await executor.insert(quizSubItems).values(subItemValues);
         }
       }),
     );

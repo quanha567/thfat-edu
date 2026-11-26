@@ -4,6 +4,20 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   reactCompiler: true,
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "DENY" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=()" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+        ],
+      },
+    ];
+  },
   async rewrites() {
     const backendUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
@@ -24,7 +38,6 @@ const nextConfig: NextConfig = {
   },
   images: {
     unoptimized: true,
-    formats: ["image/avif", "image/webp"],
     remotePatterns: [
       {
         protocol: "https",
@@ -34,11 +47,6 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "thfat-edu.vercel.app",
-        pathname: "/**",
-      },
-      {
-        protocol: "https",
-        hostname: "*.vercel.app",
         pathname: "/**",
       },
       {

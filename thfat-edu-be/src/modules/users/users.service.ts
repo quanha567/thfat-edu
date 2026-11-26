@@ -2,12 +2,14 @@ import { and, desc, eq, ilike, isNotNull, isNull, or, type SQL, sql } from "driz
 
 import {
   createFirebaseUser,
+  deleteFirebaseUser,
   generateFirebasePasswordResetLink,
   revokeFirebaseUserSessions,
   updateFirebaseUser,
 } from "../../config/firebase";
 import { createModuleLogger } from "../../config/logger";
 import { type Database, db } from "../../db";
+import { containsPattern } from "../../db/like";
 import {
   sessions,
   studentProfiles,
@@ -132,7 +134,7 @@ export class UsersService {
 
     // Filter by search keyword
     if (query.search && query.search.trim().length > 0) {
-      const searchTerm = `%${query.search.trim()}%`;
+      const searchTerm = containsPattern(query.search);
       conditions.push(
         or(
           ilike(users.fullName, searchTerm),
@@ -245,57 +247,77 @@ export class UsersService {
       );
     }
 
-    // 2. Insert user into DB
-    const [newUser] = await this.database
-      .insert(users)
-      .values({
-        email: normalizedEmail,
-        fullName: data.fullName,
-        role: data.role,
-        avatarUrl: data.avatarUrl ?? null,
-        gender: data.gender ?? null,
-        firebaseUid,
-        isActive: true,
-      })
-      .returning();
+    // 2 + 3. Insert user và profile trong một transaction; lỗi thì huỷ tài khoản Firebase vừa tạo
+    // để không để lại tài khoản mồ côi.
+    let created: {
+      newUser: TUser;
+      studentProfileRecord: TStudentProfile | null;
+      teacherProfileRecord: TTeacherProfile | null;
+    };
 
-    if (!newUser) {
-      throw new BadRequestError("Lỗi hệ thống: Không thể khởi tạo người dùng trong cơ sở dữ liệu.");
+    try {
+      created = await this.database.transaction(async (tx) => {
+        const [newUser] = await tx
+          .insert(users)
+          .values({
+            email: normalizedEmail,
+            fullName: data.fullName,
+            role: data.role,
+            avatarUrl: data.avatarUrl ?? null,
+            gender: data.gender ?? null,
+            firebaseUid,
+            isActive: true,
+          })
+          .returning();
+
+        if (!newUser) {
+          throw new BadRequestError(
+            "Lỗi hệ thống: Không thể khởi tạo người dùng trong cơ sở dữ liệu.",
+          );
+        }
+
+        let studentProfileRecord: TStudentProfile | null = null;
+        let teacherProfileRecord: TTeacherProfile | null = null;
+
+        if (data.role === "student") {
+          const profileData = data.studentProfile;
+          const [createdProfile] = await tx
+            .insert(studentProfiles)
+            .values({
+              userId: newUser.id,
+              studentCode: profileData?.studentCode ?? null,
+              grade: profileData?.grade ?? null,
+              schoolName: profileData?.schoolName ?? null,
+              dateOfBirth: profileData?.dateOfBirth ? profileData.dateOfBirth : null,
+              parentPhone: profileData?.parentPhone ?? null,
+            })
+            .returning();
+
+          studentProfileRecord = createdProfile ?? null;
+        } else if (data.role === "teacher") {
+          const profileData = data.teacherProfile;
+          const [createdProfile] = await tx
+            .insert(teacherProfiles)
+            .values({
+              userId: newUser.id,
+              teacherCode: profileData?.teacherCode ?? null,
+              department: profileData?.department ?? null,
+              bio: profileData?.bio ?? null,
+            })
+            .returning();
+
+          teacherProfileRecord = createdProfile ?? null;
+        }
+
+        return { newUser, studentProfileRecord, teacherProfileRecord };
+      });
+    } catch (error) {
+      await this.rollbackFirebaseUser(firebaseUid);
+
+      throw error;
     }
 
-    // 3. Create profile if applicable
-    let studentProfileRecord: TStudentProfile | null = null;
-    let teacherProfileRecord: TTeacherProfile | null = null;
-
-    if (data.role === "student") {
-      const profileData = data.studentProfile;
-      const [createdProfile] = await this.database
-        .insert(studentProfiles)
-        .values({
-          userId: newUser.id,
-          studentCode: profileData?.studentCode ?? null,
-          grade: profileData?.grade ?? null,
-          schoolName: profileData?.schoolName ?? null,
-          dateOfBirth: profileData?.dateOfBirth ? profileData.dateOfBirth : null,
-          parentPhone: profileData?.parentPhone ?? null,
-        })
-        .returning();
-
-      studentProfileRecord = createdProfile ?? null;
-    } else if (data.role === "teacher") {
-      const profileData = data.teacherProfile;
-      const [createdProfile] = await this.database
-        .insert(teacherProfiles)
-        .values({
-          userId: newUser.id,
-          teacherCode: profileData?.teacherCode ?? null,
-          department: profileData?.department ?? null,
-          bio: profileData?.bio ?? null,
-        })
-        .returning();
-
-      teacherProfileRecord = createdProfile ?? null;
-    }
+    const { newUser, studentProfileRecord, teacherProfileRecord } = created;
 
     usersLogger.info({ targetUserId: newUser.id, role: newUser.role }, "user created");
 
@@ -304,6 +326,17 @@ export class UsersService {
       studentProfile: studentProfileRecord,
       teacherProfile: teacherProfileRecord,
     });
+  }
+
+  private async rollbackFirebaseUser(uid: string): Promise<void> {
+    try {
+      await deleteFirebaseUser(uid);
+    } catch (error) {
+      usersLogger.error(
+        { err: error, operation: "deleteFirebaseUser" },
+        "failed to roll back Firebase user after DB failure",
+      );
+    }
   }
 
   public async updateUser({

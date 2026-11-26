@@ -43,6 +43,13 @@ export class NotFoundError extends AppError {
   }
 }
 
+export class ConflictError extends AppError {
+  constructor(message = "Conflict") {
+    super(message, 409, "CONFLICT");
+    this.name = "ConflictError";
+  }
+}
+
 export type TErrorContext = {
   code: string | number;
   error: unknown;
@@ -90,7 +97,8 @@ function buildErrorResponse({ code, error, set }: TErrorContext) {
       success: false,
       code: "VALIDATION_ERROR",
       message: "Invalid request payload or parameters",
-      details: allErrors,
+      // Không lộ chi tiết schema ở production.
+      ...(process.env.NODE_ENV === "production" ? {} : { details: allErrors }),
     };
   }
 

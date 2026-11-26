@@ -1,13 +1,13 @@
 import { type Static, t } from "elysia";
 
 export const SyncAnswerItemSchema = t.Object({
-  subItemId: t.String(),
-  selectedAnswer: t.Nullable(t.String()),
+  subItemId: t.String({ format: "uuid" }),
+  selectedAnswer: t.Nullable(t.String({ maxLength: 2000 })),
   isFlagged: t.Optional(t.Boolean()),
 });
 
 export const SyncAnswersBodySchema = t.Object({
-  answers: t.Array(SyncAnswerItemSchema),
+  answers: t.Array(SyncAnswerItemSchema, { maxItems: 500 }),
 });
 
 export const SubmitAttemptResponseSchema = t.Object({

@@ -2,9 +2,11 @@
 
 import { Spinner } from "@/components/ui/spinner";
 import { useRouter } from "next/navigation";
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { use, useCallback, useEffect, useMemo, useState } from "react";
+import { toast } from "sonner";
 
-import { useStartExam, useSubmitExam, useSyncAnswers } from "../hooks/use-exam-room";
+import { useExamAnswerSync } from "../hooks/use-exam-answer-sync";
+import { useStartExam, useSubmitExam } from "../hooks/use-exam-room";
 import { useExamRoomNavigation } from "../hooks/use-exam-room-navigation";
 import { type TExamRoomData } from "../types";
 import { ExamQuestionBottomBar } from "./exam-question-bottom-bar";
@@ -21,7 +23,6 @@ export function ExamRoomContainer({ params }: TExamRoomContainerProps) {
   const router = useRouter();
 
   const startExamMutation = useStartExam();
-  const syncMutation = useSyncAnswers();
   const submitMutation = useSubmitExam();
 
   const [roomData, setRoomData] = useState<TExamRoomData | null>(null);
@@ -29,7 +30,6 @@ export function ExamRoomContainer({ params }: TExamRoomContainerProps) {
     Record<string, { selectedAnswer: string | null; isFlagged: boolean }>
   >({});
   const [isSubmitDialogOpen, setIsSubmitDialogOpen] = useState(false);
-  const pendingSyncRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
     startExamMutation.mutate(examId, {
@@ -43,31 +43,25 @@ export function ExamRoomContainer({ params }: TExamRoomContainerProps) {
         );
         setAnswersMap(initialMap);
       },
-      onError: () => {
-        router.replace(`/exams/${examId}/result`);
+      onError: (error) => {
+        // Server đã trả lời (hết lượt, đề không tồn tại...) → xem kết quả. Lỗi mạng thì quay lại danh sách.
+        if (typeof (error as { status?: unknown }).status === "number") {
+          router.replace(`/exams/${examId}/result`);
+
+          return;
+        }
+
+        toast.error("Không thể kết nối để vào phòng thi. Vui lòng thử lại.");
+        router.replace("/exams");
       },
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [examId]);
 
-  useEffect(() => {
-    if (!roomData?.attempt.id) return;
-
-    const interval = setInterval(() => {
-      if (pendingSyncRef.current.size === 0) return;
-
-      const itemsToSync = Array.from(pendingSyncRef.current).map((subItemId) => ({
-        subItemId,
-        selectedAnswer: answersMap[subItemId]?.selectedAnswer ?? null,
-        isFlagged: answersMap[subItemId]?.isFlagged ?? false,
-      }));
-
-      pendingSyncRef.current.clear();
-      syncMutation.mutate({ attemptId: roomData.attempt.id, answers: itemsToSync });
-    }, 3000);
-
-    return () => clearInterval(interval);
-  }, [roomData?.attempt.id, answersMap, syncMutation]);
+  const { markDirty, flush } = useExamAnswerSync({
+    attemptId: roomData?.attempt.id,
+    answersMap,
+  });
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -102,7 +96,7 @@ export function ExamRoomContainer({ params }: TExamRoomContainerProps) {
         isFlagged: prev[subItemId]?.isFlagged ?? false,
       },
     }));
-    pendingSyncRef.current.add(subItemId);
+    markDirty(subItemId);
   };
 
   const handleToggleFlag = (subItemId: string) => {
@@ -113,31 +107,28 @@ export function ExamRoomContainer({ params }: TExamRoomContainerProps) {
         isFlagged: !prev[subItemId]?.isFlagged,
       },
     }));
-    pendingSyncRef.current.add(subItemId);
+    markDirty(subItemId);
   };
 
-  const handleConfirmSubmit = useCallback(() => {
-    if (!roomData?.attempt.id) return;
+  const handleConfirmSubmit = useCallback(async () => {
+    const attemptId = roomData?.attempt.id;
 
-    submitMutation.mutate(roomData.attempt.id, {
+    if (!attemptId) return;
+
+    // Đẩy nốt các đáp án chưa lưu trước khi chấm điểm (kể cả khi hết giờ).
+    await flush();
+
+    submitMutation.mutate(attemptId, {
       onSuccess: () => {
         router.replace(`/exams/${examId}/result`);
       },
     });
-  }, [roomData?.attempt.id, submitMutation, router, examId]);
+  }, [roomData?.attempt.id, flush, submitMutation, router, examId]);
 
-  const handleBack = useCallback(() => {
-    if (roomData?.attempt.id && pendingSyncRef.current.size > 0) {
-      const itemsToSync = Array.from(pendingSyncRef.current).map((subItemId) => ({
-        subItemId,
-        selectedAnswer: answersMap[subItemId]?.selectedAnswer ?? null,
-        isFlagged: answersMap[subItemId]?.isFlagged ?? false,
-      }));
-      pendingSyncRef.current.clear();
-      syncMutation.mutate({ attemptId: roomData.attempt.id, answers: itemsToSync });
-    }
+  const handleBack = useCallback(async () => {
+    await flush();
     router.push("/exams");
-  }, [roomData?.attempt.id, answersMap, syncMutation, router]);
+  }, [flush, router]);
 
   if (startExamMutation.isPending || !roomData) {
     return (

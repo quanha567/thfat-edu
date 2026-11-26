@@ -68,17 +68,19 @@ export function initializeFirebaseAdmin(): App {
 export type TDecodedToken = {
   uid: string;
   email: string;
+  emailVerified: boolean;
   name?: string;
   picture?: string;
 };
 
 export async function verifyFirebaseIdToken(idToken: string): Promise<TDecodedToken> {
-  if (env.NODE_ENV !== "production" && idToken.startsWith("mock-token:")) {
+  if (env.NODE_ENV === "test" && idToken.startsWith("mock-token:")) {
     const email = idToken.replace("mock-token:", "").trim();
 
     return {
       uid: `mock-uid-${email}`,
       email,
+      emailVerified: true,
       name: email.split("@")[0] ?? "Mock User",
     };
   }
@@ -94,6 +96,7 @@ export async function verifyFirebaseIdToken(idToken: string): Promise<TDecodedTo
   return {
     uid: decoded.uid,
     email: decoded.email,
+    emailVerified: decoded.email_verified === true,
     name: decoded.name,
     picture: decoded.picture,
   };
@@ -117,6 +120,8 @@ export async function createFirebaseUser({
 
   const userRecord = await auth.createUser({
     email,
+    // Tài khoản do hệ thống cấp (admin tạo / mã mời) nên email được coi là đã xác minh.
+    emailVerified: true,
     password: password || undefined,
     displayName: displayName || undefined,
     photoURL: photoUrl || undefined,
