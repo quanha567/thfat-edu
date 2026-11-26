@@ -6,6 +6,7 @@ import { Eye, HelpCircle } from "lucide-react";
 import Image from "next/image";
 
 import { type TQuizQuestion, type TSectionType } from "../../types";
+import { getLegacyImageUrl } from "../../utils/question-images";
 import { parseMatchingOption } from "../matching.types";
 
 export type TExamEditorLivePreviewProps = {
@@ -34,6 +35,7 @@ export function ExamEditorLivePreview({
     );
   }
 
+  const legacyImageUrl = getLegacyImageUrl(question);
   const hasContext = Boolean(question.contextContent?.trim());
   const hasSubItems = question.subItems && question.subItems.length > 0;
 
@@ -50,10 +52,10 @@ export function ExamEditorLivePreview({
         </div>
       )}
 
-      {question.imageUrl && (
+      {legacyImageUrl && (
         <div className="border-border bg-background relative inline-block max-w-full rounded border p-1">
           <Image
-            src={question.imageUrl}
+            src={legacyImageUrl}
             alt={`Xem trước ảnh câu ${questionNumber}`}
             width={350}
             height={180}

@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export function HeroSection() {
   return (
-    <section className="relative overflow-hidden bg-gradient-to-b from-[#071d49] via-[#0b2f77] to-[#0f3d99] pt-24 pb-36 text-white sm:pt-28 md:pt-32 md:pb-44">
+    <section className="from-surface-dark-mid via-surface-dark-high to-primary-700 relative overflow-hidden bg-gradient-to-b pt-24 pb-36 text-white sm:pt-28 md:pt-32 md:pb-44">
       {/* Integrated Hero Teacher/Student Visual (Seamless blend with Alpha Masking) */}
       <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
         {/* The Visual Image with CSS Alpha Mask for zero-seam feathering */}
@@ -14,19 +14,19 @@ export function HeroSection() {
           style={{
             backgroundImage: "url('/images/home/hero-teacher-banner.jpg')",
             maskImage:
-              "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 20%, black 55%), linear-gradient(to bottom, black 70%, transparent 100%)",
+              "linear-gradient(to right, transparent 0%, oklch(0 0 0 / 0.3) 20%, black 55%), linear-gradient(to bottom, black 70%, transparent 100%)",
             WebkitMaskImage:
-              "linear-gradient(to right, transparent 0%, rgba(0,0,0,0.3) 20%, black 55%), linear-gradient(to bottom, black 70%, transparent 100%)",
+              "linear-gradient(to right, transparent 0%, oklch(0 0 0 / 0.3) 20%, black 55%), linear-gradient(to bottom, black 70%, transparent 100%)",
             maskComposite: "intersect",
             WebkitMaskComposite: "destination-in",
           }}
         />
 
         {/* Left smooth solid fade ensuring 100% crisp text readability */}
-        <div className="absolute inset-y-0 left-0 hidden w-[55%] bg-gradient-to-r from-[#071d49] via-[#071d49]/90 to-transparent lg:block" />
+        <div className="from-surface-dark-mid via-surface-dark-mid/90 absolute inset-y-0 left-0 hidden w-[55%] bg-gradient-to-r to-transparent lg:block" />
 
         {/* Mobile dark overlay so text is easy to read on small screens */}
-        <div className="absolute inset-0 bg-[#071d49]/80 lg:hidden" />
+        <div className="bg-surface-dark-mid/80 absolute inset-0 lg:hidden" />
 
         {/* Soft Ambient Cyan Chemistry Luminous Bloom */}
         <div className="pointer-events-none absolute top-1/3 right-1/4 h-[420px] w-[420px] rounded-full bg-cyan-400/15 blur-3xl" />
@@ -73,7 +73,7 @@ export function HeroSection() {
             {/* Main Headline */}
             <h1 className="text-display font-extrabold tracking-tight text-white">
               Ôn luyện có trọng tâm <br />
-              <span className="bg-gradient-to-r from-cyan-300 via-sky-200 to-cyan-100 bg-clip-text text-transparent drop-shadow-[0_2px_12px_rgba(0,210,255,0.25)]">
+              <span className="bg-gradient-to-r from-cyan-300 via-cyan-200 to-cyan-100 bg-clip-text text-transparent">
                 Vững vàng môn Hóa
               </span>
             </h1>
@@ -89,12 +89,12 @@ export function HeroSection() {
               {/* Eye-catching Animated CTA Button */}
               <div className="group/btn relative inline-flex">
                 {/* Luminous Pulsing Aura */}
-                <span className="animate-pulse-aura from-primary-400 absolute -inset-1 -z-10 rounded-full bg-gradient-to-r via-cyan-400 to-sky-400 opacity-70 blur-md transition-opacity duration-300 group-hover/btn:opacity-100" />
+                <span className="animate-pulse-aura from-primary-400 absolute -inset-1 -z-10 rounded-full bg-gradient-to-r via-cyan-400 to-cyan-400 opacity-70 blur-md transition-opacity duration-300 group-hover/btn:opacity-100" />
 
                 <Button
                   asChild
                   size="lg"
-                  className="relative overflow-hidden rounded-full bg-gradient-to-r from-[#0052e0] via-[#0070f3] to-[#00c6ff] px-7 py-3.5 text-base font-bold text-white shadow-[0_4px_20px_rgba(0,110,255,0.45)] transition-all duration-300 hover:scale-[1.04] hover:shadow-[0_6px_28px_rgba(0,190,255,0.65)] active:scale-[0.98]"
+                  className="from-primary-600 via-primary-500 relative overflow-hidden rounded-full bg-gradient-to-r to-cyan-400 px-7 py-3.5 text-base font-bold text-white shadow-md transition-all duration-300 hover:scale-[1.04] hover:shadow-lg active:scale-[0.98]"
                 >
                   <Link href="/exams" className="flex items-center gap-2.5">
                     {/* Shimmer Light Reflection Sweep */}

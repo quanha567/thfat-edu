@@ -56,8 +56,6 @@ export function SectionEditorShortAnswer({
   };
   const handleContextChange = (val: string) =>
     onUpdateQuestion({ ...question, contextContent: val });
-  const handleImageChange = (url: string | null) =>
-    onUpdateQuestion({ ...question, imageUrl: url });
   const handleSubItemChange = (patch: Partial<TQuizSubItem>) => {
     onUpdateQuestion({ ...question, subItems: [{ ...primarySubItem, ...patch }] });
   };
@@ -82,7 +80,6 @@ export function SectionEditorShortAnswer({
     >
       <QuestionEditorCardHeader
         questionNumber={questionNumber}
-        imageUrl={question.imageUrl}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
         isCollapsed={isCollapsed}
@@ -93,7 +90,6 @@ export function SectionEditorShortAnswer({
         onMoveDown={onMoveDown}
         onDuplicate={onDuplicate}
         onDelete={onDelete}
-        onImageChange={handleImageChange}
       />
 
       {isCollapsed ? (

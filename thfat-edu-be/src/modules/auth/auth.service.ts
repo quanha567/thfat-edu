@@ -1,11 +1,14 @@
 import { and, eq, gt, isNull } from "drizzle-orm";
 
 import { updateFirebaseUser, verifyFirebaseIdToken } from "../../config/firebase";
+import { createModuleLogger, setRequestUserId } from "../../config/logger";
 import { type Database, db } from "../../db";
 import { sessions, studentProfiles, teacherProfiles, users } from "../../db/schema";
 import { ForbiddenError, UnauthorizedError } from "../../middlewares/error-handler";
 import { SESSION_COOKIE_MAX_AGE } from "./auth.cookie";
 import { type TUpdateMeBody, type TUserResponse } from "./auth.model";
+
+const authLogger = createModuleLogger("auth");
 
 declare const Bun:
   | {
@@ -13,7 +16,7 @@ declare const Bun:
     }
   | undefined;
 
-function generateSessionToken(): string {
+export function generateSessionToken(): string {
   if (typeof Bun !== "undefined" && typeof Bun?.randomUUIDv7 === "function") {
     return Bun.randomUUIDv7();
   }
@@ -39,6 +42,8 @@ export class AuthService {
     try {
       decodedToken = await verifyFirebaseIdToken(idToken);
     } catch (error) {
+      authLogger.warn({ err: error, reason: "invalid_firebase_token" }, "login failed");
+
       throw new UnauthorizedError(
         `Firebase token không hợp lệ hoặc đã hết hạn: ${(error as Error).message}`,
       );
@@ -53,12 +58,18 @@ export class AuthService {
       .limit(1);
 
     if (!existingUser) {
+      authLogger.warn({ reason: "user_not_provisioned" }, "login failed");
+
       throw new ForbiddenError(
         "Tài khoản chưa được cấp phép trong hệ thống. Vui lòng liên hệ quản trị viên.",
       );
     }
 
+    setRequestUserId(existingUser.id);
+
     if (!existingUser.isActive) {
+      authLogger.warn({ reason: "user_inactive" }, "login failed");
+
       throw new ForbiddenError(
         "Tài khoản của bạn đang bị tạm khóa. Vui lòng liên hệ quản trị viên.",
       );
@@ -88,6 +99,8 @@ export class AuthService {
     });
 
     const userWithProfile = await this.getUserWithProfile(existingUser.id);
+
+    authLogger.info({ role: existingUser.role }, "login succeeded");
 
     return {
       user: userWithProfile,
@@ -119,6 +132,8 @@ export class AuthService {
     if (!user || !user.isActive) {
       throw new UnauthorizedError("Tài khoản không hợp lệ hoặc đã bị vô hiệu hóa.");
     }
+
+    setRequestUserId(user.id);
 
     return this.getUserWithProfile(user.id);
   }
@@ -216,8 +231,9 @@ export class AuthService {
             data.avatarUrl === null ? "" : (data.avatarUrl ?? dbUser.avatarUrl ?? undefined),
         });
       } catch (error) {
-        console.warn(
-          `[AuthService] Failed to sync profile update to Firebase: ${(error as Error).message}`,
+        authLogger.warn(
+          { err: error, operation: "updateFirebaseUser" },
+          "failed to sync profile update to Firebase",
         );
       }
     }

@@ -1,6 +1,10 @@
+import { createModuleLogger } from "../../config/logger";
 import { nvidiaNimService } from "../../services/ai/nvidia-nim.service";
 import { extractPdfDocument } from "../../services/ai/pdf-extractor.service";
+import { uploadImportImages } from "./quizzes-import-images.service";
 import { type TCreateQuizInput, type TQuizSectionInput } from "./quizzes.model";
+
+const importLogger = createModuleLogger("quiz-import");
 
 export type TImportJobProgress = {
   step: number;
@@ -60,8 +64,8 @@ class ExamImportJobManager {
     for (const listener of job.listeners) {
       try {
         listener(event, data);
-      } catch {
-        // ignore subscriber errors
+      } catch (error) {
+        importLogger.debug({ err: error, jobId, event }, "import job subscriber threw");
       }
     }
   }
@@ -80,6 +84,7 @@ class ExamImportJobManager {
 
     job.status = "completed";
     job.data = data;
+    importLogger.info({ jobId, sections: data.sections?.length ?? 0 }, "exam import job completed");
     this.emit(jobId, "completed", data);
   }
 
@@ -89,6 +94,7 @@ class ExamImportJobManager {
 
     job.status = "failed";
     job.error = error;
+    importLogger.error({ jobId, reason: error }, "exam import job failed");
     this.emit(jobId, "failed", { error });
   }
 
@@ -116,6 +122,7 @@ export async function processExamPdfImport(
   fileName?: string,
 ): Promise<void> {
   try {
+    importLogger.info({ jobId, sizeBytes: pdfBuffer.length }, "exam import job started");
     examImportJobManager.updateProgress(jobId, 1, "Đang đọc và phân tích cấu trúc tài liệu PDF...");
     const { pages, images } = await extractPdfDocument(pdfBuffer);
 
@@ -242,11 +249,36 @@ export async function processExamPdfImport(
       });
     }
 
+    const partResults = [part1Result, part2Result, part3Result, part4Result];
+
+    for (const [index, result] of partResults.entries()) {
+      if (result.status === "rejected") {
+        importLogger.error(
+          { err: result.reason, jobId, part: index + 1 },
+          "exam import section extraction failed",
+        );
+      }
+    }
+
     examImportJobManager.updateProgress(
       jobId,
       5,
-      "Hoàn tất trích xuất và chuẩn hóa dữ liệu đề thi!",
+      "Đang lưu hình ảnh của đề thi lên kho lưu trữ...",
     );
+
+    const imported = await uploadImportImages({
+      sections,
+      folder: `/exams/imports/${jobId}`,
+    });
+
+    if (imported.failed > 0) {
+      importLogger.warn({ jobId, failed: imported.failed }, "exam import images failed to upload");
+      examImportJobManager.updateProgress(
+        jobId,
+        5,
+        `Không thể lưu ${imported.failed} hình ảnh, các câu hỏi liên quan sẽ không có ảnh.`,
+      );
+    }
 
     const parsedQuiz: TCreateQuizInput = {
       title: examTitle,
@@ -254,11 +286,12 @@ export async function processExamPdfImport(
       durationMinutes: 50,
       totalPoints: "150.00",
       status: "draft",
-      sections,
+      sections: imported.sections,
     };
 
     examImportJobManager.completeJob(jobId, parsedQuiz);
   } catch (err) {
+    importLogger.error({ err, jobId }, "exam import job crashed");
     examImportJobManager.failJob(jobId, String(err));
   }
 }

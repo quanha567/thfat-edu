@@ -54,10 +54,6 @@ export function SectionEditorMatching({
     onUpdateQuestion({ ...question, contextContent: val });
   };
 
-  const handleImageChange = (url: string | null) => {
-    onUpdateQuestion({ ...question, imageUrl: url });
-  };
-
   const handleSubItemChange = (index: number, patch: Partial<TQuizSubItem>) => {
     const updated = [...question.subItems];
     const target = updated[index];
@@ -120,7 +116,6 @@ export function SectionEditorMatching({
     >
       <QuestionEditorCardHeader
         questionNumber={questionNumber}
-        imageUrl={question.imageUrl}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
         isCollapsed={isCollapsed}
@@ -131,7 +126,6 @@ export function SectionEditorMatching({
         onMoveDown={onMoveDown}
         onDuplicate={onDuplicate}
         onDelete={onDelete}
-        onImageChange={handleImageChange}
       />
 
       {isCollapsed ? (

@@ -1,4 +1,5 @@
 export { ProfileInfoCard } from "./components/profile-info-card";
+export { AvatarUpload } from "./components/avatar-upload";
 export { ProfileEditForm } from "./components/profile-edit-form";
 export { ProfileStudentFields } from "./components/profile-student-fields";
 export { ProfileTeacherFields } from "./components/profile-teacher-fields";

@@ -18,11 +18,11 @@ export type TAttemptsTrendChartProps = {
 const chartConfig: ChartConfig = {
   startedCount: {
     label: "Bắt đầu làm",
-    color: "#3b82f6",
+    color: "var(--color-primary-500)",
   },
   submittedCount: {
     label: "Nộp thành công",
-    color: "#10b981",
+    color: "var(--color-success-500)",
   },
 };
 
@@ -41,11 +41,11 @@ export function AttemptsTrendChart({ trends }: TAttemptsTrendChartProps) {
           </div>
           <div className="flex items-center gap-3 text-xs">
             <div className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-blue-500" />
+              <span className="bg-primary-500 size-2 rounded-full" />
               <span className="text-muted-foreground">Bắt đầu</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <span className="size-2 rounded-full bg-emerald-500" />
+              <span className="bg-success-500 size-2 rounded-full" />
               <span className="text-muted-foreground">Đã nộp</span>
             </div>
           </div>
@@ -61,12 +61,12 @@ export function AttemptsTrendChart({ trends }: TAttemptsTrendChartProps) {
             <AreaChart data={trends} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
               <defs>
                 <linearGradient id="fillStarted" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="var(--color-primary-500)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="var(--color-primary-500)" stopOpacity={0.0} />
                 </linearGradient>
                 <linearGradient id="fillSubmitted" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                  <stop offset="95%" stopColor="#10b981" stopOpacity={0.0} />
+                  <stop offset="5%" stopColor="var(--color-success-500)" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="var(--color-success-500)" stopOpacity={0.0} />
                 </linearGradient>
               </defs>
               <CartesianGrid vertical={false} strokeDasharray="3 3" opacity={0.3} />
@@ -86,14 +86,14 @@ export function AttemptsTrendChart({ trends }: TAttemptsTrendChartProps) {
                 allowDecimals={false}
               />
               <ChartTooltip
-                cursor={{ stroke: "rgba(0, 0, 0, 0.1)", strokeDasharray: "3 3" }}
+                cursor={{ stroke: "var(--color-border)", strokeDasharray: "3 3" }}
                 content={<ChartTooltipContent indicator="dot" />}
               />
               <Area
                 dataKey="startedCount"
                 type="monotone"
                 fill="url(#fillStarted)"
-                stroke="#3b82f6"
+                stroke="var(--color-primary-500)"
                 strokeWidth={2}
                 baseValue={0}
                 isAnimationActive={false}
@@ -102,7 +102,7 @@ export function AttemptsTrendChart({ trends }: TAttemptsTrendChartProps) {
                 dataKey="submittedCount"
                 type="monotone"
                 fill="url(#fillSubmitted)"
-                stroke="#10b981"
+                stroke="var(--color-success-500)"
                 strokeWidth={2}
                 baseValue={0}
                 isAnimationActive={false}

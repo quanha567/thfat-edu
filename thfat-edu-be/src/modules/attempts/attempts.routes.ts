@@ -1,7 +1,6 @@
 import { Elysia, t } from "elysia";
 
-import { UnauthorizedError } from "../../middlewares/error-handler";
-import { authCookiePlugin } from "../auth/auth.cookie";
+import { requireAuth } from "../auth/auth.guard";
 import { AuthService } from "../auth/auth.service";
 import {
   AttemptResultSchema,
@@ -20,24 +19,11 @@ export const StudentExamListQuerySchema = t.Object({
 export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
   .decorate("attemptsService", new AttemptsService())
   .decorate("authService", new AuthService())
-  .use(authCookiePlugin)
-  .derive({ as: "scoped" }, async ({ authService: authSvc, sessionToken }) => {
-    if (!sessionToken) {
-      return { currentUser: null };
-    }
-
-    try {
-      const user = await authSvc.getCurrentUser(sessionToken);
-
-      return { currentUser: user };
-    } catch {
-      return { currentUser: null };
-    }
-  })
+  .use(requireAuth({ unauthorizedMessage: "Vui lòng đăng nhập để tham gia thi thử." }))
   .get(
     "/",
     async ({ attemptsService, currentUser, query }) => {
-      return attemptsService.listStudentExams(currentUser?.id ?? null, {
+      return attemptsService.listStudentExams(currentUser.id, {
         page: query.page ? Number(query.page) : 1,
         limit: query.limit ? Number(query.limit) : 10,
         search: query.search,
@@ -55,10 +41,6 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
   .post(
     "/:id/start",
     async ({ attemptsService, currentUser, params: { id } }) => {
-      if (!currentUser) {
-        throw new UnauthorizedError("Vui lòng đăng nhập để tham gia thi thử.");
-      }
-
       return attemptsService.startOrResumeAttempt(id, currentUser.id);
     },
     {
@@ -72,10 +54,6 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
   .put(
     "/:id/sync",
     async ({ attemptsService, currentUser, params: { id }, body }) => {
-      if (!currentUser) {
-        throw new UnauthorizedError("Vui lòng đăng nhập để tham gia thi thử.");
-      }
-
       return attemptsService.syncAnswers(id, currentUser.id, body.answers);
     },
     {
@@ -90,10 +68,6 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
   .post(
     "/:id/submit",
     async ({ attemptsService, currentUser, params: { id } }) => {
-      if (!currentUser) {
-        throw new UnauthorizedError("Vui lòng đăng nhập để tham gia thi thử.");
-      }
-
       return attemptsService.submitAndGradeAttempt(id, currentUser.id);
     },
     {
@@ -108,10 +82,6 @@ export const attemptsRoutes = new Elysia({ prefix: "/student-exams" })
   .get(
     "/:id/result",
     async ({ attemptsService, currentUser, params: { id } }) => {
-      if (!currentUser) {
-        throw new UnauthorizedError("Vui lòng đăng nhập để tham gia thi thử.");
-      }
-
       return attemptsService.getAttemptResult(id, currentUser.id);
     },
     {

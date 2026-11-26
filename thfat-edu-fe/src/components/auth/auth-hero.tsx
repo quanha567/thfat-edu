@@ -1,7 +1,7 @@
 import { BrandLogo } from "@/components/brand";
 import { GraduationCap, Users } from "lucide-react";
 
-export function LoginHero() {
+export function AuthHero() {
   return (
     <div className="bg-primary-950 relative hidden min-h-screen w-full flex-col justify-between overflow-hidden p-10 lg:flex lg:w-1/2 xl:p-14">
       {/* Background image & gradient overlay */}

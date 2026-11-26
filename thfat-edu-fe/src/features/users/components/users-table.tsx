@@ -53,7 +53,7 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
     status: status as TUserStatusFilter,
   };
 
-  const { data, isLoading } = useUsers(queryParams);
+  const { data, isLoading, isPlaceholderData } = useUsers(queryParams);
   const toggleActiveMutation = useToggleActiveUser();
   const softDeleteMutation = useSoftDeleteUser();
   const restoreMutation = useRestoreUser();
@@ -64,6 +64,8 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
       onEdit: (user) => setEditUser(user),
       onResetPassword: (user) => setResetPassUser(user),
       onToggleActive: (user) => {
+        if (toggleActiveMutation.isPending) return;
+
         toggleActiveMutation.mutate({
           id: user.id,
           isActive: !user.isActive,
@@ -88,15 +90,21 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
 
   const handleConfirmDeleteDialog = async () => {
     if (!deleteDialog.user) return;
+    if (softDeleteMutation.isPending || restoreMutation.isPending) return;
+
     const { id, fullName } = deleteDialog.user;
 
-    if (deleteDialog.mode === "delete") {
-      await softDeleteMutation.mutateAsync({ id, fullName });
-    } else {
-      await restoreMutation.mutateAsync({ id, fullName });
-    }
+    try {
+      if (deleteDialog.mode === "delete") {
+        await softDeleteMutation.mutateAsync({ id, fullName });
+      } else {
+        await restoreMutation.mutateAsync({ id, fullName });
+      }
 
-    setDeleteDialog({ isOpen: false, user: null, mode: "delete" });
+      setDeleteDialog({ isOpen: false, user: null, mode: "delete" });
+    } catch {
+      // Lỗi đã được hiển thị qua toast trong hook; giữ dialog mở để thử lại.
+    }
   };
 
   return (
@@ -104,7 +112,7 @@ export function UsersTable({ isCreateOpen, onCloseCreate }: TUsersTableProps) {
       <DataTable
         columns={columns}
         data={data?.items ?? []}
-        isLoading={isLoading}
+        isLoading={isLoading || isPlaceholderData}
         totalCount={data?.total ?? 0}
         pageIndex={page}
         pageSize={pageSize}

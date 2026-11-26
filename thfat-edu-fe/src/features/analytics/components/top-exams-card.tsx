@@ -16,7 +16,7 @@ export function TopExamsCard({ topExams }: TTopExamsCardProps) {
       <CardHeader className="flex flex-row items-center justify-between pb-3">
         <div>
           <div className="flex items-center gap-1.5">
-            <Flame className="size-4 text-amber-500" />
+            <Flame className="text-gold-500 size-4" />
             <CardTitle className="text-base font-bold">Top đề thi phổ biến</CardTitle>
           </div>
           <CardDescription className="text-xs">
@@ -44,7 +44,7 @@ export function TopExamsCard({ topExams }: TTopExamsCardProps) {
               >
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex items-center gap-2">
-                    <span className="bg-primary/10 text-3xs text-primary flex size-5 shrink-0 items-center justify-center rounded-full font-bold">
+                    <span className="bg-primary/10 text-xxs text-primary flex size-5 shrink-0 items-center justify-center rounded-full font-bold">
                       {idx + 1}
                     </span>
                     <Link
@@ -59,7 +59,7 @@ export function TopExamsCard({ topExams }: TTopExamsCardProps) {
                   </span>
                 </div>
 
-                <div className="text-3xs text-muted-foreground flex items-center justify-between">
+                <div className="text-xxs text-muted-foreground flex items-center justify-between">
                   <span>
                     {exam.totalAttempts} lượt thi • {exam.durationMinutes} phút
                   </span>

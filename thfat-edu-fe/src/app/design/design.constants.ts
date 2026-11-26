@@ -19,22 +19,48 @@ export type TColorScale = {
   name: string;
   key: string;
   desc: string;
+  /** Steps actually defined; defaults to the full 11-step scale. */
+  steps?: readonly number[];
 };
 
 export const COLOR_SCALES: TColorScale[] = [
   { name: "Primary", key: "primary", desc: "Brand royal cobalt blue — Electric Royal Blue" },
-  { name: "Gold", key: "gold", desc: "Brand radiant gold — Star, orbit & highlight accents" },
-  { name: "Neutral", key: "neutral", desc: "Gray scale — text, borders, backgrounds" },
+  {
+    name: "Gold (Accent)",
+    key: "gold",
+    desc: "Hue ~70 from the logo star — achievements & emphasis. As text on light use 700+",
+  },
+  {
+    name: "Cyan (Glow Accent)",
+    key: "cyan",
+    desc: "Hero, auth & dark surfaces only — chemistry glow",
+    steps: [300, 400, 500],
+  },
+  {
+    name: "Neutral",
+    key: "neutral",
+    desc: "Gray tinted toward brand hue 258 — text, borders, backgrounds",
+  },
   { name: "Success", key: "success", desc: "Correct answers & success states" },
   { name: "Warning", key: "warning", desc: "Warnings & caution states" },
   { name: "Error", key: "error", desc: "Wrong answers & error states" },
+  {
+    name: "Info",
+    key: "info",
+    desc: "Neutral notices & hints (hue 235, only steps in use)",
+    steps: [50, 100, 500, 600, 700],
+  },
 ];
 
 export const SEMANTIC_TOKENS = [
   { token: "--primary", label: "Primary" },
   { token: "--secondary", label: "Secondary" },
   { token: "--muted", label: "Muted" },
-  { token: "--accent", label: "Accent" },
+  { token: "--accent", label: "Accent (hover surface)" },
+  { token: "--highlight", label: "Highlight (gold)" },
+  { token: "--primary-on-dark", label: "Primary on dark" },
+  { token: "--surface-dark", label: "Surface dark" },
+  { token: "--surface-dark-mid", label: "Surface dark mid" },
   { token: "--destructive", label: "Destructive" },
   { token: "--background", label: "Background" },
   { token: "--border", label: "Border" },
@@ -102,6 +128,7 @@ export type TNavSection = {
 export const NAV_SECTIONS: TNavSection[] = [
   { id: "brand", label: "Logo & Brand", icon: Atom },
   { id: "colors", label: "Colors", icon: Palette },
+  { id: "logo-surfaces", label: "Logo Surfaces", icon: Layers },
   { id: "typography", label: "Typography", icon: Type },
   { id: "chemistry", label: "Chemistry & Math", icon: FlaskConical },
   { id: "buttons", label: "Buttons", icon: Sparkles },

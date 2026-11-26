@@ -2,6 +2,7 @@ import crypto from "node:crypto";
 
 import { Elysia, t } from "elysia";
 
+import { requireAuth } from "../auth/auth.guard";
 import { examImportJobManager, processExamPdfImport } from "./quizzes-import.service";
 import {
   CreateQuizSchema,
@@ -13,6 +14,12 @@ import { QuizzesService } from "./quizzes.service";
 
 export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
   .decorate("quizzesService", new QuizzesService())
+  .use(
+    requireAuth({
+      roles: ["teacher", "admin"],
+      forbiddenMessage: "Chỉ giáo viên và quản trị viên mới có quyền quản lý đề thi.",
+    }),
+  )
   .get(
     "/",
     async ({ quizzesService, query }) => {

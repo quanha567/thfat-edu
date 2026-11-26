@@ -3,6 +3,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useState } from "react";
 
 import { type TAuthUser } from "../types";
 import { GoogleLoginButton } from "./google-login-button";
@@ -12,6 +13,8 @@ export function LoginCard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect");
+  const [isGoogleBusy, setIsGoogleBusy] = useState(false);
+  const [isEmailBusy, setIsEmailBusy] = useState(false);
 
   function handleLoginSuccess(user: TAuthUser) {
     if (redirectUrl && redirectUrl.startsWith("/")) {
@@ -44,7 +47,11 @@ export function LoginCard() {
 
         <CardContent className="space-y-6 p-0">
           {/* Google sign-in */}
-          <GoogleLoginButton onSuccess={handleLoginSuccess} />
+          <GoogleLoginButton
+            onSuccess={handleLoginSuccess}
+            disabled={isEmailBusy}
+            onLoadingChange={setIsGoogleBusy}
+          />
 
           {/* Divider */}
           <div className="relative flex items-center justify-center">
@@ -55,7 +62,11 @@ export function LoginCard() {
           </div>
 
           {/* Credentials Form */}
-          <LoginForm onSuccess={handleLoginSuccess} />
+          <LoginForm
+            onSuccess={handleLoginSuccess}
+            disabled={isGoogleBusy}
+            onLoadingChange={setIsEmailBusy}
+          />
         </CardContent>
       </Card>
     </div>

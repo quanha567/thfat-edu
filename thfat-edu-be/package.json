@@ -27,13 +27,16 @@
     "drizzle-orm": "^0.45.4",
     "elysia": "^1.4.30",
     "firebase-admin": "^14.5.0",
+    "imagekit": "^6.0.0",
     "pdfjs-dist": "^6.5.438",
+    "pino": "^10.4.0",
     "postgres": "^4.0.0",
     "sharp": "^0.35.5"
   },
   "devDependencies": {
     "bun-types": "latest",
-    "drizzle-kit": "^0.31.11"
+    "drizzle-kit": "^0.31.11",
+    "pino-pretty": "^13.2.0"
   },
   "overrides": {
     "jose": "4.15.9"

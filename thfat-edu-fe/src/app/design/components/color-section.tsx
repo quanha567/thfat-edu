@@ -5,14 +5,14 @@ export function ColorSection() {
   return (
     <Section id="colors" title="Colors">
       <div className="space-y-8">
-        {COLOR_SCALES.map(({ name, key, desc }) => (
+        {COLOR_SCALES.map(({ name, key, desc, steps }) => (
           <div key={key} className="space-y-2">
             <div className="flex items-baseline gap-3">
               <p className="text-label text-neutral-900">{name}</p>
               <p className="text-caption text-neutral-400">{desc}</p>
             </div>
             <div className="grid grid-cols-11 gap-1.5">
-              {SHADES.map((shade) => (
+              {(steps ?? SHADES).map((shade) => (
                 <div key={shade} className="space-y-1.5">
                   <div
                     className="h-10 w-full rounded-lg border border-black/5"

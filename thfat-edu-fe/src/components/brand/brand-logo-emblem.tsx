@@ -1,3 +1,4 @@
+// color-exception: brand logo SVG artwork; colours are the logo itself, not UI tokens.
 export type TBrandLogoEmblemProps = {
   className?: string;
   size?: number;

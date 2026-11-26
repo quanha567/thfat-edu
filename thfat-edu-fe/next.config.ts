@@ -28,6 +28,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
+        hostname: "ik.imagekit.io",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
         hostname: "thfat-edu.vercel.app",
         pathname: "/**",
       },

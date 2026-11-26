@@ -11,7 +11,7 @@ export function StatsBar() {
         <FadeInView
           yOffset={30}
           duration={0.6}
-          className="relative overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-r from-[#1462e0]/85 via-[#1a6ef2]/80 to-[#1975ff]/85 p-6 text-white shadow-[0_20px_50px_rgba(8,40,140,0.35)] backdrop-blur-xl transition-all duration-300 hover:border-white/40 sm:rounded-3xl sm:p-7"
+          className="from-primary-600/85 via-primary-500/80 to-primary-500/85 relative overflow-hidden rounded-2xl border border-white/30 bg-gradient-to-r p-6 text-white shadow-lg backdrop-blur-xl transition-all duration-300 hover:border-white/40 sm:rounded-3xl sm:p-7"
         >
           {/* Top Edge Specular Reflection */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-[1.5px] bg-gradient-to-r from-transparent via-white/60 to-transparent" />
@@ -36,12 +36,16 @@ export function StatsBar() {
           preserveAspectRatio="none"
         >
           {/* Top Hero Blue Extension (Seamlessly matches Hero bottom) */}
-          <path d="M0 0H1440V65C1220 140 940 160 720 115C480 65 240 120 0 80V0Z" fill="#0f3d99" />
+          <path
+            d="M0 0H1440V65C1220 140 940 160 720 115C480 65 240 120 0 80V0Z"
+            className="fill-primary-700"
+          />
 
           {/* Delicate single curve contour */}
           <path
             d="M0 80C240 120 480 65 720 115C940 160 1220 140 1440 65"
-            stroke="rgba(255,255,255,0.25)"
+            stroke="currentColor"
+            className="text-white/25"
             strokeWidth="1.5"
             strokeLinecap="round"
           />

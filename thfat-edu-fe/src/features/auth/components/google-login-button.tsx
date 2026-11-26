@@ -1,9 +1,10 @@
+// color-exception: Google brand mark must keep Google's official colours.
 "use client";
 
 import { Button } from "@/components/ui/button";
 import { loginWithGoogle } from "@/lib/firebase";
 import { Loader2 } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 
 import { useLogin } from "../hooks/use-login";
@@ -12,11 +13,20 @@ import { type TAuthUser } from "../types";
 export type TGoogleLoginButtonProps = {
   onSuccess: (user: TAuthUser) => void;
   disabled?: boolean;
+  onLoadingChange?: (isLoading: boolean) => void;
 };
 
-export function GoogleLoginButton({ onSuccess, disabled }: TGoogleLoginButtonProps) {
+export function GoogleLoginButton({
+  onSuccess,
+  disabled,
+  onLoadingChange,
+}: TGoogleLoginButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
   const { mutateAsync: loginMutation } = useLogin();
+
+  useEffect(() => {
+    onLoadingChange?.(isLoading);
+  }, [isLoading, onLoadingChange]);
 
   async function handleGoogleLogin() {
     setIsLoading(true);

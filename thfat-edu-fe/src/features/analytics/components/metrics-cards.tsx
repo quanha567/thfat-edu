@@ -59,7 +59,7 @@ export function MetricsCards({ kpi }: TMetricsCardsProps) {
       change: kpi.totalAttempts.changePercentage,
       subText: kpi.totalAttempts.subText,
       sparkline: kpi.totalAttempts.sparkline,
-      color: "var(--color-primary-600, #2563eb)",
+      color: "var(--color-primary-600)",
       icon: FileQuestion,
     },
     {
@@ -69,7 +69,7 @@ export function MetricsCards({ kpi }: TMetricsCardsProps) {
       change: kpi.completionRate.changePercentage,
       subText: kpi.completionRate.subText,
       sparkline: kpi.completionRate.sparkline,
-      color: "var(--color-success-600, #16a34a)",
+      color: "var(--color-success-600)",
       icon: CheckCircle2,
     },
     {
@@ -79,7 +79,7 @@ export function MetricsCards({ kpi }: TMetricsCardsProps) {
       change: kpi.averageScore.changePercentage,
       subText: kpi.averageScore.subText,
       sparkline: kpi.averageScore.sparkline,
-      color: "var(--color-gold-600, #d97706)",
+      color: "var(--color-gold-600)",
       icon: Award,
     },
     {
@@ -89,7 +89,7 @@ export function MetricsCards({ kpi }: TMetricsCardsProps) {
       change: kpi.activeCandidates.changePercentage,
       subText: kpi.activeCandidates.subText,
       sparkline: kpi.activeCandidates.sparkline,
-      color: "var(--color-cyan-600, #0891b2)",
+      color: "var(--color-cyan-600)",
       icon: Users,
     },
   ];
@@ -119,8 +119,8 @@ export function MetricsCards({ kpi }: TMetricsCardsProps) {
                   <span
                     className={`inline-flex items-center gap-0.5 font-medium ${
                       isPositive
-                        ? "text-emerald-600 dark:text-emerald-400"
-                        : "text-rose-600 dark:text-rose-400"
+                        ? "text-success-600 dark:text-success-400"
+                        : "text-error-600 dark:text-error-400"
                     }`}
                   >
                     {isPositive ? (

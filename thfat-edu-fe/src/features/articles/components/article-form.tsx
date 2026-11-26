@@ -12,10 +12,12 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { useCategories } from "@/features/categories";
+import { uploadBlobImagesInHtml } from "@/hooks/use-upload";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
+import { toast } from "sonner";
 
 import { useCreateArticle } from "../hooks/use-create-article";
 import { useUpdateArticle } from "../hooks/use-update-article";
@@ -23,7 +25,7 @@ import { articleSchema, type TArticleFormValues } from "../schemas/article.schem
 import type { TArticleDetail } from "../types/article.types";
 import { AiArticleAssistant } from "./ai-article-assistant";
 import { ArticleSidebarSettings } from "./article-sidebar-settings";
-import { MarkdownEditor } from "./markdown-editor/markdown-editor";
+import { TiptapEditor } from "./tiptap-editor/tiptap-editor";
 
 export type TArticleFormProps = {
   article?: TArticleDetail | null;
@@ -33,11 +35,14 @@ export function ArticleForm({ article }: TArticleFormProps) {
   const router = useRouter();
   const isEditing = Boolean(article);
   const [isStreaming, setIsStreaming] = useState(false);
+  const [isUploadingImages, setIsUploadingImages] = useState(false);
+  const [draftId] = useState(() => crypto.randomUUID());
+  const mediaOwnerId = article?.id ?? draftId;
   const { data: categories = [] } = useCategories();
 
   const createMutation = useCreateArticle();
   const updateMutation = useUpdateArticle();
-  const isPending = createMutation.isPending || updateMutation.isPending;
+  const isPending = createMutation.isPending || updateMutation.isPending || isUploadingImages;
 
   const {
     register,
@@ -76,12 +81,27 @@ export function ArticleForm({ article }: TArticleFormProps) {
   }, [article, reset]);
 
   const onSubmit = async (values: TArticleFormValues) => {
+    setIsUploadingImages(true);
+
+    let content = values.content;
+
+    try {
+      // Upload any inline blob: images to ImageKit before saving
+      content = await uploadBlobImagesInHtml(content, `/articles/content/${mediaOwnerId}`);
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Không thể tải ảnh trong nội dung lên.");
+
+      return;
+    } finally {
+      setIsUploadingImages(false);
+    }
+
     const payload = {
       title: values.title.trim(),
       slug: values.slug?.trim() || undefined,
       excerpt: values.excerpt?.trim() || undefined,
       thumbnailUrl: values.thumbnailUrl?.trim() || undefined,
-      content: values.content,
+      content,
       status: values.status,
       categoryId: values.categoryId || null,
     };
@@ -196,7 +216,7 @@ export function ArticleForm({ article }: TArticleFormProps) {
             onStreamingChange={setIsStreaming}
           />
 
-          {/* Editor Card */}
+          {/* Tiptap Editor Card */}
           <div className="space-y-2">
             <Label className="text-sm font-semibold">
               Nội dung bài viết <span className="text-destructive">*</span>
@@ -205,16 +225,19 @@ export function ArticleForm({ article }: TArticleFormProps) {
               name="content"
               control={control}
               render={({ field }) => (
-                <MarkdownEditor
+                <TiptapEditor
                   value={field.value}
                   onChange={field.onChange}
-                  readOnly={isPending}
-                  isStreaming={isStreaming}
+                  editable={!isPending && !isStreaming}
+                  uploadFolder={`/articles/content/${mediaOwnerId}`}
                 />
               )}
             />
             {errors.content && (
               <p className="text-destructive text-xs font-medium">{errors.content.message}</p>
+            )}
+            {isUploadingImages && (
+              <p className="text-muted-foreground text-xs">Đang tải ảnh lên ImageKit...</p>
             )}
           </div>
         </div>
@@ -226,6 +249,7 @@ export function ArticleForm({ article }: TArticleFormProps) {
             setValue={setValue}
             isPending={isPending}
             isEditing={isEditing}
+            articleId={mediaOwnerId}
           />
         </div>
       </div>

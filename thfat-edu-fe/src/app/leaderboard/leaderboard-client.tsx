@@ -28,9 +28,18 @@ export function LeaderboardClient() {
       ? (timeframe as TTimeframe)
       : "this_week";
 
+  const currentPage = Math.max(1, page);
+
   const { data, isLoading } = useLeaderboard({
     timeframe: validTimeframe,
-    page: Math.max(1, page),
+    page: currentPage,
+    limit: DEFAULT_LIMIT,
+  });
+
+  // Podium always shows the overall top 3, so fetch page 1 (shares the cache key when on page 1).
+  const { data: firstPageData, isLoading: isPodiumLoading } = useLeaderboard({
+    timeframe: validTimeframe,
+    page: 1,
     limit: DEFAULT_LIMIT,
   });
 
@@ -47,15 +56,14 @@ export function LeaderboardClient() {
   const total = data?.total ?? 0;
   const myRank = data?.myRank ?? null;
 
-  // Top 3 for the podium from current or first page items
-  const top3 = items.filter((item) => item.rank >= 1 && item.rank <= 3);
+  const top3 = (firstPageData?.items ?? []).filter((item) => item.rank >= 1 && item.rank <= 3);
   const isMyRankVisible = myRank ? items.some((item) => item.userId === myRank.userId) : true;
 
   return (
     <div className="flex flex-1 flex-col justify-between pb-12 sm:pb-16">
       <div>
         {/* Full-width continuous wave hero & podium section */}
-        <section className="relative w-full overflow-hidden bg-gradient-to-b from-[#051a44] via-[#09357a] to-[#1255b5] pt-20 pb-24 text-white sm:pt-24 sm:pb-32">
+        <section className="from-surface-dark via-surface-dark-high to-primary-700 relative w-full overflow-hidden bg-gradient-to-b pt-20 pb-24 text-white sm:pt-24 sm:pb-32">
           {/* Wide Panoramic Chemistry Hero Background */}
           <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden">
             <Image
@@ -66,8 +74,8 @@ export function LeaderboardClient() {
               className="object-cover object-center opacity-30 mix-blend-screen"
             />
             {/* Soft gradient masks for seamless top & bottom blending */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#051a44]/75 via-transparent to-[#1255b5]/85" />
-            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,#051a44_100%)] opacity-50" />
+            <div className="from-surface-dark/75 to-primary-700/85 absolute inset-0 bg-gradient-to-b via-transparent" />
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_25%,var(--surface-dark)_100%)] opacity-50" />
           </div>
 
           {/* Ambient background glowing orbs */}
@@ -78,7 +86,7 @@ export function LeaderboardClient() {
           <div className="relative z-10 mx-auto max-w-7xl space-y-8 px-4 sm:px-6 lg:px-8">
             <LeaderboardHero timeframe={validTimeframe} onTimeframeChange={handleTimeframeChange} />
 
-            {isLoading ? <LeaderboardSkeleton /> : <LeaderboardPodium topItems={top3} />}
+            {isPodiumLoading ? <LeaderboardSkeleton /> : <LeaderboardPodium topItems={top3} />}
           </div>
 
           {/* Smooth organic wave swoosh at bottom */}

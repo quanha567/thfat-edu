@@ -9,7 +9,7 @@ import { HOME_CTA_DATA } from "../constants/home.data";
 export function CtaSection() {
   return (
     <FadeInView delay={0.15} className="w-full">
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-[#071d49] via-[#0b2f77] to-[#0f3d99] px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10 md:px-12">
+      <div className="from-surface-dark-mid via-surface-dark-high to-primary-700 relative overflow-hidden rounded-3xl bg-gradient-to-r px-6 py-8 text-white shadow-xl sm:px-10 sm:py-10 md:px-12">
         {/* Decorative subtle lighting */}
         <div className="pointer-events-none absolute -top-12 -right-12 h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl" />
         <div className="bg-gold-400/10 pointer-events-none absolute -bottom-12 left-1/3 h-48 w-48 rounded-full blur-3xl" />
@@ -50,7 +50,7 @@ export function CtaSection() {
                 src={HOME_CTA_DATA.imageSrc}
                 alt="3D Rocket Launching"
                 fill
-                className="object-contain drop-shadow-[0_10px_20px_rgba(0,0,0,0.3)]"
+                className="object-contain drop-shadow-lg"
                 sizes="112px"
               />
             </div>

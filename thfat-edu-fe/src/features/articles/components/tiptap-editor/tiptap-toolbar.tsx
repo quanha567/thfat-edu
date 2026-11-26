@@ -16,23 +16,29 @@ import {
   Link as LinkIcon,
   List,
   ListOrdered,
+  Loader2,
   Minus,
   Quote,
   Redo,
   Strikethrough,
   Undo,
+  Upload,
 } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export type TTiptapToolbarProps = {
   editor: Editor | null;
+  /** ImageKit folder for file uploads, e.g. /articles/content */
+  uploadFolder?: string;
 };
 
-export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
+export function TiptapToolbar({ editor, uploadFolder }: TTiptapToolbarProps) {
   const [linkUrl, setLinkUrl] = useState("");
   const [imageUrl, setImageUrl] = useState("");
   const [isLinkOpen, setIsLinkOpen] = useState(false);
   const [isImageOpen, setIsImageOpen] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   if (!editor) return null;
 
@@ -43,6 +49,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
 
       return;
     }
+
     const url = linkUrl.startsWith("http") ? linkUrl : `https://${linkUrl}`;
     editor.chain().focus().setLink({ href: url }).run();
     setLinkUrl("");
@@ -54,6 +61,28 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
       editor.chain().focus().setImage({ src: imageUrl.trim() }).run();
       setImageUrl("");
       setIsImageOpen(false);
+    }
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file || !uploadFolder) {
+      return;
+    }
+
+    setIsUploading(true);
+
+    try {
+      // Insert as blob: URL immediately for instant preview
+      const blobUrl = URL.createObjectURL(file);
+      editor.chain().focus().setImage({ src: blobUrl }).run();
+    } finally {
+      setIsUploading(false);
+
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
@@ -100,7 +129,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         size="icon"
         className={`size-8 ${editor.isActive("heading", { level: 1 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
-        title="Tiêu đề 1"
+        title="Tiêu đề H1"
       >
         <Heading1 className="size-4" />
       </Button>
@@ -111,7 +140,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         size="icon"
         className={`size-8 ${editor.isActive("heading", { level: 2 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
-        title="Tiêu đề 2"
+        title="Tiêu đề H2"
       >
         <Heading2 className="size-4" />
       </Button>
@@ -122,7 +151,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         size="icon"
         className={`size-8 ${editor.isActive("heading", { level: 3 }) ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
-        title="Tiêu đề 3"
+        title="Tiêu đề H3"
       >
         <Heading3 className="size-4" />
       </Button>
@@ -135,7 +164,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         size="icon"
         className={`size-8 ${editor.isActive("bulletList") ? "bg-muted text-foreground font-bold" : "text-muted-foreground"}`}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
-        title="Danh sách dấu chấm"
+        title="Danh sách gạch đầu dòng"
       >
         <List className="size-4" />
       </Button>
@@ -218,7 +247,7 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
         </PopoverContent>
       </Popover>
 
-      {/* Insert Image Popover */}
+      {/* Insert Image by URL Popover */}
       <Popover open={isImageOpen} onOpenChange={setIsImageOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -249,6 +278,34 @@ export function TiptapToolbar({ editor }: TTiptapToolbarProps) {
           </div>
         </PopoverContent>
       </Popover>
+
+      {/* Upload image file (only when uploadFolder is provided) */}
+      {uploadFolder && (
+        <>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="text-muted-foreground size-8"
+            title="Tải ảnh lên từ máy tính"
+            disabled={isUploading}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {isUploading ? (
+              <Loader2 className="size-4 animate-spin" />
+            ) : (
+              <Upload className="size-4" />
+            )}
+          </Button>
+        </>
+      )}
 
       <div className="ml-auto flex items-center gap-0.5">
         <Button

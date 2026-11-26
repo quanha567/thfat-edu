@@ -2,21 +2,8 @@
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-import {
-  ArrowDown,
-  ArrowUp,
-  ChevronDown,
-  ChevronUp,
-  Copy,
-  ImageIcon,
-  Loader2,
-  Sparkles,
-  X,
-} from "lucide-react";
-import Image from "next/image";
-import { useState } from "react";
+import { ArrowDown, ArrowUp, ChevronDown, ChevronUp, Copy, Loader2, Sparkles } from "lucide-react";
 
 import { QuestionDeleteDialog } from "./question-delete-dialog";
 
@@ -24,7 +11,6 @@ export type TQuestionEditorCardHeaderProps = {
   questionNumber: number;
   customBadge?: string;
   pointsLabel?: string;
-  imageUrl?: string | null;
   canMoveUp: boolean;
   canMoveDown: boolean;
   isCollapsed?: boolean;
@@ -35,14 +21,12 @@ export type TQuestionEditorCardHeaderProps = {
   onMoveDown: () => void;
   onDuplicate: () => void;
   onDelete: () => void;
-  onImageChange: (url: string | null) => void;
 };
 
 export function QuestionEditorCardHeader({
   questionNumber,
   customBadge,
   pointsLabel: _pointsLabel,
-  imageUrl,
   canMoveUp,
   canMoveDown,
   isCollapsed,
@@ -53,10 +37,7 @@ export function QuestionEditorCardHeader({
   onMoveDown,
   onDuplicate,
   onDelete,
-  onImageChange,
 }: TQuestionEditorCardHeaderProps) {
-  const [showImageInput, setShowImageInput] = useState(Boolean(imageUrl));
-
   return (
     <TooltipProvider delayDuration={200}>
       <div className={`space-y-2 ${isCollapsed ? "" : "border-border/30 border-b pb-2"}`}>
@@ -107,22 +88,6 @@ export function QuestionEditorCardHeader({
                 <TooltipContent side="top">Tự động suy luận và điền đáp án bằng AI</TooltipContent>
               </Tooltip>
             )}
-
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="xs"
-                  onClick={() => setShowImageInput((prev) => !prev)}
-                  className="text-muted-foreground hover:text-foreground h-7 px-2 text-xs"
-                >
-                  <ImageIcon className="mr-1 size-3.5" />
-                  {imageUrl ? "Sửa ảnh" : "Thêm ảnh"}
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="top">Đính kèm hoặc sửa ảnh minh họa</TooltipContent>
-            </Tooltip>
 
             <div className="bg-border/60 mx-0.5 h-3.5 w-px" />
 
@@ -181,41 +146,6 @@ export function QuestionEditorCardHeader({
             </div>
           </div>
         </div>
-
-        {showImageInput && (
-          <div className="bg-muted/30 border-border flex items-center gap-2 rounded-md border p-2">
-            <Input
-              value={imageUrl ?? ""}
-              onChange={(e) => onImageChange(e.target.value || null)}
-              placeholder="Dán đường dẫn ảnh minh họa (URL)..."
-              className="h-7 text-xs"
-            />
-            {imageUrl && (
-              <Button
-                type="button"
-                variant="ghost"
-                size="icon-xs"
-                onClick={() => onImageChange(null)}
-                aria-label="Xóa ảnh"
-              >
-                <X className="size-3" />
-              </Button>
-            )}
-          </div>
-        )}
-
-        {imageUrl && (
-          <div className="border-border bg-background relative inline-block max-w-sm rounded border p-1 shadow-2xs">
-            <Image
-              src={imageUrl}
-              alt={`Ảnh minh họa câu hỏi ${questionNumber}`}
-              width={400}
-              height={200}
-              unoptimized
-              className="max-h-48 w-auto rounded object-contain"
-            />
-          </div>
-        )}
       </div>
     </TooltipProvider>
   );

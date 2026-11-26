@@ -1,3 +1,4 @@
+// color-exception: decorative laurel/crown illustration with metallic gradients outside the UI palette.
 import { type ReactNode } from "react";
 
 import { WREATH_CONFIGS } from "../constants/leaderboard-wreath.constants";

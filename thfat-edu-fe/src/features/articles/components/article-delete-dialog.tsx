@@ -18,6 +18,7 @@ export type TArticleDeleteDialogProps = {
   isOpen: boolean;
   article: Nullable<TArticleItem>;
   batchCount?: number;
+  isDeleting?: boolean;
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -26,6 +27,7 @@ export function ArticleDeleteDialog({
   isOpen,
   article,
   batchCount = 0,
+  isDeleting = false,
   onClose,
   onConfirm,
 }: TArticleDeleteDialogProps) {
@@ -45,12 +47,18 @@ export function ArticleDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Hủy bỏ</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting} onClick={onClose}>
+            Hủy bỏ
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            disabled={isDeleting}
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Xác nhận xóa
+            {isDeleting ? "Đang xóa..." : "Xác nhận xóa"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

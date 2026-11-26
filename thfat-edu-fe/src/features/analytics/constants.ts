@@ -10,9 +10,9 @@ export const TIME_RANGE_OPTIONS: Array<{ value: TAnalyticsTimeRange; label: stri
 export const DEFAULT_TIME_RANGE: TAnalyticsTimeRange = "7d";
 
 export const SCORE_TIER_COLORS: Record<string, string> = {
-  kem: "var(--color-error-500, #e11d48)",
-  yeu: "var(--color-warning-500, #f59e0b)",
-  trung_binh: "var(--color-gold-500, #eab308)",
-  kha: "var(--color-cyan-500, #06b6d4)",
-  gioi: "var(--color-primary-700, #1d4ed8)",
+  kem: "var(--color-error-500)",
+  yeu: "var(--color-warning-500)",
+  trung_binh: "var(--color-gold-500)",
+  kha: "var(--color-cyan-500)",
+  gioi: "var(--color-primary-700)",
 };

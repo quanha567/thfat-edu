@@ -7,6 +7,7 @@ import { DesignHero } from "./components/design-hero";
 import { DesignSidebar } from "./components/design-sidebar";
 import { FeedbackSection } from "./components/feedback-section";
 import { FormSection } from "./components/form-section";
+import { LogoSurfaceSection } from "./components/logo-surface-section";
 import { NavigationSection } from "./components/navigation-section";
 import { OverlaySection } from "./components/overlay-section";
 import { SurfaceSection } from "./components/surface-section";
@@ -25,6 +26,7 @@ export default function DesignPage() {
         <div className="max-w-4xl space-y-16 px-8 py-10">
           <BrandSection />
           <ColorSection />
+          <LogoSurfaceSection />
           <TypographySection />
           <ChemistrySection />
           <ButtonSection />

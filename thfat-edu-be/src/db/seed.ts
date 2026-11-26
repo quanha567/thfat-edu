@@ -3,9 +3,12 @@ import { getAuth } from "firebase-admin/auth";
 
 import { env } from "../config/env";
 import { initializeFirebaseAdmin } from "../config/firebase";
+import { createModuleLogger } from "../config/logger";
 import { db, queryClient } from "./index";
 import { examAttempts, quizzes, studentProfiles, teacherProfiles, users } from "./schema";
 import { SEED_STUDENTS_DATA } from "./seed-students.data";
+
+const seedLogger = createModuleLogger("seed");
 
 export const DEFAULT_SEED_PASSWORD = "Password123@";
 
@@ -36,7 +39,7 @@ async function syncFirebaseUser({
           password,
           displayName,
         });
-        console.info(`   🔑 Created Firebase account: ${email} | Password: ${password}`);
+        seedLogger.info({ email }, "created Firebase account");
 
         return createdUser.uid;
       }
@@ -49,7 +52,7 @@ async function syncFirebaseUser({
 }
 
 export async function seedDatabase(): Promise<void> {
-  console.info("🌱 Seeding database...");
+  seedLogger.info("seeding database");
 
   const adminEmail = env.ADMIN_EMAIL || "admin@thfat.edu.vn";
   const existingAdmin = await db.select().from(users).where(eq(users.email, adminEmail)).limit(1);
@@ -67,7 +70,7 @@ export async function seedDatabase(): Promise<void> {
       isActive: true,
       firebaseUid: adminFirebaseUid,
     });
-    console.info(`✅ Seeded Admin: ${adminEmail}`);
+    seedLogger.info({ email: adminEmail }, "seeded admin");
   } else {
     if (adminFirebaseUid && !existingAdmin[0]?.firebaseUid) {
       await db
@@ -75,7 +78,7 @@ export async function seedDatabase(): Promise<void> {
         .set({ firebaseUid: adminFirebaseUid })
         .where(eq(users.id, existingAdmin[0].id));
     }
-    console.info(`ℹ️ Admin ${adminEmail} already exists`);
+    seedLogger.info({ email: adminEmail }, "admin already exists");
   }
 
   const teacherEmail = "teacher@thfat.edu.vn";
@@ -110,7 +113,7 @@ export async function seedDatabase(): Promise<void> {
         bio: "Giáo viên chuyên bồi dưỡng học sinh giỏi Hóa học.",
       });
     }
-    console.info(`✅ Seeded Teacher: ${teacherEmail}`);
+    seedLogger.info({ email: teacherEmail }, "seeded teacher");
   } else {
     if (teacherFirebaseUid && !existingTeacher[0]?.firebaseUid) {
       await db
@@ -118,7 +121,7 @@ export async function seedDatabase(): Promise<void> {
         .set({ firebaseUid: teacherFirebaseUid })
         .where(eq(users.id, existingTeacher[0].id));
     }
-    console.info(`ℹ️ Teacher ${teacherEmail} already exists`);
+    seedLogger.info({ email: teacherEmail }, "teacher already exists");
   }
 
   const studentEmail = "student@thfat.edu.vn";
@@ -153,7 +156,7 @@ export async function seedDatabase(): Promise<void> {
         schoolName: "THPT Chuyên",
       });
     }
-    console.info(`✅ Seeded Student: ${studentEmail}`);
+    seedLogger.info({ email: studentEmail }, "seeded student");
   } else {
     if (studentFirebaseUid && !existingStudent[0]?.firebaseUid) {
       await db
@@ -161,22 +164,19 @@ export async function seedDatabase(): Promise<void> {
         .set({ firebaseUid: studentFirebaseUid })
         .where(eq(users.id, existingStudent[0].id));
     }
-    console.info(`ℹ️ Student ${studentEmail} already exists`);
+    seedLogger.info({ email: studentEmail }, "student already exists");
   }
 
   await seedStudentResults();
 
-  console.info("🎉 Database seeding completed successfully!");
-  console.info(
-    `👉 Default dev password for all seeded accounts (if Firebase Admin is connected): ${DEFAULT_SEED_PASSWORD}`,
-  );
-  console.info(
-    "👉 Or you can create users directly in Firebase Console -> Authentication -> Users with any password you like.",
+  seedLogger.info("database seeding completed");
+  seedLogger.info(
+    "seeded accounts use the default dev password (see DEFAULT_SEED_PASSWORD in seed.ts) when Firebase Admin is connected, or create users in Firebase Console -> Authentication -> Users",
   );
 }
 
 export async function seedStudentResults(): Promise<void> {
-  console.info("🌱 Seeding 98 students and exam results...");
+  seedLogger.info("seeding students and exam results");
 
   const [publishedQuiz] = await db
     .select()
@@ -185,12 +185,12 @@ export async function seedStudentResults(): Promise<void> {
     .limit(1);
 
   if (!publishedQuiz) {
-    console.warn("⚠️ No published quiz found to attach student attempts to.");
+    seedLogger.warn("no published quiz found to attach student attempts to");
 
     return;
   }
 
-  console.info(`📌 Target quiz: "${publishedQuiz.title}" (${publishedQuiz.id})`);
+  seedLogger.info({ quizId: publishedQuiz.id, title: publishedQuiz.title }, "target quiz selected");
 
   const nonStudentUsers = await db
     .select({ id: users.id })
@@ -216,15 +216,7 @@ export async function seedStudentResults(): Promise<void> {
       email = "quanhavo005@gmail.com";
     }
 
-    let existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
-
-    if (existingUser.length === 0) {
-      existingUser = await db
-        .select()
-        .from(users)
-        .where(eq(users.fullName, item.fullName))
-        .limit(1);
-    }
+    const existingUser = await db.select().from(users).where(eq(users.email, email)).limit(1);
 
     let userId: string;
 
@@ -329,13 +321,13 @@ export async function seedStudentResults(): Promise<void> {
     }
   }
 
-  console.info(`✅ Successfully seeded ${SEED_STUDENTS_DATA.length} students and exam results!`);
+  seedLogger.info({ count: SEED_STUDENTS_DATA.length }, "seeded students and exam results");
 }
 
 if ((import.meta as { main?: boolean }).main) {
   seedDatabase()
     .catch((err) => {
-      console.error("❌ Seeding failed:", err);
+      seedLogger.error({ err }, "seeding failed");
       process.exit(1);
     })
     .finally(async () => {

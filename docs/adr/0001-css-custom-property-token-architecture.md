@@ -15,3 +15,5 @@ Tailwind v4 đã dịch chuyển sang CSS-first configuration; `@theme inline` l
 ## Consequences
 
 Mọi token mới phải được khai báo trong `globals.css` trước khi dùng trong component. Không được hardcode giá trị màu hay kích thước — luôn tham chiếu qua `var(--token-name)` hoặc Tailwind utility tương ứng.
+
+Ngoại lệ duy nhất: file illustration/brand-asset/third-party có thể chứa màu thô nếu có comment `color-exception: <lý do>`. Test `no-hardcoded-colors` chặn mọi trường hợp còn lại.

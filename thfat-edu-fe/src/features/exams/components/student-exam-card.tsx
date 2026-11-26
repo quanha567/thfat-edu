@@ -143,7 +143,7 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
       {/* Top section: Code, Status & Title */}
       <div>
         <div className="flex items-center justify-between gap-2 pb-3">
-          <div className="text-2xs inline-flex items-center gap-1.5 rounded-md border border-neutral-200/80 bg-neutral-50 px-2 py-0.5 font-mono font-semibold tracking-wide text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/60 dark:text-neutral-300">
+          <div className="text-xxs inline-flex items-center gap-1.5 rounded-md border border-neutral-200/80 bg-neutral-50 px-2 py-0.5 font-mono font-semibold tracking-wide text-neutral-600 dark:border-neutral-800 dark:bg-neutral-800/60 dark:text-neutral-300">
             <GraduationCap className="text-primary-600 dark:text-primary-400 h-3 w-3" />
             <span>{examCode}</span>
           </div>
@@ -213,7 +213,7 @@ export function StudentExamCard({ exam }: TStudentExamCardProps) {
         {/* Attempt count details */}
         <div className="flex items-center justify-between px-0.5 text-xs text-neutral-500 dark:text-neutral-400">
           <span>{renderAttemptCountText(maxAttempts, attemptCount)}</span>
-          <span className="text-2xs font-mono text-neutral-400">{exam.totalPoints}đ tối đa</span>
+          <span className="text-xxs font-mono text-neutral-400">{exam.totalPoints}đ tối đa</span>
         </div>
       </div>
 

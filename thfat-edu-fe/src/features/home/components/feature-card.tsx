@@ -23,7 +23,7 @@ export function FeatureCard({ feature, index }: TFeatureCardProps) {
 
   return (
     <FadeInView delay={index * 0.1} className="h-full">
-      <Card className="group hover:border-primary-200 relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-[0_4px_20px_rgba(0,40,120,0.04)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_12px_32px_rgba(0,60,180,0.12)] dark:border-white/10 dark:bg-neutral-900/80">
+      <Card className="group hover:border-primary-200 relative flex h-full flex-col justify-between rounded-3xl border border-neutral-200/80 bg-white p-7 shadow-sm transition-all duration-300 hover:-translate-y-1.5 hover:shadow-md dark:border-white/10 dark:bg-neutral-900/80">
         <div>
           {/* 3D Glossy Icon matching design */}
           <div className="relative mb-6 h-16 w-16 transition-transform duration-300 group-hover:scale-110 sm:h-18 sm:w-18">
@@ -32,7 +32,7 @@ export function FeatureCard({ feature, index }: TFeatureCardProps) {
                 src={feature.imageSrc}
                 alt={feature.title}
                 fill
-                className="object-contain drop-shadow-[0_8px_18px_rgba(0,50,150,0.18)]"
+                className="object-contain drop-shadow-md"
                 sizes="72px"
               />
             ) : (

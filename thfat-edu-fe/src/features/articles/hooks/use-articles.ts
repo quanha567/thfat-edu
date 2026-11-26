@@ -1,7 +1,7 @@
 import { getApiBaseUrl } from "@/lib/api";
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { queryKeys } from "@/lib/query-keys";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import type { TArticleQuery, TPaginatedArticles } from "../types/article.types";
 
@@ -38,5 +38,6 @@ export function useArticles({ query = {}, isAdmin = false }: TUseArticlesOptions
       return res.json();
     },
     staleTime: 30 * 1000,
+    placeholderData: keepPreviousData,
   });
 }

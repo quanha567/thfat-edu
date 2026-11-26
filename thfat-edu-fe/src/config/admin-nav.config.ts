@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Newspaper,
   Settings,
+  Ticket,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -69,6 +70,11 @@ export const ADMIN_NAV_GROUPS: TAdminNavGroup[] = [
         icon: Users,
       },
       {
+        title: "Mã mời",
+        href: "/admin/invite-codes",
+        icon: Ticket,
+      },
+      {
         title: "Cấu hình",
         href: "/admin/settings",
         icon: Settings,
@@ -85,5 +91,6 @@ export const ADMIN_ROUTE_LABELS: Record<string, string> = {
   "/admin/articles/create": "Tạo bài viết mới",
   "/admin/categories": "Chuyên mục",
   "/admin/users": "Người dùng",
+  "/admin/invite-codes": "Mã mời",
   "/admin/settings": "Cấu hình",
 };

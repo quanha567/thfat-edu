@@ -100,7 +100,7 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
 
       <DropdownMenuContent
         align="center"
-        className="w-80 border-white/10 bg-[#071d49]/95 p-2 text-white shadow-xl backdrop-blur-xl sm:w-96"
+        className="bg-surface-dark-mid/95 w-80 border-white/10 p-2 text-white shadow-xl backdrop-blur-xl sm:w-96"
       >
         <DropdownMenuLabel className="flex items-center justify-between px-2.5 py-1.5 text-xs font-semibold text-white/80">
           <span className="flex items-center gap-1.5">

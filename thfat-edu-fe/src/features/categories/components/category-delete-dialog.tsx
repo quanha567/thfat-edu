@@ -17,6 +17,7 @@ import { type TCategory } from "../types/category.types";
 export type TCategoryDeleteDialogProps = {
   isOpen: boolean;
   category: Nullable<TCategory>;
+  isDeleting?: boolean;
   onClose: () => void;
   onConfirm: () => void;
 };
@@ -24,6 +25,7 @@ export type TCategoryDeleteDialogProps = {
 export function CategoryDeleteDialog({
   isOpen,
   category,
+  isDeleting = false,
   onClose,
   onConfirm,
 }: TCategoryDeleteDialogProps) {
@@ -38,12 +40,18 @@ export function CategoryDeleteDialog({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel onClick={onClose}>Hủy bỏ</AlertDialogCancel>
+          <AlertDialogCancel disabled={isDeleting} onClick={onClose}>
+            Hủy bỏ
+          </AlertDialogCancel>
           <AlertDialogAction
-            onClick={onConfirm}
+            disabled={isDeleting}
+            onClick={(e) => {
+              e.preventDefault();
+              onConfirm();
+            }}
             className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
           >
-            Xác nhận xóa
+            {isDeleting ? "Đang xóa..." : "Xác nhận xóa"}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

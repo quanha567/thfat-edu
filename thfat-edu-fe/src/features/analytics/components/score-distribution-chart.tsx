@@ -14,7 +14,7 @@ export type TScoreDistributionChartProps = {
 const chartConfig: ChartConfig = {
   count: {
     label: "Số bài thi",
-    color: "#3b82f6",
+    color: "var(--color-primary-500)",
   },
 };
 
@@ -91,12 +91,15 @@ export function ScoreDistributionChart({ scoreDistribution }: TScoreDistribution
                 allowDecimals={false}
               />
               <ChartTooltip
-                cursor={{ fill: "rgba(0, 0, 0, 0.04)" }}
+                cursor={{ fill: "var(--color-muted)" }}
                 content={<ScoreDistributionTooltip />}
               />
               <Bar dataKey="count" radius={[4, 4, 0, 0]} maxBarSize={36}>
                 {scoreDistribution.map((entry) => (
-                  <Cell key={entry.tier} fill={SCORE_TIER_COLORS[entry.tier] || "#3b82f6"} />
+                  <Cell
+                    key={entry.tier}
+                    fill={SCORE_TIER_COLORS[entry.tier] || "var(--color-primary-500)"}
+                  />
                 ))}
               </Bar>
             </BarChart>

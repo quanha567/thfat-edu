@@ -282,7 +282,18 @@ export const userRoutes = new Elysia({ prefix: "/users" })
     "detail": "Invalid or expired access token."
   }
   ```
-- **Logging**: Structured JSON logs (`info`, `warn`, `error`, `debug`). Every request log must include `requestId` and authenticated `userId` when available.
+- **Logging**: See §4.5.
+
+### 4.5 Logging
+
+Decision record: [ADR 0004](docs/adr/0004-structured-logging.md).
+
+- Never use `console` in `thfat-edu-be/src/`. Create a logger with `createModuleLogger("<module>")` from `src/config/logger.ts` (one per file, module-level `const`).
+- Put data in fields and keep the message short and constant: `logger.warn({ err, targetUserId }, "failed to sync user to Firebase")`. Pass errors as `err`.
+- Levels: `error` for failures needing attention (5xx, failed external calls), `warn` for recoverable or expected-but-notable failures (4xx, swallowed errors, fallbacks), `info` for requests and business or security events (login, role change, delete, import), `debug` for diagnostics. Default level is `debug` in development, `info` in production, `silent` in test; override with `LOG_LEVEL`.
+- Never log request bodies, query strings, PII (email, name) or exam content (questions, answers, attempts). Log `userId` (uuid) only. Secrets are redacted by key name in `logger.ts`; add new secret keys there.
+- External calls (Firebase, ImageKit, NVIDIA NIM, PDF) log `service`, `operation`, `durationMs` and `outcome`.
+- Do not pass the logger or `requestId` through function parameters. `requestId` and `userId` are attached automatically per request.
 
 ### 4.4 Database Schema & Drizzle ORM
 
@@ -420,25 +431,25 @@ export function useLogin() {
 
 Enforced in CI and pre-commit hooks via `oxlint`:
 
-| Rule Name                                                     | Severity                       | Purpose                                                |
-| ------------------------------------------------------------- | ------------------------------ | ------------------------------------------------------ |
-| `max-params`                                                  | `error` (`{ "max": 3 }`)       | Enforce options object pattern for >3 params           |
-| `max-depth`                                                   | `error` (`{ "max": 3 }`)       | Prevent deep nesting, enforce early returns            |
-| `prefer-const`                                                | `error`                        | Enforce immutability by default                        |
-| `no-var`                                                      | `error`                        | Prevent legacy `var` declarations                      |
-| `eqeqeq`                                                      | `error`                        | Strict equality `===` checks                           |
-| `no-nested-ternary`                                           | `error`                        | Avoid unreadable nested ternary operators              |
-| `no-else-return`                                              | `error`                        | Enforce guard clauses                                  |
-| `prefer-template`                                             | `error`                        | String interpolation over concatenation                |
-| `no-param-reassign`                                           | `error`                        | Prevent mutating incoming function arguments           |
-| `import/newline-after-import`                                 | `error`                        | Enforce exactly 1 empty line after import block        |
-| `import/no-namespace`                                         | `error`                        | Ban `import * as React` wildcards                      |
-| `react/no-namespace`                                          | `error`                        | Ban React component/type namespaces                    |
-| `typescript/no-explicit-any`                                  | `error`                        | Require proper type narrowing / `unknown`              |
-| `typescript/no-non-null-assertion`                            | `error`                        | Ban `!` operator                                       |
-| `typescript/consistent-type-imports`                          | `error`                        | Enforce `import type`                                  |
-| `stylistic/padding-line-between-statements` (via `jsPlugins`) | `error`                        | **Auto-enforce blank line before `return` statements** |
-| `no-console`                                                  | `warn` (allow `warn`, `error`) | Ban `console.log` in production                        |
+| Rule Name                                                     | Severity                                      | Purpose                                                         |
+| ------------------------------------------------------------- | --------------------------------------------- | --------------------------------------------------------------- |
+| `max-params`                                                  | `error` (`{ "max": 3 }`)                      | Enforce options object pattern for >3 params                    |
+| `max-depth`                                                   | `error` (`{ "max": 3 }`)                      | Prevent deep nesting, enforce early returns                     |
+| `prefer-const`                                                | `error`                                       | Enforce immutability by default                                 |
+| `no-var`                                                      | `error`                                       | Prevent legacy `var` declarations                               |
+| `eqeqeq`                                                      | `error`                                       | Strict equality `===` checks                                    |
+| `no-nested-ternary`                                           | `error`                                       | Avoid unreadable nested ternary operators                       |
+| `no-else-return`                                              | `error`                                       | Enforce guard clauses                                           |
+| `prefer-template`                                             | `error`                                       | String interpolation over concatenation                         |
+| `no-param-reassign`                                           | `error`                                       | Prevent mutating incoming function arguments                    |
+| `import/newline-after-import`                                 | `error`                                       | Enforce exactly 1 empty line after import block                 |
+| `import/no-namespace`                                         | `error`                                       | Ban `import * as React` wildcards                               |
+| `react/no-namespace`                                          | `error`                                       | Ban React component/type namespaces                             |
+| `typescript/no-explicit-any`                                  | `error`                                       | Require proper type narrowing / `unknown`                       |
+| `typescript/no-non-null-assertion`                            | `error`                                       | Ban `!` operator                                                |
+| `typescript/consistent-type-imports`                          | `error`                                       | Enforce `import type`                                           |
+| `stylistic/padding-line-between-statements` (via `jsPlugins`) | `error`                                       | **Auto-enforce blank line before `return` statements**          |
+| `no-console`                                                  | BE `error`; FE `warn` (allow `warn`, `error`) | Backend must use the logger (§4.5); frontend bans `console.log` |
 
 ### 6.2 Oxfmt (Code Formatting & Built-in Plugins)
 

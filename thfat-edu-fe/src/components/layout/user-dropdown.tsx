@@ -15,7 +15,7 @@ import { useAuthUser } from "@/features/auth/hooks/use-auth-user";
 import { useLogout } from "@/features/auth/hooks/use-logout";
 import type { TAuthUser, TUserRole } from "@/features/auth/types";
 import { cn } from "cn";
-import { ChevronDown, ChevronsUpDown, LogOut, User } from "lucide-react";
+import { ChevronDown, ChevronsUpDown, Home, LogOut, ShieldCheck, User } from "lucide-react";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -217,6 +217,24 @@ export function UserDropdown({
 
         <DropdownMenuSeparator className="my-1" />
 
+        {user.role === "admin" && (
+          <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
+            <Link href="/admin" className="flex w-full items-center gap-2.5">
+              <ShieldCheck className="text-muted-foreground size-4" />
+              <span>Quản trị hệ thống</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        {variant === "admin" && (
+          <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
+            <Link href="/" className="flex w-full items-center gap-2.5">
+              <Home className="text-muted-foreground size-4" />
+              <span>Về trang học tập</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
         <DropdownMenuItem asChild className="cursor-pointer gap-2.5 px-2.5 py-2 text-sm">
           <Link href="/profile" className="flex w-full items-center gap-2.5">
             <User className="text-muted-foreground size-4" />
@@ -228,10 +246,11 @@ export function UserDropdown({
 
         <DropdownMenuItem
           onClick={() => logoutMutation.mutate()}
+          disabled={logoutMutation.isPending}
           className="text-destructive focus:text-destructive flex cursor-pointer items-center gap-2.5 px-2.5 py-2 text-sm"
         >
           <LogOut className="size-4" />
-          <span>Đăng xuất</span>
+          <span>{logoutMutation.isPending ? "Đang đăng xuất..." : "Đăng xuất"}</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

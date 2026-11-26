@@ -9,9 +9,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ChevronLeft, ChevronRight, MoreHorizontal } from "lucide-react";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 
-import { type TDataTablePaginationProps } from "./data-table.types";
+import { type TDataTableInstance, type TDataTablePaginationProps } from "./data-table.types";
 
 const DEFAULT_PAGE_SIZE_OPTIONS = [10, 20, 50];
 
@@ -31,6 +31,34 @@ function generatePaginationRange(currentPage: number, totalPages: number): (numb
   return [1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages];
 }
 
+type TResolveTotalPagesOptions = {
+  pageCount?: number;
+  totalCount?: number;
+  resolvedPageSize: number;
+  table?: TDataTableInstance<unknown>;
+  resolvedTotal: number;
+};
+
+function resolveTotalPages({
+  pageCount,
+  totalCount,
+  resolvedPageSize,
+  table,
+  resolvedTotal,
+}: TResolveTotalPagesOptions): number {
+  if (pageCount !== undefined) {
+    return pageCount;
+  }
+  if (totalCount !== undefined) {
+    return Math.max(1, Math.ceil(totalCount / resolvedPageSize));
+  }
+  if (table) {
+    return Math.max(1, table.getPageCount());
+  }
+
+  return Math.max(1, Math.ceil(resolvedTotal / resolvedPageSize));
+}
+
 export function DataTablePagination<TData>({
   table,
   pageIndex,
@@ -47,16 +75,31 @@ export function DataTablePagination<TData>({
   const resolvedPageIndex = pageIndex ?? (tablePagination ? tablePagination.pageIndex + 1 : 1);
   const resolvedPageSize = pageSize ?? (tablePagination ? tablePagination.pageSize : 10);
   const resolvedTotal = totalCount ?? (table ? table.getFilteredRowModel().rows.length : 0);
-  const calculatedTotalPages =
-    pageCount ??
-    (table ? table.getPageCount() : Math.max(1, Math.ceil(resolvedTotal / resolvedPageSize)));
+  const calculatedTotalPages = resolveTotalPages({
+    pageCount,
+    totalCount,
+    resolvedPageSize,
+    table: table as TDataTableInstance<unknown> | undefined,
+    resolvedTotal,
+  });
+
+  const safePageIndex = Math.min(Math.max(1, resolvedPageIndex), calculatedTotalPages);
+
+  useEffect(() => {
+    // Bỏ qua khi tổng = 0 (đang tải hoặc chưa có dữ liệu) để không reset về trang 1
+    if (resolvedTotal === 0) return;
+    if (pageIndex !== undefined && pageIndex > calculatedTotalPages) {
+      onPageChange?.(calculatedTotalPages);
+    }
+  }, [pageIndex, calculatedTotalPages, resolvedTotal, onPageChange]);
 
   const pages = useMemo(
-    () => generatePaginationRange(resolvedPageIndex, calculatedTotalPages),
-    [resolvedPageIndex, calculatedTotalPages],
+    () => generatePaginationRange(safePageIndex, calculatedTotalPages),
+    [safePageIndex, calculatedTotalPages],
   );
 
   const handlePageSelect = (targetPage: number) => {
+    if (targetPage < 1 || targetPage > calculatedTotalPages) return;
     if (onPageChange) {
       onPageChange(targetPage);
     }
@@ -74,8 +117,9 @@ export function DataTablePagination<TData>({
     }
   };
 
-  const from = resolvedTotal === 0 ? 0 : (resolvedPageIndex - 1) * resolvedPageSize + 1;
-  const to = Math.min(resolvedPageIndex * resolvedPageSize, resolvedTotal);
+  const from =
+    resolvedTotal === 0 ? 0 : Math.min((safePageIndex - 1) * resolvedPageSize + 1, resolvedTotal);
+  const to = Math.min(safePageIndex * resolvedPageSize, resolvedTotal);
 
   return (
     <div className="border-border flex flex-col-reverse items-center justify-between gap-4 border-t px-6 py-4 sm:flex-row">
@@ -84,8 +128,8 @@ export function DataTablePagination<TData>({
           variant="outline"
           size="icon"
           className="size-8"
-          onClick={() => handlePageSelect(resolvedPageIndex - 1)}
-          disabled={resolvedPageIndex <= 1}
+          onClick={() => handlePageSelect(safePageIndex - 1)}
+          disabled={safePageIndex <= 1}
           aria-label="Trang trước"
         >
           <ChevronLeft className="size-4" />
@@ -105,14 +149,14 @@ export function DataTablePagination<TData>({
             );
           }
 
-          const isActive = p === resolvedPageIndex;
+          const isActive = p === safePageIndex;
 
           return (
             <Button
               key={`page-${p}`}
               variant={isActive ? "default" : "outline"}
               size="icon"
-              className="size-8 text-xs"
+              className="size-8 text-xs transition-none"
               onClick={() => handlePageSelect(p)}
               aria-current={isActive ? "page" : undefined}
             >
@@ -125,8 +169,8 @@ export function DataTablePagination<TData>({
           variant="outline"
           size="icon"
           className="size-8"
-          onClick={() => handlePageSelect(resolvedPageIndex + 1)}
-          disabled={resolvedPageIndex >= calculatedTotalPages}
+          onClick={() => handlePageSelect(safePageIndex + 1)}
+          disabled={safePageIndex >= calculatedTotalPages}
           aria-label="Trang sau"
         >
           <ChevronRight className="size-4" />

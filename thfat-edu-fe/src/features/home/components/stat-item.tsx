@@ -23,7 +23,7 @@ export function StatItem({ stat, isFirst }: TStatItemProps) {
             alt={stat.label}
             width={56}
             height={56}
-            className="h-full w-full object-contain drop-shadow-[0_8px_16px_rgba(0,180,255,0.35)]"
+            className="h-full w-full object-contain drop-shadow-md"
           />
         ) : null}
       </div>

@@ -1,3 +1,4 @@
+// color-exception: shadcn-generated recharts selector matches the library's own default stroke (#ccc).
 "use client";
 
 import { cn } from "cn";

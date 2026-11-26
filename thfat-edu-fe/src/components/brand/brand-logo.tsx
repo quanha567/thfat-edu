@@ -41,10 +41,11 @@ export function BrandLogo({
       <div
         className={`relative shrink-0 transition-transform group-hover:scale-105 ${emblemSizeClass}`}
       >
+        {/* Logo-safe: theme="dark" must sit on surface-dark (primary-950/900); the glow is an accent, not a contrast fix. */}
         {theme === "dark" && (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-0 rounded-full bg-cyan-400/25 blur-md transition-opacity group-hover:opacity-100"
+            className="pointer-events-none absolute inset-0 rounded-full bg-cyan-400/15 blur-md transition-opacity group-hover:opacity-100"
           />
         )}
         <Image
@@ -52,11 +53,7 @@ export function BrandLogo({
           alt="ThFat Edu Crest"
           fill
           sizes="64px"
-          className={`object-contain ${
-            theme === "dark"
-              ? "drop-shadow-[0_0_2px_rgba(255,255,255,0.4)] drop-shadow-[0_0_10px_rgba(56,189,248,0.55)]"
-              : ""
-          }`}
+          className="object-contain"
           priority
         />
       </div>
