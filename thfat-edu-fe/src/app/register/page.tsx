@@ -1,6 +1,8 @@
 import { AuthSplitLayout } from "@/components/auth/auth-split-layout";
+import { Card } from "@/components/ui/card";
 import { RegisterCard } from "@/features/invite-codes/components/register-card";
 import type { Metadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Đăng ký | TH FAT EDU",
@@ -14,13 +16,27 @@ type TRegisterPageProps = {
   searchParams: Promise<{ code?: string | string[] }>;
 };
 
-export default async function RegisterPage({ searchParams }: TRegisterPageProps) {
+async function RegisterContent({ searchParams }: TRegisterPageProps) {
   const { code } = await searchParams;
   const inviteCode = typeof code === "string" ? code.trim() : "";
 
+  return <RegisterCard code={inviteCode} />;
+}
+
+export default function RegisterPage({ searchParams }: TRegisterPageProps) {
   return (
     <AuthSplitLayout>
-      <RegisterCard code={inviteCode} />
+      <Suspense
+        fallback={
+          <Card className="flex h-96 w-full max-w-[440px] items-center justify-center rounded-2xl shadow-xl">
+            <span className="text-caption text-muted-foreground animate-pulse">
+              Đang tải giao diện đăng ký...
+            </span>
+          </Card>
+        }
+      >
+        <RegisterContent searchParams={searchParams} />
+      </Suspense>
     </AuthSplitLayout>
   );
 }
