@@ -39,7 +39,7 @@ export function ArticleListTable() {
     categoryId: categoryId === "all" ? undefined : categoryId,
   };
 
-  const { data, isLoading } = useArticles({ query: queryParams, isAdmin: true });
+  const { data, isLoading, isPlaceholderData } = useArticles({ query: queryParams, isAdmin: true });
   const articles = data?.items ?? [];
   const total = data?.total ?? 0;
 
@@ -51,14 +51,19 @@ export function ArticleListTable() {
   };
 
   const handleConfirmSingleDelete = async () => {
-    if (!targetArticle) return;
-    await deleteMutation.mutateAsync(targetArticle.id);
-    setTargetArticle(null);
+    if (!targetArticle || deleteMutation.isPending) return;
+
+    try {
+      await deleteMutation.mutateAsync(targetArticle.id);
+      setTargetArticle(null);
+    } catch {
+      // Lỗi đã được hiển thị qua toast trong hook; giữ dialog mở để thử lại.
+    }
   };
 
   const handleConfirmBatchDelete = async () => {
     const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
-    if (selectedIds.length === 0) return;
+    if (selectedIds.length === 0 || batchDeleteMutation.isPending) return;
 
     try {
       await batchDeleteMutation.mutateAsync(selectedIds);
@@ -85,7 +90,7 @@ export function ArticleListTable() {
       <DataTable
         columns={columns}
         data={articles}
-        isLoading={isLoading}
+        isLoading={isLoading || isPlaceholderData}
         totalCount={total}
         pageIndex={page}
         pageSize={pageSize}
@@ -139,6 +144,7 @@ export function ArticleListTable() {
       <ArticleDeleteDialog
         isOpen={Boolean(targetArticle)}
         article={targetArticle}
+        isDeleting={deleteMutation.isPending}
         onClose={() => setTargetArticle(null)}
         onConfirm={handleConfirmSingleDelete}
       />
@@ -147,6 +153,7 @@ export function ArticleListTable() {
         isOpen={isBatchDeleteOpen}
         article={null}
         batchCount={selectedCount}
+        isDeleting={batchDeleteMutation.isPending}
         onClose={() => setIsBatchDeleteOpen(false)}
         onConfirm={handleConfirmBatchDelete}
       />

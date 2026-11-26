@@ -28,7 +28,7 @@ export function createCategoryColumns({
           <div className="flex flex-col py-1">
             <span className="text-foreground font-semibold">{cat.name}</span>
             {cat.description && (
-              <span className="text-muted-foreground text-3xs line-clamp-1">{cat.description}</span>
+              <span className="text-muted-foreground text-xxs line-clamp-1">{cat.description}</span>
             )}
           </div>
         );
@@ -38,7 +38,7 @@ export function createCategoryColumns({
       id: "slug",
       header: "Đường dẫn (Slug)",
       cell: ({ row }) => (
-        <Badge variant="outline" className="text-3xs font-mono">
+        <Badge variant="outline" className="text-xxs font-mono">
           {row.original.slug}
         </Badge>
       ),
@@ -47,7 +47,7 @@ export function createCategoryColumns({
       id: "articleCount",
       header: "Số bài viết",
       cell: ({ row }) => (
-        <Badge variant="secondary" className="text-3xs font-semibold">
+        <Badge variant="secondary" className="text-xxs font-semibold">
           {row.original.articleCount ?? 0}
         </Badge>
       ),

@@ -25,9 +25,16 @@ export const queryKeys = {
     list: (params?: Record<string, unknown>) => [...queryKeys.users.all, "list", params] as const,
     detail: (id: string) => [...queryKeys.users.all, "detail", id] as const,
   },
+  inviteCodes: {
+    all: ["invite-codes"] as const,
+    list: (params?: Record<string, unknown>) =>
+      [...queryKeys.inviteCodes.all, "list", params] as const,
+    check: (code: string) => [...queryKeys.inviteCodes.all, "check", code] as const,
+  },
   settings: {
     all: ["settings"] as const,
     exam: () => [...queryKeys.settings.all, "exam"] as const,
+    site: () => [...queryKeys.settings.all, "site"] as const,
   },
   categories: {
     all: ["categories"] as const,

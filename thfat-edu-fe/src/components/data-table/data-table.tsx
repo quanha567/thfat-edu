@@ -62,6 +62,8 @@ export function DataTable<TData, TValue = unknown>({
   onRowSelectionChange,
   getRowId,
 }: TDataTableProps<TData, TValue>) {
+  const calculatedTotalPages = Math.max(1, Math.ceil((totalCount ?? data.length) / pageSize));
+
   const table = useReactTable({
     data,
     columns,
@@ -71,8 +73,14 @@ export function DataTable<TData, TValue = unknown>({
     getRowId:
       getRowId ?? ((row: TData, index: number) => (row as { id?: string }).id ?? String(index)),
     manualPagination: true,
+    pageCount: calculatedTotalPages,
+    rowCount: totalCount,
     state: {
       rowSelection,
+      pagination: {
+        pageIndex: pageIndex - 1,
+        pageSize,
+      },
     },
   });
 
@@ -177,6 +185,7 @@ export function DataTable<TData, TValue = unknown>({
             pageIndex={pageIndex}
             pageSize={pageSize}
             totalCount={totalCount}
+            pageCount={calculatedTotalPages}
             pageSizeOptions={pageSizeOptions}
             onPageChange={onPageChange}
             onPageSizeChange={onPageSizeChange}

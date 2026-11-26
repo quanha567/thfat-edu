@@ -1,10 +1,29 @@
 import { BrandLogo } from "@/components/brand";
-import { Button } from "@/components/ui/button";
+import { SocialIcon } from "@/components/icons/social-icon";
 import { Separator } from "@/components/ui/separator";
 import { HOME_FOOTER_LINKS } from "@/features/home/constants/home.data";
+import { SOCIAL_FIELDS } from "@/features/settings/constants/site-info.constants";
+import { getSiteInfo } from "@/features/settings/server/get-site-info";
+import { cacheLife } from "next/cache";
 import Link from "next/link";
 
-export function MainFooter() {
+async function getCurrentYear(): Promise<number> {
+  "use cache";
+
+  cacheLife("days");
+
+  return new Date().getFullYear();
+}
+
+export async function MainFooter() {
+  const [siteInfo, year] = await Promise.all([getSiteInfo(), getCurrentYear()]);
+
+  const socialLinks = SOCIAL_FIELDS.map((field) => ({
+    name: field.name,
+    label: field.label,
+    href: siteInfo[field.name],
+  })).filter((link) => link.href !== "");
+
   return (
     <footer className="relative border-t border-neutral-200/80 bg-white text-neutral-900 dark:border-white/10 dark:bg-neutral-950 dark:text-white">
       {/* Decorative subtle molecular background watermarks */}
@@ -42,7 +61,7 @@ export function MainFooter() {
       <div className="relative z-10 mx-auto max-w-7xl px-4 pt-10 pb-8 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-between gap-6 md:flex-row">
           {/* Brand with Light Theme */}
-          <BrandLogo theme="light" showSlogan={true} />
+          <BrandLogo theme="light" showSlogan={siteInfo.slogan !== ""} slogan={siteInfo.slogan} />
 
           {/* Navigation Links */}
           <nav className="text-body-sm flex flex-wrap items-center justify-center gap-4 text-neutral-600 sm:gap-6 dark:text-neutral-300">
@@ -61,41 +80,43 @@ export function MainFooter() {
             ))}
           </nav>
 
-          {/* Social Links */}
-          <div className="flex items-center gap-3">
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="hover:text-primary-600 h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
-            >
-              <a href="https://youtube.com" target="_blank" rel="noreferrer" aria-label="YouTube">
-                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
-                </svg>
-              </a>
-            </Button>
-
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="hover:text-primary-600 h-9 w-9 rounded-full border-neutral-200 bg-neutral-50 text-neutral-700 transition-all hover:scale-105 hover:bg-neutral-100 dark:border-white/10 dark:bg-white/5 dark:text-white dark:hover:bg-white/15"
-            >
-              <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
-                <svg className="h-4 w-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                </svg>
-              </a>
-            </Button>
-          </div>
+          {/* Contact & Social Links */}
+          {(socialLinks.length > 0 || siteInfo.contactEmail !== "") && (
+            <div className="text-body-sm flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-neutral-600 dark:text-neutral-300">
+              {siteInfo.contactEmail !== "" && (
+                <a
+                  href={`mailto:${siteInfo.contactEmail}`}
+                  className="hover:text-primary-600 font-medium transition-colors dark:hover:text-cyan-400"
+                >
+                  {siteInfo.contactEmail}
+                </a>
+              )}
+              {socialLinks.length > 0 && (
+                <div className="flex items-center gap-1">
+                  {socialLinks.map((link) => (
+                    <a
+                      key={link.name}
+                      href={link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={link.label}
+                      title={link.label}
+                      className="hover:bg-primary-50 hover:text-primary-700 focus-visible:ring-ring flex size-9 items-center justify-center rounded-full transition-colors focus-visible:ring-2 focus-visible:outline-none dark:hover:bg-white/10 dark:hover:text-cyan-400"
+                    >
+                      <SocialIcon name={link.name} className="size-5" />
+                    </a>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Divider & Copyright */}
         <Separator className="mt-8 bg-neutral-200 dark:bg-white/10" />
         <div className="pt-6 text-center">
           <p className="text-caption text-neutral-500 dark:text-neutral-400">
-            © 2026 ThFat Edu. Mọi quyền được bảo lưu.
+            © {year} {siteInfo.siteName}. Mọi quyền được bảo lưu.
           </p>
         </div>
       </div>

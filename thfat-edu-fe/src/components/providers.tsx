@@ -2,10 +2,12 @@
 
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
+import { installUnauthorizedRedirect } from "@/lib/auth-redirect";
+import { queryKeys } from "@/lib/query-keys";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ThemeProvider } from "next-themes";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 
 export type TProvidersProps = {
   children: ReactNode;
@@ -23,6 +25,14 @@ export function Providers({ children }: TProvidersProps) {
           },
         },
       }),
+  );
+
+  useEffect(
+    () =>
+      installUnauthorizedRedirect(() => {
+        queryClient.setQueryData(queryKeys.auth.me(), null);
+      }),
+    [queryClient],
   );
 
   return (

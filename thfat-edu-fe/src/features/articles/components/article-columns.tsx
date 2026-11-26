@@ -13,7 +13,7 @@ import { type TArticleItem, type TArticleStatus } from "../types/article.types";
 function ArticleStatusBadge({ status }: { status: TArticleStatus }) {
   if (status === "published") {
     return (
-      <Badge variant="default" className="text-3xs font-semibold">
+      <Badge variant="default" className="text-xxs font-semibold">
         Đã xuất bản
       </Badge>
     );
@@ -21,14 +21,14 @@ function ArticleStatusBadge({ status }: { status: TArticleStatus }) {
 
   if (status === "archived") {
     return (
-      <Badge variant="secondary" className="text-3xs font-semibold">
+      <Badge variant="secondary" className="text-xxs font-semibold">
         Lưu trữ
       </Badge>
     );
   }
 
   return (
-    <Badge variant="outline" className="text-3xs font-semibold">
+    <Badge variant="outline" className="text-xxs font-semibold">
       Bản nháp
     </Badge>
   );
@@ -67,7 +67,7 @@ export function createArticleColumns({
               <span className="text-foreground line-clamp-1 font-semibold" title={article.title}>
                 {article.title}
               </span>
-              <span className="text-muted-foreground text-3xs">
+              <span className="text-muted-foreground text-xxs">
                 {formattedDate} • Tác giả: {article.author?.fullName ?? "Quản trị viên"}
               </span>
             </div>
@@ -85,7 +85,7 @@ export function createArticleColumns({
         }
 
         return (
-          <Badge variant="outline" className="text-3xs font-medium">
+          <Badge variant="outline" className="text-xxs font-medium">
             {category.name}
           </Badge>
         );

@@ -26,7 +26,7 @@ export function RecentAttemptsTable({ recentAttempts }: TRecentAttemptsTableProp
       return (
         <Badge
           variant="outline"
-          className="text-3xs border-emerald-500/40 bg-emerald-500/10 font-semibold text-emerald-600 dark:text-emerald-400"
+          className="text-xxs border-success-500/40 bg-success-500/10 text-success-600 dark:text-success-400 font-semibold"
         >
           Đã nộp
         </Badge>
@@ -36,7 +36,7 @@ export function RecentAttemptsTable({ recentAttempts }: TRecentAttemptsTableProp
       return (
         <Badge
           variant="outline"
-          className="text-3xs border-amber-500/40 bg-amber-500/10 font-semibold text-amber-600 dark:text-amber-400"
+          className="text-xxs border-warning-500/40 bg-warning-500/10 text-warning-600 dark:text-warning-400 font-semibold"
         >
           Đang làm
         </Badge>
@@ -46,7 +46,7 @@ export function RecentAttemptsTable({ recentAttempts }: TRecentAttemptsTableProp
     return (
       <Badge
         variant="outline"
-        className="text-3xs border-rose-500/40 bg-rose-500/10 font-semibold text-rose-600 dark:text-rose-400"
+        className="text-xxs border-error-500/40 bg-error-500/10 text-error-600 dark:text-error-400 font-semibold"
       >
         Bỏ dở
       </Badge>
@@ -106,7 +106,7 @@ export function RecentAttemptsTable({ recentAttempts }: TRecentAttemptsTableProp
                             <span className="text-foreground line-clamp-1 text-xs font-semibold">
                               {attempt.studentName}
                             </span>
-                            <span className="text-3xs text-muted-foreground line-clamp-1">
+                            <span className="text-xxs text-muted-foreground line-clamp-1">
                               {attempt.studentEmail}
                             </span>
                           </div>

@@ -46,7 +46,7 @@ export function NavbarItem({ item }: TNavbarItemProps) {
         </DropdownMenuTrigger>
         <DropdownMenuContent
           align="center"
-          className="w-60 border-white/10 bg-[#071d49]/95 p-2 text-white shadow-xl backdrop-blur-xl"
+          className="bg-surface-dark-mid/95 w-60 border-white/10 p-2 text-white shadow-xl backdrop-blur-xl"
         >
           {item.children.map((subItem) => (
             <DropdownMenuItem

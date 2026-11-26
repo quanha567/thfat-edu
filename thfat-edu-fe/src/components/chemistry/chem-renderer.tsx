@@ -129,6 +129,16 @@ const MARKDOWN_COMPONENTS: Components = {
       {children}
     </blockquote>
   ),
+  img: ({ src, alt }) =>
+    typeof src === "string" ? (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={src}
+        alt={alt ?? ""}
+        loading="lazy"
+        className="my-2 block max-h-80 max-w-full rounded-md object-contain"
+      />
+    ) : null,
   code: ({ children }) => (
     <code className="bg-muted text-foreground rounded px-1.5 py-0.5 font-mono text-xs">
       {children}

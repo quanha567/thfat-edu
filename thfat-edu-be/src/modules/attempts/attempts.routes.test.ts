@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
 
 import { errorHandlerPlugin } from "../../middlewares/error-handler";
+import { bearer, createMockAuthService } from "../auth/auth.test-utils";
 import { attemptsRoutes } from "./attempts.routes";
 import { type AttemptsService } from "./attempts.service";
 
@@ -18,11 +19,14 @@ describe("attempts.routes (Student Exams)", () => {
 
   const testApp = new Elysia()
     .use(errorHandlerPlugin)
+    .decorate("authService", createMockAuthService())
     .decorate("attemptsService", mockAttemptsService)
     .use(attemptsRoutes);
 
-  it("GET /student-exams returns 200 and list structure for public view", async () => {
-    const response = await testApp.handle(new Request("http://localhost/student-exams"));
+  it("GET /student-exams returns 200 and list structure for a logged-in student", async () => {
+    const response = await testApp.handle(
+      new Request("http://localhost/student-exams", { headers: bearer("student") }),
+    );
 
     expect(response.status).toBe(200);
     const body = (await response.json()) as { items: unknown[]; total: number };
@@ -66,6 +70,19 @@ describe("attempts.routes (Student Exams)", () => {
     const response = await testApp.handle(
       new Request("http://localhost/student-exams/test-id/result"),
     );
+
+    expect(response.status).toBe(401);
+  });
+});
+
+describe("attempts.routes guest access", () => {
+  const guestApp = new Elysia()
+    .use(errorHandlerPlugin)
+    .decorate("authService", createMockAuthService())
+    .use(attemptsRoutes);
+
+  it("GET /student-exams returns 401 for guests", async () => {
+    const response = await guestApp.handle(new Request("http://localhost/student-exams"));
 
     expect(response.status).toBe(401);
   });

@@ -42,14 +42,18 @@ export function CategoryListTable({
   }, [categories, search]);
 
   const total = filteredCategories.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
+
   const paginatedCategories = useMemo(() => {
-    const start = (page - 1) * pageSize;
+    const start = (safePage - 1) * pageSize;
 
     return filteredCategories.slice(start, start + pageSize);
-  }, [filteredCategories, page, pageSize]);
+  }, [filteredCategories, safePage, pageSize]);
 
   const handleConfirmDelete = async () => {
-    if (!deleteCategory) return;
+    if (!deleteCategory || deleteMutation.isPending) return;
+
     try {
       await deleteMutation.mutateAsync(deleteCategory.id);
       toast.success(`Đã xóa chuyên mục "${deleteCategory.name}" thành công.`);
@@ -83,7 +87,7 @@ export function CategoryListTable({
         data={paginatedCategories}
         isLoading={isLoading}
         totalCount={total}
-        pageIndex={page}
+        pageIndex={safePage}
         pageSize={pageSize}
         pageSizeOptions={[10, 20, 50]}
         onPageChange={setPage}
@@ -115,6 +119,7 @@ export function CategoryListTable({
       <CategoryDeleteDialog
         isOpen={Boolean(deleteCategory)}
         category={deleteCategory}
+        isDeleting={deleteMutation.isPending}
         onClose={() => setDeleteCategory(null)}
         onConfirm={handleConfirmDelete}
       />

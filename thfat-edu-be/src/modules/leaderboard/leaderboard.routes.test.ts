@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
 
 import { errorHandlerPlugin } from "../../middlewares/error-handler";
+import { bearer, createMockAuthService } from "../auth/auth.test-utils";
 import { leaderboardRoutes } from "./leaderboard.routes";
 import { type LeaderboardService } from "./leaderboard.service";
 
@@ -50,6 +51,7 @@ describe("leaderboard.routes", () => {
 
   const testApp = new Elysia()
     .use(errorHandlerPlugin)
+    .decorate("authService", createMockAuthService())
     .decorate("leaderboardService", mockLeaderboardService)
     .use(leaderboardRoutes);
 
@@ -68,14 +70,14 @@ describe("leaderboard.routes", () => {
     expect(data.items[0]?.fullName).toBe("Nguyễn Văn A");
   });
 
-  it("GET /leaderboard extracts x-user-id header when provided", async () => {
+  it("GET /leaderboard resolves current user from session and ignores x-user-id", async () => {
     const res = await testApp.handle(
       new Request("http://localhost/leaderboard", {
-        headers: { "x-user-id": "user-uuid-123" },
+        headers: { ...bearer("student"), "x-user-id": "spoofed-id" },
       }),
     );
     expect(res.status).toBe(200);
-    expect(capturedGlobalUserId).toBe("user-uuid-123");
+    expect(capturedGlobalUserId).toBe("student-uuid");
   });
 
   it("GET /leaderboard/quizzes/:quizId returns quiz-specific leaderboard", async () => {
@@ -88,7 +90,7 @@ describe("leaderboard.routes", () => {
     expect(capturedQuizId).toBe(quizId);
   });
 
-  it("GET /leaderboard/quizzes/:quizId extracts x-user-id header when provided", async () => {
+  it("GET /leaderboard/quizzes/:quizId treats x-user-id alone as Guest", async () => {
     const quizId = "22222222-2222-4222-a222-222222222222";
     const res = await testApp.handle(
       new Request(`http://localhost/leaderboard/quizzes/${quizId}`, {
@@ -96,6 +98,6 @@ describe("leaderboard.routes", () => {
       }),
     );
     expect(res.status).toBe(200);
-    expect(capturedQuizUserId).toBe("user-uuid-456");
+    expect(capturedQuizUserId).toBeUndefined();
   });
 });

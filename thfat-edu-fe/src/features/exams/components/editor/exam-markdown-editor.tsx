@@ -5,8 +5,16 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { Check, Pencil } from "lucide-react";
-import { type FocusEvent, useRef, useState } from "react";
+import {
+  type ChangeEvent,
+  type ClipboardEvent,
+  type FocusEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
+import { useExamImageUpload } from "../../hooks/use-exam-image-upload";
 import { ExamMarkdownSnippetBar } from "./exam-markdown-snippet-bar";
 
 export type TExamMarkdownEditorProps = {
@@ -37,6 +45,32 @@ export function ExamMarkdownEditor({
   const [isEditing, setIsEditing] = useState(!value.trim());
   const containerRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const valueRef = useRef(value);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const selectionRef = useRef<{ start: number; end: number } | null>(null);
+  const isPickingImageRef = useRef(false);
+  const { isUploading, uploadImage } = useExamImageUpload();
+
+  useEffect(() => {
+    valueRef.current = value;
+  }, [value]);
+
+  useEffect(() => {
+    const input = fileInputRef.current;
+
+    if (!input) {
+      return;
+    }
+
+    const handleCancel = () => {
+      isPickingImageRef.current = false;
+      selectionRef.current = null;
+    };
+
+    input.addEventListener("cancel", handleCancel);
+
+    return () => input.removeEventListener("cancel", handleCancel);
+  }, []);
 
   const handleInsertSnippet = (snippet: string) => {
     const textarea = textareaRef.current;
@@ -58,6 +92,67 @@ export function ExamMarkdownEditor({
     });
   };
 
+  const handleUploadImage = async (file: File) => {
+    const textarea = textareaRef.current;
+    const length = valueRef.current.length;
+    const selection = selectionRef.current ?? {
+      start: textarea?.selectionStart ?? length,
+      end: textarea?.selectionEnd ?? length,
+    };
+
+    selectionRef.current = null;
+
+    const url = await uploadImage(file);
+
+    if (!url) {
+      return;
+    }
+
+    const current = valueRef.current;
+    const snippet = `![ảnh minh họa](${url})`;
+    const start = Math.min(selection.start, current.length);
+    const end = Math.min(selection.end, current.length);
+
+    onChange(current.slice(0, start) + snippet + current.slice(end));
+  };
+
+  const handleRequestImage = () => {
+    const textarea = textareaRef.current;
+
+    // Opening the native file dialog blurs the textarea; remember where to insert and keep the
+    // editor open so the hidden file input stays mounted until a file is chosen.
+    selectionRef.current = {
+      start: textarea?.selectionStart ?? valueRef.current.length,
+      end: textarea?.selectionEnd ?? valueRef.current.length,
+    };
+    isPickingImageRef.current = true;
+    fileInputRef.current?.click();
+  };
+
+  const handleImageFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    e.target.value = "";
+    isPickingImageRef.current = false;
+
+    if (file) {
+      void handleUploadImage(file);
+    }
+  };
+
+  const handlePaste = (e: ClipboardEvent<HTMLTextAreaElement>) => {
+    const imageFile = Array.from(e.clipboardData.files).find((file) =>
+      file.type.startsWith("image/"),
+    );
+
+    if (!imageFile) {
+      return;
+    }
+
+    e.preventDefault();
+    void handleUploadImage(imageFile);
+  };
+
   const handleStartEditing = () => {
     const cleaned = cleanMathBackslashes(value);
     if (cleaned !== value) {
@@ -70,7 +165,7 @@ export function ExamMarkdownEditor({
   };
 
   const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
-    if (!clickToEdit || !value.trim()) return;
+    if (!clickToEdit || !value.trim() || isPickingImageRef.current || isUploading) return;
     if (!containerRef.current?.contains(e.relatedTarget as Node | null)) {
       const cleaned = cleanMathBackslashes(value);
       if (cleaned !== value) {
@@ -160,6 +255,14 @@ export function ExamMarkdownEditor({
         className,
       )}
     >
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={handleImageFileChange}
+      />
+
       {(label || showRenderedView) && (
         <div className="border-border/35 flex items-center justify-between border-b px-3 py-1.5 text-xs">
           {label ? (
@@ -194,12 +297,17 @@ export function ExamMarkdownEditor({
         </button>
       ) : (
         <div>
-          <ExamMarkdownSnippetBar onInsertSnippet={handleInsertSnippet} />
+          <ExamMarkdownSnippetBar
+            onInsertSnippet={handleInsertSnippet}
+            onRequestImage={handleRequestImage}
+            isUploadingImage={isUploading}
+          />
 
           <Textarea
             ref={textareaRef}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onPaste={handlePaste}
             placeholder={placeholder}
             rows={rows}
             className={`placeholder:text-muted-foreground/60 field-sizing-content min-h-[64px] resize-none border-0 bg-transparent p-2.5 text-xs font-medium focus-visible:ring-0 sm:text-sm ${

@@ -38,13 +38,15 @@ export function ExamListTable() {
 
   const [rowSelection, setRowSelection] = useState<Record<string, boolean>>({});
   const [targetExam, setTargetExam] = useState<Nullable<{ id: string; title: string }>>(null);
+  const [isBatchDeleteOpen, setIsBatchDeleteOpen] = useState(false);
 
   const queryParams = {
+    limit: 1000,
     search: search.trim() || undefined,
     status: status === "all" ? undefined : (status as TExamStatus),
   };
 
-  const { data, isLoading, error } = useExams(queryParams);
+  const { data, isLoading, isPlaceholderData, error } = useExams(queryParams);
   const deleteMutation = useDeleteExam();
   const batchDeleteMutation = useBatchDeleteExams();
   const updateMutation = useUpdateExam("");
@@ -57,12 +59,14 @@ export function ExamListTable() {
   );
 
   const total = filteredItems.length;
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
+  const safePage = Math.min(Math.max(1, page), totalPages);
 
   const paginatedItems = useMemo(() => {
-    const start = (page - 1) * pageSize;
+    const start = (safePage - 1) * pageSize;
 
     return filteredItems.slice(start, start + pageSize);
-  }, [filteredItems, page, pageSize]);
+  }, [filteredItems, safePage, pageSize]);
 
   const handleConfirmDelete = async () => {
     if (!targetExam) return;
@@ -78,12 +82,13 @@ export function ExamListTable() {
 
   const handleBatchDelete = async () => {
     const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
-    if (selectedIds.length === 0) return;
+    if (selectedIds.length === 0 || batchDeleteMutation.isPending) return;
 
     try {
       await batchDeleteMutation.mutateAsync(selectedIds);
       toast.success(`Đã xóa thành công ${selectedIds.length} đề thi`);
       setRowSelection({});
+      setIsBatchDeleteOpen(false);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Có lỗi xảy ra khi xóa.");
     }
@@ -91,6 +96,8 @@ export function ExamListTable() {
 
   const handleToggleStatus = useCallback(
     async (exam: TQuizListItem) => {
+      if (updateMutation.isPending) return;
+
       const nextStatus = exam.status === "archived" ? "published" : "archived";
       try {
         await updateMutation.mutateAsync({ id: exam.id, status: nextStatus });
@@ -106,6 +113,8 @@ export function ExamListTable() {
     [updateMutation],
   );
 
+  const selectedCount = Object.keys(rowSelection).filter((id) => rowSelection[id]).length;
+
   const columns = useMemo(
     () =>
       createExamColumns({
@@ -120,9 +129,9 @@ export function ExamListTable() {
       <DataTable
         columns={columns}
         data={paginatedItems}
-        isLoading={isLoading}
+        isLoading={isLoading || isPlaceholderData}
         totalCount={total}
-        pageIndex={page}
+        pageIndex={safePage}
         pageSize={pageSize}
         pageSizeOptions={[10, 20, 50]}
         onPageChange={setPage}
@@ -146,7 +155,8 @@ export function ExamListTable() {
           <Button
             variant="destructive"
             size="sm"
-            onClick={handleBatchDelete}
+            onClick={() => setIsBatchDeleteOpen(true)}
+            disabled={batchDeleteMutation.isPending}
             className="h-7 gap-1.5 rounded-lg px-2.5 text-xs shadow-xs"
           >
             <Trash2 className="size-3.5" />
@@ -169,6 +179,14 @@ export function ExamListTable() {
         isDeleting={deleteMutation.isPending}
         onClose={() => setTargetExam(null)}
         onConfirm={handleConfirmDelete}
+      />
+
+      <ExamDeleteDialog
+        targetExam={null}
+        batchCount={isBatchDeleteOpen ? selectedCount : 0}
+        isDeleting={batchDeleteMutation.isPending}
+        onClose={() => setIsBatchDeleteOpen(false)}
+        onConfirm={handleBatchDelete}
       />
     </div>
   );

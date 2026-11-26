@@ -12,7 +12,6 @@ import type { TProfileFormValues } from "../schemas/profile.schema";
 function buildPayload(values: TProfileFormValues, role: TAuthUser["role"]) {
   const base = {
     fullName: values.fullName,
-    avatarUrl: values.avatarUrl ?? null,
     gender: values.gender ?? null,
   };
 
@@ -77,7 +76,6 @@ export function useUpdateProfile() {
           return {
             ...old,
             fullName: payload.fullName ?? old.fullName,
-            avatarUrl: payload.avatarUrl ?? old.avatarUrl,
             gender: payload.gender !== undefined ? payload.gender : old.gender,
             studentProfile:
               "studentProfile" in payload && payload.studentProfile

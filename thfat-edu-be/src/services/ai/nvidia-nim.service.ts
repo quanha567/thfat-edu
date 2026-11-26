@@ -1,4 +1,7 @@
 import { env } from "../../config/env";
+import { createModuleLogger } from "../../config/logger";
+
+const nimLogger = createModuleLogger("nvidia-nim");
 
 const NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1";
 
@@ -84,6 +87,34 @@ export class NvidiaNimService {
   }
 
   public async chatCompletion(options: TNimChatOptions): Promise<string> {
+    const startedAt = performance.now();
+    const fields = { service: "nvidia-nim", operation: "chatCompletion", model: options.model };
+
+    try {
+      const result = await this.executeChatCompletion(options);
+
+      nimLogger.info(
+        { ...fields, outcome: "success", durationMs: Math.round(performance.now() - startedAt) },
+        "external call completed",
+      );
+
+      return result;
+    } catch (error) {
+      nimLogger.error(
+        {
+          ...fields,
+          outcome: "failure",
+          durationMs: Math.round(performance.now() - startedAt),
+          err: error,
+        },
+        "external call failed",
+      );
+
+      throw error;
+    }
+  }
+
+  private async executeChatCompletion(options: TNimChatOptions): Promise<string> {
     const apiKey = this.getApiKey();
 
     const res = await fetch(`${NVIDIA_BASE_URL}/chat/completions`, {
@@ -281,7 +312,9 @@ EXAM SECTION RULES:
       explanation?: string | null;
     }>;
   }> {
-    const rawImageUrl = input.question.imageUrl?.trim();
+    const rawImageUrl =
+      input.question.imageUrl?.trim() ||
+      extractFirstMarkdownImageUrl(input.question.contextContent);
     const hasValidImage = Boolean(
       rawImageUrl &&
       (rawImageUrl.startsWith("http://") ||
@@ -355,6 +388,11 @@ ${JSON.stringify(input.question.subItems, null, 2)}`;
     } catch (primaryErr) {
       // Fallback to ultra 550b text-only if multimodal model fails
       if (hasValidImage) {
+        nimLogger.warn(
+          { err: primaryErr, fallbackModel: "nvidia/nemotron-3-ultra-550b-a55b" },
+          "multimodal model failed, falling back to text-only model",
+        );
+
         rawResponse = await this.chatCompletion({
           model: "nvidia/nemotron-3-ultra-550b-a55b",
           messages: [
@@ -408,3 +446,11 @@ ${JSON.stringify(input.question.subItems, null, 2)}`;
 }
 
 export const nvidiaNimService = new NvidiaNimService();
+
+/** Returns the URL of the first `![alt](url)` image embedded in markdown content, if any. */
+export function extractFirstMarkdownImageUrl(markdown: string | null | undefined): string | null {
+  const match = markdown?.match(/!\[[^\]]*\]\(\s*(<[^>]+>|[^)\s]+)[^)]*\)/);
+  const url = match?.[1]?.replace(/^<|>$/g, "").trim();
+
+  return url ? url : null;
+}

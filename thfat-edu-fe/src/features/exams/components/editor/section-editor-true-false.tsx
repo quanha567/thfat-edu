@@ -50,8 +50,6 @@ export function SectionEditorTrueFalse({
   const hasContent = Boolean(question.contextContent?.trim());
   const handleContextChange = (val: string) =>
     onUpdateQuestion({ ...question, contextContent: val });
-  const handleImageChange = (url: string | null) =>
-    onUpdateQuestion({ ...question, imageUrl: url });
   const handleSubItemChange = (index: number, patch: Partial<TQuizSubItem>) => {
     const updated = [...question.subItems];
     if (updated[index]) {
@@ -69,7 +67,6 @@ export function SectionEditorTrueFalse({
     >
       <QuestionEditorCardHeader
         questionNumber={questionNumber}
-        imageUrl={question.imageUrl}
         canMoveUp={canMoveUp}
         canMoveDown={canMoveDown}
         isCollapsed={isCollapsed}
@@ -80,7 +77,6 @@ export function SectionEditorTrueFalse({
         onMoveDown={onMoveDown}
         onDuplicate={onDuplicate}
         onDelete={onDelete}
-        onImageChange={handleImageChange}
       />
 
       {isCollapsed ? (

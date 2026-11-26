@@ -169,6 +169,7 @@ export function MobileNavSheet({ ref }: TMobileNavSheetProps) {
           {user ? (
             <Button
               variant="outline"
+              disabled={logoutMutation.isPending}
               onClick={() => {
                 logoutMutation.mutate();
                 setOpen(false);

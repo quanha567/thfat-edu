@@ -1,18 +1,28 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Check, Loader2, RotateCcw } from "lucide-react";
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 
+import { DEFAULT_EXAM_SETTINGS_VALUES } from "../constants/settings.constants";
 import { useExamSettings } from "../hooks/use-exam-settings";
 import { useUpdateExamSettings } from "../hooks/use-update-exam-settings";
 import { examSettingsSchema, type TExamSettingsFormValues } from "../schemas/exam-settings.schema";
+import { type TExamSettings } from "../types/settings.types";
 import { AttemptRulesCard } from "./attempt-rules-card";
+import { FormActionBar } from "./form-action-bar";
 import { ResultRulesCard } from "./result-rules-card";
-import { SettingsPreviewPanel } from "./settings-preview-panel";
+
+function toFormValues(settings: TExamSettings): TExamSettingsFormValues {
+  return {
+    maxAttempts: settings.maxAttempts,
+    scorePolicy: settings.scorePolicy,
+    cooldownMinutes: settings.cooldownMinutes,
+    showScoreImmediately: settings.showScoreImmediately,
+    showExplanationPolicy: settings.showExplanationPolicy,
+  };
+}
 
 export function ExamSettingsForm() {
   const { data: settings, isLoading } = useExamSettings();
@@ -27,106 +37,44 @@ export function ExamSettingsForm() {
     formState: { errors, isDirty },
   } = useForm<TExamSettingsFormValues>({
     resolver: zodResolver(examSettingsSchema),
-    defaultValues: {
-      maxAttempts: 1,
-      scorePolicy: "highest",
-      cooldownMinutes: 0,
-      showScoreImmediately: true,
-      showExplanationPolicy: "immediately",
-    },
+    defaultValues: DEFAULT_EXAM_SETTINGS_VALUES,
   });
 
   useEffect(() => {
     if (settings) {
-      reset(settings);
+      reset(toFormValues(settings));
     }
   }, [settings, reset]);
 
-  const onSubmit = (values: TExamSettingsFormValues) => {
-    updateMutation.mutate(values);
-  };
-
   if (isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-        <div className="space-y-6 xl:col-span-7">
-          <Skeleton className="h-72 w-full rounded-xl" />
-          <Skeleton className="h-60 w-full rounded-xl" />
-        </div>
-        <div className="xl:col-span-5">
-          <Skeleton className="h-80 w-full rounded-xl" />
-        </div>
+      <div className="grid gap-6 xl:grid-cols-2">
+        <Skeleton className="h-72 w-full rounded-xl" />
+        <Skeleton className="h-72 w-full rounded-xl" />
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="pb-12">
-      <div className="grid grid-cols-1 gap-8 xl:grid-cols-12">
-        {/* Left Column: Form Controls */}
-        <div className="space-y-6 xl:col-span-7">
-          <AttemptRulesCard
-            control={control}
-            register={register}
-            setValue={setValue}
-            errors={errors}
-          />
-
-          <ResultRulesCard control={control} />
-
-          <div className="border-border/80 bg-card flex items-center justify-between rounded-xl border p-4 shadow-2xs">
-            <div>
-              {isDirty ? (
-                <span className="text-warning-600 dark:text-warning-400 flex items-center gap-1.5 text-xs font-semibold">
-                  <span className="bg-warning-500 inline-block size-2 animate-pulse rounded-full" />
-                  Có thay đổi chưa lưu
-                </span>
-              ) : (
-                <span className="text-muted-foreground text-xs">
-                  Cấu hình hiện tại đã đồng bộ với máy chủ
-                </span>
-              )}
-            </div>
-            <div className="flex items-center gap-2.5">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={!isDirty || updateMutation.isPending}
-                onClick={() => settings && reset(settings)}
-              >
-                <RotateCcw className="mr-1.5 h-3.5 w-3.5" />
-                Hủy thay đổi
-              </Button>
-              <Button
-                type="submit"
-                size="sm"
-                disabled={!isDirty || updateMutation.isPending}
-                className="min-w-28"
-              >
-                {updateMutation.isPending ? (
-                  <>
-                    <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
-                    Đang lưu...
-                  </>
-                ) : (
-                  <>
-                    <Check className="mr-1.5 h-3.5 w-3.5" />
-                    Lưu cấu hình
-                  </>
-                )}
-              </Button>
-            </div>
-          </div>
-        </div>
-
-        {/* Right Column: Live Preview & Guidance Panel */}
-        <div className="xl:col-span-5">
-          <div className="sticky top-20">
-            <SettingsPreviewPanel control={control} />
-          </div>
-        </div>
+    <form
+      onSubmit={handleSubmit((values) => updateMutation.mutate(values))}
+      className="space-y-6 pb-12"
+    >
+      <div className="grid items-start gap-6 xl:grid-cols-2">
+        <AttemptRulesCard
+          control={control}
+          register={register}
+          setValue={setValue}
+          errors={errors}
+        />
+        <ResultRulesCard control={control} />
       </div>
+      <FormActionBar
+        meta={settings}
+        isDirty={isDirty}
+        isPending={updateMutation.isPending}
+        onReset={() => settings && reset(toFormValues(settings))}
+      />
     </form>
   );
 }

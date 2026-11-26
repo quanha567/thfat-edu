@@ -53,14 +53,14 @@ export function AboutPreviewSection() {
           <div className="relative flex h-56 w-full items-center justify-center sm:h-64 md:col-span-5 lg:h-72">
             {/* Ambient Cyan Aura behind Flask */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
-              <div className="h-48 w-48 rounded-full bg-gradient-to-tr from-cyan-400/25 to-blue-500/20 blur-2xl dark:bg-cyan-500/15" />
+              <div className="to-primary-500/20 h-48 w-48 rounded-full bg-gradient-to-tr from-cyan-400/25 blur-2xl dark:bg-cyan-500/15" />
             </div>
 
             <Image
               src={HOME_ABOUT_DATA.imageSrc}
               alt="Bình thí nghiệm hóa học 3D ThFat Edu"
               fill
-              className="relative z-10 object-contain drop-shadow-[0_16px_32px_rgba(0,140,255,0.25)] transition-transform duration-500 hover:scale-105"
+              className="relative z-10 object-contain drop-shadow-lg transition-transform duration-500 hover:scale-105"
               sizes="(max-width: 768px) 100vw, 360px"
               priority
             />

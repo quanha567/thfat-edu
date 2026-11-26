@@ -26,15 +26,16 @@ const SIZE_CLASSES: Record<TBaseAvatarSize, string> = {
   xl: "h-12 w-12 text-base",
 };
 
+// Decorative per-user colour: every gradient stays inside the brand palette.
 export const AVATAR_GRADIENTS = [
-  "from-blue-600 via-indigo-600 to-blue-700",
-  "from-emerald-500 via-teal-600 to-cyan-700",
-  "from-amber-500 via-orange-500 to-rose-600",
-  "from-purple-600 via-violet-600 to-indigo-700",
-  "from-cyan-500 via-blue-600 to-indigo-700",
-  "from-rose-500 via-pink-600 to-purple-600",
-  "from-indigo-600 via-blue-700 to-purple-800",
-  "from-teal-500 via-emerald-600 to-teal-700",
+  "from-primary-600 via-primary-500 to-primary-700",
+  "from-success-500 via-success-600 to-info-600",
+  "from-gold-500 via-gold-600 to-gold-700",
+  "from-primary-700 via-primary-600 to-info-600",
+  "from-cyan-500 via-primary-600 to-primary-800",
+  "from-gold-400 via-gold-500 to-primary-600",
+  "from-primary-500 via-primary-700 to-primary-900",
+  "from-info-500 via-info-600 to-primary-700",
 ] as const;
 
 export const DEFAULT_BOY_AVATARS = [

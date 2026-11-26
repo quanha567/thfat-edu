@@ -6,6 +6,17 @@ export const EnvSchema = t.Object({
     default: "development",
   }),
   PORT: t.String({ default: "3001" }),
+  LOG_LEVEL: t.Optional(
+    t.Union([
+      t.Literal("fatal"),
+      t.Literal("error"),
+      t.Literal("warn"),
+      t.Literal("info"),
+      t.Literal("debug"),
+      t.Literal("trace"),
+      t.Literal("silent"),
+    ]),
+  ),
   DATABASE_URL: t.String({ minLength: 1 }),
   FRONTEND_URL: t.String({ default: "http://localhost:3000" }),
   JWT_SECRET: t.String({ minLength: 16 }),
@@ -16,6 +27,9 @@ export const EnvSchema = t.Object({
   FIREBASE_SERVICE_ACCOUNT_PATH: t.Optional(t.String()),
   VERCEL: t.Optional(t.String()),
   NVIDIA_API_KEY: t.Optional(t.String()),
+  IMAGEKIT_PUBLIC_KEY: t.String({ minLength: 1 }),
+  IMAGEKIT_PRIVATE_KEY: t.String({ minLength: 1 }),
+  IMAGEKIT_URL_ENDPOINT: t.String({ minLength: 1 }),
 });
 
 export type TEnv = Static<typeof EnvSchema>;
@@ -27,6 +41,7 @@ function loadEnv(): TEnv {
   const rawEnv: Record<string, unknown> = {
     NODE_ENV: process.env.NODE_ENV ?? "development",
     PORT: process.env.PORT ?? "3001",
+    LOG_LEVEL: process.env.LOG_LEVEL || undefined,
     DATABASE_URL:
       process.env.DATABASE_URL ?? (isTest ? "postgres://localhost:5432/test_db" : undefined),
     FRONTEND_URL: process.env.FRONTEND_URL ?? "http://localhost:3000",
@@ -39,6 +54,9 @@ function loadEnv(): TEnv {
     FIREBASE_SERVICE_ACCOUNT_PATH: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
     VERCEL: process.env.VERCEL,
     NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
+    IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,
+    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
+    IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
   };
 
   if (!Value.Check(EnvSchema, rawEnv)) {

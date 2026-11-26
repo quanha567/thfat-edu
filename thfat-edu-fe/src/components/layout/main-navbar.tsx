@@ -37,7 +37,7 @@ export function MainNavbar() {
       className={`fixed inset-x-0 top-0 z-50 w-full transition-all duration-300 ${
         isTransparent
           ? "border-b border-transparent bg-transparent"
-          : "border-b border-white/10 bg-[#061845]/95 shadow-md backdrop-blur-md"
+          : "bg-surface-dark/95 border-b border-white/10 shadow-md backdrop-blur-md"
       }`}
     >
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">

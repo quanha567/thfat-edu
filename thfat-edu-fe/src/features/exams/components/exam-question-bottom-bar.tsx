@@ -61,9 +61,9 @@ export function ExamQuestionBottomBar({
   const unansweredCount = Math.max(0, totalQuestions - completedCount - partialCount);
 
   return (
-    <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200/80 bg-white/95 py-2 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] backdrop-blur-md sm:py-2.5">
+    <footer className="fixed inset-x-0 bottom-0 z-40 border-t border-neutral-200/80 bg-white/95 py-2 shadow-md backdrop-blur-md sm:py-2.5">
       {/* Hàng chú thích nằm ngay trên danh sách câu hỏi */}
-      <div className="text-2xs flex items-center justify-center gap-3 border-b border-neutral-100 px-4 pb-1.5 text-neutral-600 sm:gap-6 sm:text-xs">
+      <div className="text-xxs flex items-center justify-center gap-3 border-b border-neutral-100 px-4 pb-1.5 text-neutral-600 sm:gap-6 sm:text-xs">
         <div className="flex items-center gap-1.5 font-medium">
           <span className="bg-primary-700 h-2.5 w-2.5 rounded-xs sm:h-3 sm:w-3" />
           <span>Đã làm ({completedCount})</span>

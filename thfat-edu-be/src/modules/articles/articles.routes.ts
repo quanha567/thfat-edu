@@ -1,7 +1,7 @@
 import { Elysia, t } from "elysia";
 
-import { ForbiddenError, UnauthorizedError } from "../../middlewares/error-handler";
-import { extractSessionToken, SESSION_COOKIE_NAME } from "../auth/auth.cookie";
+import { createModuleLogger } from "../../config/logger";
+import { requireAuth } from "../auth/auth.guard";
 import { type AuthService, authService as defaultAuthService } from "../auth/auth.service";
 import {
   AiEnhancePromptInputSchema,
@@ -20,6 +20,8 @@ import {
   type ArticlesService,
   articlesService as defaultArticlesService,
 } from "./articles.service";
+
+const articlesLogger = createModuleLogger("articles");
 
 export type TArticlesRoutesOptions = {
   articlesService?: ArticlesService;
@@ -86,27 +88,12 @@ export function createAdminArticlesRoutes(options?: TArticlesRoutesOptions) {
   return new Elysia({ prefix: "/admin" })
     .decorate("articlesService", service)
     .decorate("authService", auth)
-    .derive(async ({ cookie, request, authService: activeAuthService }) => {
-      let token = extractSessionToken(cookie[SESSION_COOKIE_NAME]?.value);
-      if (!token) {
-        const authHeader = request.headers.get("authorization");
-        if (authHeader?.startsWith("Bearer ")) {
-          token = authHeader.slice(7).trim();
-        }
-      }
-
-      if (!token) {
-        throw new UnauthorizedError("Bạn cần đăng nhập để thực hiện thao tác này.");
-      }
-
-      const currentAuthService = activeAuthService ?? auth;
-      const currentUser = await currentAuthService.getCurrentUser(token);
-      if (!currentUser || currentUser.role !== "admin") {
-        throw new ForbiddenError("Chỉ quản trị viên mới có quyền truy cập chức năng này.");
-      }
-
-      return { currentUser, sessionToken: token };
-    })
+    .use(
+      requireAuth({
+        roles: ["admin"],
+        forbiddenMessage: "Chỉ quản trị viên mới có quyền truy cập chức năng này.",
+      }),
+    )
     .group("/articles", (group) =>
       group
         .get(
@@ -155,6 +142,11 @@ export function createAdminArticlesRoutes(options?: TArticlesRoutesOptions) {
                   controller.enqueue(encoder.encode("data: [DONE]\n\n"));
                   controller.close();
                 } catch (err: unknown) {
+                  articlesLogger.error(
+                    { err, operation: "streamGenerateArticle" },
+                    "AI article stream failed",
+                  );
+
                   const errorMsg =
                     err instanceof Error ? err.message : "Đã có lỗi xảy ra khi tạo bài viết.";
                   controller.enqueue(

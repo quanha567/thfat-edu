@@ -3,6 +3,7 @@ import { describe, expect, it } from "bun:test";
 import { Elysia } from "elysia";
 
 import { errorHandlerPlugin } from "../../middlewares/error-handler";
+import { bearer, createMockAuthService } from "../auth/auth.test-utils";
 import { quizzesRoutes } from "./quizzes.routes";
 import { type QuizzesService } from "./quizzes.service";
 
@@ -29,11 +30,14 @@ describe("quizzes.routes", () => {
 
   const testApp = new Elysia()
     .use(errorHandlerPlugin)
+    .decorate("authService", createMockAuthService())
     .decorate("quizzesService", mockQuizzesService)
     .use(quizzesRoutes);
 
   it("GET /quizzes returns a paginated list structure", async () => {
-    const response = await testApp.handle(new Request("http://localhost/quizzes?page=1&limit=10"));
+    const response = await testApp.handle(
+      new Request("http://localhost/quizzes?page=1&limit=10", { headers: bearer("teacher") }),
+    );
 
     expect(response.status).toBe(200);
     const body = (await response.json()) as {
@@ -71,7 +75,7 @@ describe("quizzes.routes", () => {
     const response = await testApp.handle(
       new Request("http://localhost/quizzes/ai/solve-question", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...bearer("teacher") },
         body: JSON.stringify(payload),
       }),
     );

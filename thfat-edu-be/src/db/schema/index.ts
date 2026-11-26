@@ -12,6 +12,7 @@ export * from "./quizzes";
 export * from "./attempts";
 export * from "./settings";
 export * from "./articles";
+export * from "./invite-codes";
 
 export const usersRelations = relations(users, ({ one, many }) => ({
   studentProfile: one(studentProfiles, {

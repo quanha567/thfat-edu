@@ -1,7 +1,7 @@
 import { getApiBaseUrl } from "@/lib/api";
 import { extractApiErrorMessage } from "@/lib/api-error";
 import { queryKeys } from "@/lib/query-keys";
-import { useQuery } from "@tanstack/react-query";
+import { keepPreviousData, useQuery } from "@tanstack/react-query";
 
 import { type TExamFilterParams, type TQuizListResponse } from "../types";
 
@@ -28,5 +28,6 @@ export function useExams(params: TExamFilterParams = {}) {
       return res.json();
     },
     staleTime: 60 * 1000,
+    placeholderData: keepPreviousData,
   });
 }

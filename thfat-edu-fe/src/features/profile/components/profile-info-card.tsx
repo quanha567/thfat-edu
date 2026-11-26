@@ -1,14 +1,15 @@
 "use client";
 
-import { BaseAvatar } from "@/components/base";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import type { TAuthUser } from "@/features/auth/types";
 import { Mail, Shield, GraduationCap, BookOpen, User } from "lucide-react";
+import { useState } from "react";
 
 import { useSendResetPasswordEmail } from "../hooks/use-send-reset-password-email";
+import { AvatarUpload } from "./avatar-upload";
 
 const GENDER_LABELS: Record<string, string> = {
   male: "Nam",
@@ -82,18 +83,24 @@ function RoleBadge({ role }: { role: TAuthUser["role"] }) {
 
 export function ProfileInfoCard({ user }: TProfileInfoCardProps) {
   const resetPasswordMutation = useSendResetPasswordEmail({ email: user.email });
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(user.avatarUrl ?? null);
+
+  const userInitials = user.fullName
+    .split(" ")
+    .slice(-2)
+    .map((n) => n[0])
+    .join("")
+    .toUpperCase();
 
   return (
     <Card className="h-fit">
       <CardContent className="flex flex-col items-center gap-5 p-6">
-        {/* Avatar */}
-        <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex size-24 shrink-0 items-center justify-center rounded-full shadow-md ring-4">
-          <BaseAvatar
-            src={user.avatarUrl}
-            name={user.fullName}
-            gender={user.gender}
-            size="xl"
-            className="size-24 text-2xl"
+        {/* Avatar with upload */}
+        <div className="ring-primary-500/20 dark:ring-primary-400/30 relative flex shrink-0 items-center justify-center rounded-full shadow-md ring-4">
+          <AvatarUpload
+            currentAvatarUrl={avatarUrl}
+            userInitials={userInitials}
+            onUploadSuccess={setAvatarUrl}
           />
         </div>
 

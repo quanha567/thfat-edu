@@ -1,3 +1,4 @@
+// color-exception: decorative celebration illustration with metallic gradients outside the UI palette.
 export function LeaderboardRibbons() {
   return (
     <div className="pointer-events-none absolute inset-x-0 -top-4 bottom-0 z-0 overflow-hidden">

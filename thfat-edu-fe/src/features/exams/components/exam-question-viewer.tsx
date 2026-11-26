@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Flag } from "lucide-react";
 
 import { type TExamRoomQuestion, type TSectionType } from "../types";
+import { getLegacyImageUrl } from "../utils/question-images";
 import { sanitizeDisplayContext } from "../utils/sanitize-context";
 import { GroupMcqOptions } from "./group-mcq-options";
 import { MatchingTable } from "./matching-table";
@@ -140,6 +141,7 @@ export function ExamQuestionViewer({
   onAnswerChange,
   onToggleFlag,
 }: TExamQuestionViewerProps) {
+  const legacyImageUrl = getLegacyImageUrl(question);
   const isSingleSubItem = question.subItems.length === 1;
   const singleSubItem = isSingleSubItem ? question.subItems[0] : null;
   const isSingleFlagged = singleSubItem ? Boolean(answersMap[singleSubItem.id]?.isFlagged) : false;
@@ -186,11 +188,11 @@ export function ExamQuestionViewer({
           )}
         </div>
 
-        {question.imageUrl && (
+        {legacyImageUrl && (
           <div className="my-2 flex justify-center overflow-hidden rounded-lg border border-neutral-200 bg-neutral-50 p-2">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src={question.imageUrl}
+              src={legacyImageUrl}
               alt={`Hình ảnh câu ${questionNumber}`}
               className="max-h-80 max-w-full rounded-md object-contain"
             />

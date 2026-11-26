@@ -35,3 +35,54 @@ export const DEFAULT_EXAM_SETTINGS: TExamSettings = {
   showScoreImmediately: true,
   showExplanationPolicy: "immediately",
 };
+
+export const SettingsMetaSchema = t.Object({
+  updatedAt: t.Nullable(t.String()),
+  updatedByName: t.Nullable(t.String()),
+});
+export type TSettingsMeta = Static<typeof SettingsMetaSchema>;
+
+export const ExamSettingsResponseSchema = t.Object({
+  ...ExamSettingsSchema.properties,
+  ...SettingsMetaSchema.properties,
+});
+export type TExamSettingsResponse = Static<typeof ExamSettingsResponseSchema>;
+
+const OPTIONAL_URL_PATTERN = "^(https?://\\S+)?$";
+const OPTIONAL_EMAIL_PATTERN = "^([^\\s@]+@[^\\s@]+\\.[^\\s@]+)?$";
+
+const OptionalUrlSchema = t.String({ maxLength: 500, pattern: OPTIONAL_URL_PATTERN });
+
+export const SiteInfoSchema = t.Object({
+  siteName: t.String({ minLength: 1, maxLength: 60 }),
+  slogan: t.String({ maxLength: 120 }),
+  contactEmail: t.String({ maxLength: 254, pattern: OPTIONAL_EMAIL_PATTERN }),
+  facebookUrl: OptionalUrlSchema,
+  youtubeUrl: OptionalUrlSchema,
+  zaloUrl: OptionalUrlSchema,
+  tiktokUrl: OptionalUrlSchema,
+  telegramUrl: OptionalUrlSchema,
+  instagramUrl: OptionalUrlSchema,
+});
+export type TSiteInfo = Static<typeof SiteInfoSchema>;
+
+export const UpdateSiteInfoSchema = SiteInfoSchema;
+export type TUpdateSiteInfoInput = Static<typeof UpdateSiteInfoSchema>;
+
+export const SiteInfoResponseSchema = t.Object({
+  ...SiteInfoSchema.properties,
+  ...SettingsMetaSchema.properties,
+});
+export type TSiteInfoResponse = Static<typeof SiteInfoResponseSchema>;
+
+export const DEFAULT_SITE_INFO: TSiteInfo = {
+  siteName: "ThFat Edu",
+  slogan: "Học chắc bản chất, vững vàng phòng thi",
+  contactEmail: "",
+  facebookUrl: "",
+  youtubeUrl: "",
+  zaloUrl: "",
+  tiktokUrl: "",
+  telegramUrl: "",
+  instagramUrl: "",
+};

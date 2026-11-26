@@ -6,6 +6,7 @@ import {
   revokeFirebaseUserSessions,
   updateFirebaseUser,
 } from "../../config/firebase";
+import { createModuleLogger } from "../../config/logger";
 import { type Database, db } from "../../db";
 import {
   sessions,
@@ -28,6 +29,8 @@ import {
   type TUpdateUserBody,
   type TUserDetailResponse,
 } from "./users.model";
+
+const usersLogger = createModuleLogger("users");
 
 function formatStudentProfile(profile: TStudentProfile | null): TStudentProfileResponse | null {
   if (!profile) return null;
@@ -232,6 +235,11 @@ export class UsersService {
       });
       firebaseUid = fbResult.uid;
     } catch (fbError) {
+      usersLogger.warn(
+        { err: fbError, operation: "createFirebaseUser" },
+        "failed to create Firebase user",
+      );
+
       throw new BadRequestError(
         `Không thể tạo tài khoản trên Firebase Auth: ${(fbError as Error).message}`,
       );
@@ -289,6 +297,8 @@ export class UsersService {
       teacherProfileRecord = createdProfile ?? null;
     }
 
+    usersLogger.info({ targetUserId: newUser.id, role: newUser.role }, "user created");
+
     return formatUserDetail({
       user: newUser,
       studentProfile: studentProfileRecord,
@@ -323,8 +333,9 @@ export class UsersService {
             data.avatarUrl === null ? "" : (data.avatarUrl ?? existing.avatarUrl ?? undefined),
         });
       } catch (error) {
-        console.warn(
-          `[UsersService] Failed to sync updated profile to Firebase: ${(error as Error).message}`,
+        usersLogger.warn(
+          { err: error, targetUserId: id, operation: "updateFirebaseUser" },
+          "failed to sync updated profile to Firebase",
         );
       }
     }
@@ -355,10 +366,18 @@ export class UsersService {
       if (existing.firebaseUid) {
         try {
           await revokeFirebaseUserSessions(existing.firebaseUid);
-        } catch {
-          // ignore error if revoked already
+        } catch (error) {
+          usersLogger.debug(
+            { err: error, targetUserId: id, operation: "revokeFirebaseUserSessions" },
+            "Firebase session revoke failed after role change (may be already revoked)",
+          );
         }
       }
+
+      usersLogger.info(
+        { targetUserId: id, fromRole: existing.role, toRole: data.role },
+        "user role changed",
+      );
     }
 
     // Update or create profiles
@@ -503,8 +522,9 @@ export class UsersService {
           await revokeFirebaseUserSessions(existing.firebaseUid);
         }
       } catch (error) {
-        console.warn(
-          `[UsersService] Failed to toggle Firebase active status: ${(error as Error).message}`,
+        usersLogger.warn(
+          { err: error, targetUserId: id, operation: "toggleFirebaseActive" },
+          "failed to toggle Firebase active status",
         );
       }
     }
@@ -512,6 +532,8 @@ export class UsersService {
     if (!isActive) {
       await this.database.delete(sessions).where(eq(sessions.userId, id));
     }
+
+    usersLogger.info({ targetUserId: id, isActive }, "user active status changed");
 
     return this.getUserById(id);
   }
@@ -543,11 +565,14 @@ export class UsersService {
         });
         await revokeFirebaseUserSessions(existing.firebaseUid);
       } catch (error) {
-        console.warn(
-          `[UsersService] Failed to disable soft-deleted user in Firebase: ${(error as Error).message}`,
+        usersLogger.warn(
+          { err: error, targetUserId: id, operation: "disableFirebaseUser" },
+          "failed to disable soft-deleted user in Firebase",
         );
       }
     }
+
+    usersLogger.info({ targetUserId: id }, "user soft-deleted");
   }
 
   public async restoreUser(id: string): Promise<TUserDetailResponse> {
@@ -574,11 +599,14 @@ export class UsersService {
           disabled: false,
         });
       } catch (error) {
-        console.warn(
-          `[UsersService] Failed to re-enable user in Firebase: ${(error as Error).message}`,
+        usersLogger.warn(
+          { err: error, targetUserId: id, operation: "enableFirebaseUser" },
+          "failed to re-enable user in Firebase",
         );
       }
     }
+
+    usersLogger.info({ targetUserId: id }, "user restored");
 
     return this.getUserById(id);
   }
@@ -612,6 +640,15 @@ export class UsersService {
     if (data.sendResetEmail) {
       resetLink = await generateFirebasePasswordResetLink(existing.email);
     }
+
+    usersLogger.info(
+      {
+        targetUserId: id,
+        passwordChanged: Boolean(data.newPassword),
+        resetEmailSent: Boolean(data.sendResetEmail),
+      },
+      "user password reset",
+    );
 
     return {
       message: data.newPassword

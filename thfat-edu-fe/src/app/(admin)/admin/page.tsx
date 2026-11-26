@@ -31,7 +31,7 @@ export default function AdminDashboardPage() {
   if (isError || !data) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center p-8 text-center">
-        <div className="mb-3 flex size-12 items-center justify-center rounded-full bg-rose-500/10 text-rose-600">
+        <div className="bg-error-500/10 text-error-600 mb-3 flex size-12 items-center justify-center rounded-full">
           <AlertCircle className="size-6" />
         </div>
         <h2 className="text-foreground text-base font-bold">Không thể tải dữ liệu thống kê</h2>

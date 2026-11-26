@@ -1,3 +1,4 @@
+// color-exception: decorative laurel/crown illustration palette.
 export type TRankWreathConfig = {
   leafGradient: { id: string; stops: Array<{ offset: string; color: string }> };
   crownGradient: { id: string; stops: Array<{ offset: string; color: string }> };

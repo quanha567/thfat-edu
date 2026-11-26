@@ -10,6 +10,7 @@ import {
   type TQuizQuestion,
   type TQuizSection,
 } from "../types";
+import { embedLegacyImages } from "../utils/question-images";
 import { validateExamSections } from "../utils/validate-exam";
 import { useUpdateExam } from "./use-update-exam";
 
@@ -23,7 +24,7 @@ export function useExamEditorState(initialExam: TQuizDetail) {
 
   const [sections, setSections] = useState<TQuizSection[]>(() => {
     if (initialExam.sections && initialExam.sections.length > 0) {
-      return initialExam.sections;
+      return embedLegacyImages(initialExam.sections);
     }
 
     return createDefaultSections();

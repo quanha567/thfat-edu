@@ -16,7 +16,7 @@ export type TArticlePageProps = {
 async function fetchArticleServer(slug: string): Promise<TArticleDetail | null> {
   try {
     const res = await fetch(`${getApiBaseUrl()}/articles/${slug}`, {
-      next: { revalidate: 60 },
+      cache: "no-store",
     });
 
     if (!res.ok) {

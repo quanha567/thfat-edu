@@ -102,25 +102,6 @@ export function ProfileEditForm({ user }: TProfileEditFormProps) {
 
               <FormField
                 control={form.control}
-                name="avatarUrl"
-                render={({ field }) => (
-                  <FormItem className="sm:col-span-2">
-                    <FormLabel>URL ảnh đại diện</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="https://example.com/avatar.jpg"
-                        {...field}
-                        value={field.value ?? ""}
-                        onChange={(e) => field.onChange(e.target.value || null)}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
                 name="gender"
                 render={({ field }) => (
                   <FormItem className="sm:col-span-2">

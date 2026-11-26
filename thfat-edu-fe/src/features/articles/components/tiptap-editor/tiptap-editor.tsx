@@ -14,6 +14,8 @@ export type TTiptapEditorProps = {
   placeholder?: string;
   className?: string;
   editable?: boolean;
+  /** ImageKit folder for inline image uploads, e.g. /articles/content */
+  uploadFolder?: string;
 };
 
 export function TiptapEditor({
@@ -21,6 +23,7 @@ export function TiptapEditor({
   onChange,
   className = "",
   editable = true,
+  uploadFolder,
 }: TTiptapEditorProps) {
   const editor = useEditor({
     immediatelyRender: false,
@@ -66,7 +69,7 @@ export function TiptapEditor({
     <div
       className={`border-border/80 bg-card focus-within:ring-primary-500/20 focus-within:border-primary-500 flex flex-col overflow-hidden rounded-xl border shadow-2xs transition-all focus-within:ring-2 ${className}`}
     >
-      {editable && <TiptapToolbar editor={editor} />}
+      {editable && <TiptapToolbar editor={editor} uploadFolder={uploadFolder} />}
       <div className="flex-1 overflow-y-auto">
         <EditorContent editor={editor} />
       </div>

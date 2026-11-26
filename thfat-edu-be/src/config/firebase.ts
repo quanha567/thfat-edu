@@ -4,6 +4,9 @@ import { applicationDefault, cert, getApps, initializeApp, type App } from "fire
 import { getAuth } from "firebase-admin/auth";
 
 import { env } from "./env";
+import { createModuleLogger } from "./logger";
+
+const firebaseLogger = createModuleLogger("firebase");
 
 let firebaseApp: App | null = null;
 
@@ -48,7 +51,12 @@ export function initializeFirebaseAdmin(): App {
     });
 
     return firebaseApp;
-  } catch {
+  } catch (error) {
+    firebaseLogger.warn(
+      { err: error },
+      "no Firebase credentials found, falling back to project-only app",
+    );
+
     firebaseApp = initializeApp({
       projectId: "thfat-edu-dev",
     });
@@ -153,6 +161,13 @@ export async function generateFirebasePasswordResetLink(email: string): Promise<
   const link = await auth.generatePasswordResetLink(email);
 
   return link;
+}
+
+export async function deleteFirebaseUser(uid: string): Promise<void> {
+  const app = initializeFirebaseAdmin();
+  const auth = getAuth(app);
+
+  await auth.deleteUser(uid);
 }
 
 export async function revokeFirebaseUserSessions(uid: string): Promise<void> {

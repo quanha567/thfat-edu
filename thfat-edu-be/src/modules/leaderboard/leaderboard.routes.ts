@@ -1,49 +1,17 @@
 import { Elysia, t } from "elysia";
 
 import { db } from "../../db";
-import { extractSessionToken, SESSION_COOKIE_NAME } from "../auth/auth.cookie";
-import { authService as defaultAuthService } from "../auth/auth.service";
+import { optionalAuth } from "../auth/auth.guard";
 import { leaderboardQuerySchema } from "./leaderboard.model";
 import { LeaderboardService } from "./leaderboard.service";
 
-async function resolveCurrentUserId(
-  request: Request,
-  cookie: Record<string, { value?: unknown }>,
-): Promise<string | undefined> {
-  const headerUserId = request.headers.get("x-user-id");
-  if (headerUserId) {
-    return headerUserId;
-  }
-
-  let token = extractSessionToken(cookie[SESSION_COOKIE_NAME]?.value);
-  if (!token) {
-    const authHeader = request.headers.get("authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-      token = authHeader.slice(7).trim();
-    }
-  }
-
-  if (!token) {
-    return undefined;
-  }
-
-  try {
-    const user = await defaultAuthService.getCurrentUser(token);
-
-    return user?.id;
-  } catch {
-    return undefined;
-  }
-}
-
 export const leaderboardRoutes = new Elysia({ prefix: "/leaderboard" })
   .decorate("leaderboardService", new LeaderboardService(db))
+  .use(optionalAuth())
   .get(
     "/",
-    async ({ leaderboardService, query, request, cookie }) => {
-      const currentUserId = await resolveCurrentUserId(request, cookie);
-
-      return leaderboardService.getGlobalLeaderboard(query, currentUserId);
+    async ({ leaderboardService, query, currentUser }) => {
+      return leaderboardService.getGlobalLeaderboard(query, currentUser?.id);
     },
     {
       query: leaderboardQuerySchema,
@@ -55,10 +23,8 @@ export const leaderboardRoutes = new Elysia({ prefix: "/leaderboard" })
   )
   .get(
     "/quizzes/:quizId",
-    async ({ leaderboardService, params, query, request, cookie }) => {
-      const currentUserId = await resolveCurrentUserId(request, cookie);
-
-      return leaderboardService.getQuizLeaderboard(params.quizId, query, currentUserId);
+    async ({ leaderboardService, params, query, currentUser }) => {
+      return leaderboardService.getQuizLeaderboard(params.quizId, query, currentUser?.id);
     },
     {
       params: t.Object({

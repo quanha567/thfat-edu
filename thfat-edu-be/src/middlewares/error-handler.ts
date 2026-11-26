@@ -1,5 +1,9 @@
 import { Elysia } from "elysia";
 
+import { createModuleLogger, getRequestContext } from "../config/logger";
+
+const errorLogger = createModuleLogger("error-handler");
+
 export class AppError extends Error {
   constructor(
     public override message: string,
@@ -45,7 +49,7 @@ export type TErrorContext = {
   set: { status?: number | string };
 };
 
-export function handleApplicationError({ code, error, set }: TErrorContext) {
+function buildErrorResponse({ code, error, set }: TErrorContext) {
   if (code === "UNAUTHORIZED" || error instanceof UnauthorizedError) {
     set.status = 401;
 
@@ -111,6 +115,48 @@ export function handleApplicationError({ code, error, set }: TErrorContext) {
       ? "An internal server error occurred"
       : (error as Error).message || "Unknown error",
   };
+}
+
+function extractValidationPaths(error: unknown): string[] {
+  const allErrors = (error as { all?: { path?: string }[] }).all;
+
+  if (!Array.isArray(allErrors)) {
+    return [];
+  }
+
+  return allErrors.map((entry) => entry.path ?? "").filter(Boolean);
+}
+
+function logApplicationError({ code, error, set }: TErrorContext) {
+  const status = Number(set.status);
+
+  if (code === "VALIDATION") {
+    errorLogger.warn({ code, paths: extractValidationPaths(error) }, "request validation failed");
+
+    return;
+  }
+
+  if (status < 500) {
+    return;
+  }
+
+  errorLogger.error(
+    { code, status, err: error instanceof Error ? error : new Error(String(error)) },
+    "unhandled request error",
+  );
+}
+
+export function handleApplicationError(context: TErrorContext) {
+  const body = buildErrorResponse(context);
+  const requestId = getRequestContext()?.requestId;
+
+  logApplicationError(context);
+
+  if (!requestId) {
+    return body;
+  }
+
+  return { ...body, requestId };
 }
 
 export const errorHandlerPlugin = new Elysia({ name: "app:error-handler" })

@@ -36,6 +36,20 @@
       "when": 1794759947022,
       "tag": "0004_mighty_venom",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1795610880691,
+      "tag": "0005_amused_the_anarchist",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795703593551,
+      "tag": "0006_breezy_tempest",
+      "breakpoints": true
     }
   ]
 }

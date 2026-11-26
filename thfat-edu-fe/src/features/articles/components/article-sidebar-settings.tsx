@@ -3,18 +3,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ImageIcon, Loader2, Save, Send } from "lucide-react";
+import { useUploadMedia } from "@/hooks/use-upload";
+import { ImageIcon, Loader2, Save, Send, Trash2, Upload } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import type { UseFormSetValue, UseFormWatch } from "react-hook-form";
 
 import type { TArticleFormValues } from "../schemas/article.schema";
@@ -25,6 +17,7 @@ export type TArticleSidebarSettingsProps = {
   setValue: UseFormSetValue<TArticleFormValues>;
   isPending: boolean;
   isEditing: boolean;
+  articleId: string;
 };
 
 function getStatusBadgeVariant(status: TArticleStatus): "default" | "secondary" | "outline" {
@@ -46,18 +39,43 @@ export function ArticleSidebarSettings({
   setValue,
   isPending,
   isEditing,
+  articleId,
 }: TArticleSidebarSettingsProps) {
   const status = watch("status");
   const thumbnailUrl = watch("thumbnailUrl");
   const [imageError, setImageError] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadMedia = useUploadMedia({
+    onSuccess: (result) => {
+      setValue("thumbnailUrl", result.url, { shouldDirty: true });
+      setImageError(false);
+    },
+  });
 
   const handleStatusChange = (val: string) => {
     setValue("status", val as TArticleStatus, { shouldDirty: true });
   };
 
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) {
+      return;
+    }
+
+    const folder = `/articles/thumbnails/${articleId}`;
+
+    uploadMedia.mutate({ file, folder, fileName: "thumbnail" });
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
+  const handleRemoveThumbnail = () => {
+    setValue("thumbnailUrl", "", { shouldDirty: true });
     setImageError(false);
-    setValue("thumbnailUrl", e.target.value, { shouldDirty: true });
   };
 
   let submitButtonLabel = "Lưu bản nháp";
@@ -66,6 +84,8 @@ export function ArticleSidebarSettings({
   } else if (status === "published") {
     submitButtonLabel = "Xuất bản bài viết";
   }
+
+  const isUploadingThumbnail = uploadMedia.isPending;
 
   return (
     <div className="space-y-6">
@@ -84,17 +104,24 @@ export function ArticleSidebarSettings({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="space-y-1.5">
-            <Label className="text-xs">Trạng thái bài viết</Label>
-            <Select value={status} onValueChange={handleStatusChange}>
-              <SelectTrigger className="w-full text-xs">
-                <SelectValue placeholder="Chọn trạng thái" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="draft">Bản nháp (Draft)</SelectItem>
-                <SelectItem value="published">Xuất bản công khai (Published)</SelectItem>
-                <SelectItem value="archived">Lưu trữ (Archived)</SelectItem>
-              </SelectContent>
-            </Select>
+            <span className="text-muted-foreground text-xs">Trạng thái bài viết</span>
+            <div className="flex flex-col gap-1">
+              {(["draft", "published", "archived"] as TArticleStatus[]).map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  onClick={() => handleStatusChange(s)}
+                  disabled={isPending}
+                  className={`flex items-center gap-2 rounded-md px-3 py-2 text-xs font-medium transition-colors ${
+                    status === s
+                      ? "bg-primary text-primary-foreground"
+                      : "hover:bg-muted text-muted-foreground"
+                  }`}
+                >
+                  {getStatusBadgeLabel(s)}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="flex flex-col gap-2 pt-2">
@@ -118,39 +145,57 @@ export function ArticleSidebarSettings({
           <CardTitle className="text-sm font-semibold">Ảnh bìa đại diện</CardTitle>
         </CardHeader>
         <CardContent className="space-y-3">
-          <div className="space-y-1.5">
-            <Label htmlFor="article-thumbnail" className="text-xs">
-              Đường dẫn ảnh (URL)
-            </Label>
-            <Input
-              id="article-thumbnail"
-              placeholder="https://images.unsplash.com/..."
-              value={thumbnailUrl || ""}
-              onChange={handleThumbnailChange}
-              disabled={isPending}
-              className="text-xs"
-            />
-          </div>
-
+          {/* Preview */}
           {thumbnailUrl && !imageError ? (
-            <div className="border-border bg-muted relative aspect-video w-full overflow-hidden rounded-lg border">
+            <div className="border-border/60 relative aspect-video w-full overflow-hidden rounded-lg border">
               <Image
                 src={thumbnailUrl}
-                alt="Ảnh bìa bài viết"
+                alt="Thumbnail preview"
                 fill
-                sizes="(max-width: 768px) 100vw, 350px"
                 className="object-cover"
                 onError={() => setImageError(true)}
               />
+              <button
+                type="button"
+                onClick={handleRemoveThumbnail}
+                className="bg-background/80 text-destructive hover:bg-destructive hover:text-destructive-foreground absolute top-2 right-2 rounded-md p-1 transition-colors"
+                title="Xóa ảnh bìa"
+              >
+                <Trash2 className="size-3.5" />
+              </button>
             </div>
           ) : (
-            <div className="border-border/80 bg-muted/40 flex aspect-video w-full flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed p-4 text-center">
-              <ImageIcon className="text-muted-foreground/60 size-8" />
-              <span className="text-muted-foreground text-xs">
-                {imageError ? "Không thể tải ảnh từ URL này" : "Chưa có ảnh bìa"}
-              </span>
+            <div className="border-border/60 bg-muted/20 text-muted-foreground flex aspect-video w-full flex-col items-center justify-center gap-2 rounded-lg border border-dashed">
+              <ImageIcon className="size-8 opacity-40" />
+              <span className="text-xs">Chưa có ảnh bìa</span>
             </div>
           )}
+
+          {/* Upload button */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            className="hidden"
+            onChange={handleFileUpload}
+          />
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="w-full gap-1.5 text-xs"
+            disabled={isPending || isUploadingThumbnail}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            {isUploadingThumbnail ? (
+              <Loader2 className="size-3.5 animate-spin" />
+            ) : (
+              <Upload className="size-3.5" />
+            )}
+            {isUploadingThumbnail ? "Đang tải lên..." : "Tải ảnh lên"}
+          </Button>
+
+          <p className="text-muted-foreground text-xxs">Định dạng: JPG, PNG, WebP · Tối đa 5MB</p>
         </CardContent>
       </Card>
     </div>

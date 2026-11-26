@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { loginWithEmail } from "@/lib/firebase";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { AlertCircle, ArrowRight, Loader2, Lock, Mail } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -25,9 +25,10 @@ export type TLoginFormData = z.infer<typeof loginSchema>;
 export type TLoginFormProps = {
   onSuccess: (user: TAuthUser) => void;
   disabled?: boolean;
+  onLoadingChange?: (isLoading: boolean) => void;
 };
 
-export function LoginForm({ onSuccess, disabled }: TLoginFormProps) {
+export function LoginForm({ onSuccess, disabled, onLoadingChange }: TLoginFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { mutateAsync: loginMutation, isPending: isMutating } = useLogin();
 
@@ -41,6 +42,10 @@ export function LoginForm({ onSuccess, disabled }: TLoginFormProps) {
   });
 
   const isLoading = form.formState.isSubmitting || isMutating;
+
+  useEffect(() => {
+    onLoadingChange?.(isLoading);
+  }, [isLoading, onLoadingChange]);
 
   async function onSubmit(data: TLoginFormData) {
     setErrorMessage(null);
