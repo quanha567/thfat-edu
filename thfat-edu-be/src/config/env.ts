@@ -54,9 +54,13 @@ function loadEnv(): TEnv {
     FIREBASE_SERVICE_ACCOUNT_PATH: process.env.FIREBASE_SERVICE_ACCOUNT_PATH,
     VERCEL: process.env.VERCEL,
     NVIDIA_API_KEY: process.env.NVIDIA_API_KEY,
-    IMAGEKIT_PUBLIC_KEY: process.env.IMAGEKIT_PUBLIC_KEY,
-    IMAGEKIT_PRIVATE_KEY: process.env.IMAGEKIT_PRIVATE_KEY,
-    IMAGEKIT_URL_ENDPOINT: process.env.IMAGEKIT_URL_ENDPOINT,
+    IMAGEKIT_PUBLIC_KEY:
+      process.env.IMAGEKIT_PUBLIC_KEY ?? (isTest ? "test_imagekit_public_key" : undefined),
+    IMAGEKIT_PRIVATE_KEY:
+      process.env.IMAGEKIT_PRIVATE_KEY ?? (isTest ? "test_imagekit_private_key" : undefined),
+    IMAGEKIT_URL_ENDPOINT:
+      process.env.IMAGEKIT_URL_ENDPOINT ??
+      (isTest ? "https://ik.imagekit.io/test_imagekit_id" : undefined),
   };
 
   if (!Value.Check(EnvSchema, rawEnv)) {
