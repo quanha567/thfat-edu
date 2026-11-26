@@ -1,6 +1,7 @@
-import { and, desc, eq, ilike, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
+import { containsPattern } from "../../db/like";
 import {
   examAnswers,
   examAttempts,
@@ -14,6 +15,7 @@ import {
   users,
 } from "../../db/schema";
 import { BadRequestError, NotFoundError } from "../../middlewares/error-handler";
+import { loadQuizCounts, loadQuizStructure } from "../quizzes/quiz-structure";
 import { type SettingsService, settingsService as defaultSettingsService } from "../settings";
 import {
   type TAttemptResult,
@@ -126,6 +128,14 @@ export function isShortAnswerCorrect(
   return false;
 }
 
+type TGradedAnswerRow = {
+  attemptId: string;
+  subItemId: string;
+  selectedAnswer: string | null;
+  isCorrect: boolean;
+  pointsEarned: string;
+};
+
 // ── Service Options Types ──────────────────────────────────────────────
 
 export type TListStudentExamsOptions = {
@@ -202,7 +212,7 @@ export class AttemptsService {
     const baseConditions = [eq(quizzes.status, "published"), sql`${quizzes.deletedAt} IS NULL`];
 
     if (options.search) {
-      baseConditions.push(ilike(quizzes.title, `%${options.search}%`));
+      baseConditions.push(ilike(quizzes.title, containsPattern(options.search)));
     }
 
     const whereClause = and(...baseConditions);
@@ -234,17 +244,12 @@ export class AttemptsService {
       .offset(offset);
 
     const items: TStudentExamListItem[] = [];
+    const quizIds = quizRows.map((quiz) => quiz.id);
+    const countsByQuiz = await loadQuizCounts(this.database, quizIds);
+    const attemptsByQuiz = await this.loadUserAttemptsByQuiz(userId, quizIds);
 
     for (const quiz of quizRows) {
-      let userAttempts: TExamAttempt[] = [];
-
-      if (userId) {
-        userAttempts = await this.database
-          .select()
-          .from(examAttempts)
-          .where(and(eq(examAttempts.quizId, quiz.id), eq(examAttempts.userId, userId)))
-          .orderBy(desc(examAttempts.createdAt));
-      }
+      const userAttempts = attemptsByQuiz.get(quiz.id) ?? [];
 
       const effectiveMaxAttempts = quiz.maxAttempts ?? globalSettings.maxAttempts;
       const effectiveScorePolicy = quiz.scorePolicy ?? globalSettings.scorePolicy;
@@ -291,22 +296,8 @@ export class AttemptsService {
         quiz.durationMinutes,
       );
 
-      const [{ totalQuestions }] = await this.database
-        .select({
-          totalQuestions: sql<number>`cast(count(${quizQuestions.id}) as integer)`,
-        })
-        .from(quizQuestions)
-        .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
-        .where(eq(quizSections.quizId, quiz.id));
-
-      const [{ totalSubItems }] = await this.database
-        .select({
-          totalSubItems: sql<number>`cast(count(${quizSubItems.id}) as integer)`,
-        })
-        .from(quizSubItems)
-        .innerJoin(quizQuestions, eq(quizSubItems.questionId, quizQuestions.id))
-        .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
-        .where(eq(quizSections.quizId, quiz.id));
+      const totalQuestions = countsByQuiz.get(quiz.id)?.totalQuestions ?? 0;
+      const totalSubItems = countsByQuiz.get(quiz.id)?.totalSubItems ?? 0;
 
       items.push({
         id: quiz.id,
@@ -391,6 +382,8 @@ export class AttemptsService {
         );
       }
 
+      // Unique index một lượt `in_progress` cho mỗi (quiz, user): bấm đúp/2 tab cùng lúc sẽ không
+      // tạo lượt thứ hai mà dùng lại lượt vừa được tạo.
       const [newAttempt] = await this.database
         .insert(examAttempts)
         .values({
@@ -399,9 +392,30 @@ export class AttemptsService {
           status: "in_progress",
           startedAt: new Date(),
         })
+        .onConflictDoNothing()
         .returning();
 
-      attempt = newAttempt;
+      if (newAttempt) {
+        attempt = newAttempt;
+      } else {
+        const [existing] = await this.database
+          .select()
+          .from(examAttempts)
+          .where(
+            and(
+              eq(examAttempts.quizId, quizId),
+              eq(examAttempts.userId, userId),
+              eq(examAttempts.status, "in_progress"),
+            ),
+          )
+          .limit(1);
+
+        if (!existing) {
+          throw new BadRequestError("Không thể bắt đầu bài thi. Vui lòng thử lại.");
+        }
+
+        attempt = existing;
+      }
     }
 
     const remainingSeconds = Math.max(
@@ -472,29 +486,61 @@ export class AttemptsService {
       }
     }
 
+    // Với cùng một subItemId, bản ghi sau cùng thắng.
+    const latestById = new Map<string, TSyncAnswerItem>();
     for (const item of answers) {
-      const [existingAnswer] = await this.database
-        .select()
-        .from(examAnswers)
-        .where(and(eq(examAnswers.attemptId, attemptId), eq(examAnswers.subItemId, item.subItemId)))
-        .limit(1);
+      latestById.set(item.subItemId, item);
+    }
 
-      if (existingAnswer) {
+    const uniqueItems = [...latestById.values()];
+
+    if (uniqueItems.length > 0) {
+      await this.assertSubItemsBelongToQuiz(
+        attempt.quizId,
+        uniqueItems.map((item) => item.subItemId),
+      );
+
+      const withFlag = uniqueItems.filter((item) => item.isFlagged !== undefined);
+      const withoutFlag = uniqueItems.filter((item) => item.isFlagged === undefined);
+
+      if (withFlag.length > 0) {
         await this.database
-          .update(examAnswers)
-          .set({
-            selectedAnswer: item.selectedAnswer,
-            isFlagged: item.isFlagged ?? existingAnswer.isFlagged,
-            updatedAt: new Date(),
-          })
-          .where(eq(examAnswers.id, existingAnswer.id));
-      } else {
-        await this.database.insert(examAnswers).values({
-          attemptId,
-          subItemId: item.subItemId,
-          selectedAnswer: item.selectedAnswer,
-          isFlagged: item.isFlagged ?? false,
-        });
+          .insert(examAnswers)
+          .values(
+            withFlag.map((item) => ({
+              attemptId,
+              subItemId: item.subItemId,
+              selectedAnswer: item.selectedAnswer,
+              isFlagged: item.isFlagged ?? false,
+            })),
+          )
+          .onConflictDoUpdate({
+            target: [examAnswers.attemptId, examAnswers.subItemId],
+            set: {
+              selectedAnswer: sql`excluded.selected_answer`,
+              isFlagged: sql`excluded.is_flagged`,
+              updatedAt: new Date(),
+            },
+          });
+      }
+
+      if (withoutFlag.length > 0) {
+        await this.database
+          .insert(examAnswers)
+          .values(
+            withoutFlag.map((item) => ({
+              attemptId,
+              subItemId: item.subItemId,
+              selectedAnswer: item.selectedAnswer,
+            })),
+          )
+          .onConflictDoUpdate({
+            target: [examAnswers.attemptId, examAnswers.subItemId],
+            set: {
+              selectedAnswer: sql`excluded.selected_answer`,
+              updatedAt: new Date(),
+            },
+          });
       }
     }
 
@@ -555,13 +601,14 @@ export class AttemptsService {
 
     let grandTotalPoints = 0;
     let totalQuestionsAnswered = 0;
+    const gradedRows: TGradedAnswerRow[] = [];
 
     for (const section of quizWithStructure.sections) {
       for (const question of section.questions) {
         const isTrueFalse = section.sectionType === "true_false";
         const result = isTrueFalse
-          ? await this.gradeTrueFalseQuestion(attemptId, question.subItems, answerMap)
-          : await this.gradeStandardQuestion({
+          ? this.gradeTrueFalseQuestion(attemptId, question.subItems, answerMap)
+          : this.gradeStandardQuestion({
               attemptId,
               sectionType: section.sectionType,
               subItems: question.subItems,
@@ -570,8 +617,11 @@ export class AttemptsService {
 
         grandTotalPoints += result.points;
         totalQuestionsAnswered += result.answeredCount;
+        gradedRows.push(...result.rows);
       }
     }
+
+    await this.upsertGradedAnswers(gradedRows);
 
     const submittedAt = new Date();
     const maxQuizPoints = parseFloat(quizWithStructure.totalPoints || "150.00");
@@ -581,7 +631,9 @@ export class AttemptsService {
         : grandTotalPoints;
     const finalScore = clampedScore.toFixed(2);
 
-    await this.database
+    // Chỉ một request thắng việc chuyển `in_progress` → `submitted`; request đồng thời còn lại
+    // trả kết quả đã chốt.
+    const [claimed] = await this.database
       .update(examAttempts)
       .set({
         status: "submitted",
@@ -590,7 +642,21 @@ export class AttemptsService {
         submittedAt,
         updatedAt: submittedAt,
       })
-      .where(eq(examAttempts.id, attemptId));
+      .where(and(eq(examAttempts.id, attemptId), eq(examAttempts.status, "in_progress")))
+      .returning({ id: examAttempts.id });
+
+    if (!claimed) {
+      const settled = await this.getAttemptById(attemptId);
+
+      return {
+        attemptId,
+        score: settled?.score ?? "0.00",
+        totalQuestionsAnswered: settled?.totalAnswered ?? 0,
+        submittedAt: settled?.submittedAt?.toISOString() ?? submittedAt.toISOString(),
+        status: "submitted",
+        message: "Bài thi đã được nộp trước đó.",
+      };
+    }
 
     return {
       attemptId,
@@ -671,6 +737,36 @@ export class AttemptsService {
     };
   }
 
+  /** Lấy mọi lượt thi của một user cho nhiều đề trong một truy vấn (mới nhất trước). */
+  private async loadUserAttemptsByQuiz(
+    userId: string | null,
+    quizIds: string[],
+  ): Promise<Map<string, TExamAttempt[]>> {
+    const byQuiz = new Map<string, TExamAttempt[]>();
+
+    if (!userId || quizIds.length === 0) {
+      return byQuiz;
+    }
+
+    const rows = await this.database
+      .select()
+      .from(examAttempts)
+      .where(and(eq(examAttempts.userId, userId), inArray(examAttempts.quizId, quizIds)))
+      .orderBy(desc(examAttempts.createdAt));
+
+    for (const row of rows) {
+      const bucket = byQuiz.get(row.quizId);
+
+      if (bucket) {
+        bucket.push(row);
+      } else {
+        byQuiz.set(row.quizId, [row]);
+      }
+    }
+
+    return byQuiz;
+  }
+
   private calculateCooldownRemainingSeconds(
     submittedAttempts: TExamAttempt[],
     cooldownMinutes: number,
@@ -702,37 +798,41 @@ export class AttemptsService {
     return attempt ?? null;
   }
 
-  private async upsertGradedAnswer(options: {
-    attemptId: string;
-    subItemId: string;
-    selectedAnswer: string | null | undefined;
-    isCorrect: boolean;
-    pointsEarned: string;
-  }): Promise<void> {
-    const { attemptId, subItemId, selectedAnswer, isCorrect, pointsEarned } = options;
-    const [existing] = await this.database
-      .select()
-      .from(examAnswers)
-      .where(and(eq(examAnswers.attemptId, attemptId), eq(examAnswers.subItemId, subItemId)))
-      .limit(1);
+  private async assertSubItemsBelongToQuiz(quizId: string, subItemIds: string[]): Promise<void> {
+    const rows = await this.database
+      .select({ id: quizSubItems.id })
+      .from(quizSubItems)
+      .innerJoin(quizQuestions, eq(quizSubItems.questionId, quizQuestions.id))
+      .innerJoin(quizSections, eq(quizQuestions.sectionId, quizSections.id))
+      .where(and(eq(quizSections.quizId, quizId), inArray(quizSubItems.id, subItemIds)));
 
-    if (existing) {
+    if (rows.length !== subItemIds.length) {
+      throw new BadRequestError("Có câu trả lời không thuộc đề thi này.");
+    }
+  }
+
+  /** Ghi điểm từng câu con theo lô (một câu lệnh cho mỗi 500 dòng) thay vì từng dòng một. */
+  private async upsertGradedAnswers(rows: TGradedAnswerRow[]): Promise<void> {
+    const BATCH_SIZE = 500;
+    const batches: TGradedAnswerRow[][] = [];
+
+    for (let index = 0; index < rows.length; index += BATCH_SIZE) {
+      batches.push(rows.slice(index, index + BATCH_SIZE));
+    }
+
+    for (const batch of batches) {
+      // oxlint-disable-next-line no-await-in-loop -- tuần tự để không vượt kết nối của lambda
       await this.database
-        .update(examAnswers)
-        .set({
-          isCorrect,
-          pointsEarned,
-          updatedAt: new Date(),
-        })
-        .where(eq(examAnswers.id, existing.id));
-    } else {
-      await this.database.insert(examAnswers).values({
-        attemptId,
-        subItemId,
-        selectedAnswer: selectedAnswer ?? null,
-        isCorrect,
-        pointsEarned,
-      });
+        .insert(examAnswers)
+        .values(batch)
+        .onConflictDoUpdate({
+          target: [examAnswers.attemptId, examAnswers.subItemId],
+          set: {
+            isCorrect: sql`excluded.is_correct`,
+            pointsEarned: sql`excluded.points_earned`,
+            updatedAt: new Date(),
+          },
+        });
     }
   }
 
@@ -785,14 +885,15 @@ export class AttemptsService {
     };
   }
 
-  private async gradeTrueFalseQuestion(
+  private gradeTrueFalseQuestion(
     attemptId: string,
     subItems: Array<typeof quizSubItems.$inferSelect>,
     answerMap: Map<string, string | null>,
-  ): Promise<{ points: number; answeredCount: number }> {
+  ): { points: number; answeredCount: number; rows: TGradedAnswerRow[] } {
     let correctCount = 0;
     let totalPoints = 0;
     let answeredCount = 0;
+    const rows: TGradedAnswerRow[] = [];
 
     for (const subItem of subItems) {
       totalPoints += Number(subItem.points || "1.50");
@@ -815,10 +916,10 @@ export class AttemptsService {
         correctCount++;
       }
 
-      await this.upsertGradedAnswer({
+      rows.push({
         attemptId,
         subItemId: subItem.id,
-        selectedAnswer: userAnswer,
+        selectedAnswer: userAnswer ?? null,
         isCorrect,
         pointsEarned: "0.00",
       });
@@ -832,33 +933,19 @@ export class AttemptsService {
     const points = calculateGraduatedTrueFalsePoints(correctCount, effectiveTotalPoints);
 
     if (points > 0 && correctCount > 0) {
-      const pointPerCorrect = Number((points / correctCount).toFixed(2));
-      for (const subItem of subItems) {
-        const userAnswer = answerMap.get(subItem.id);
-        const normalizedUser = normalizeBooleanAnswer(userAnswer);
-        const normalizedCorrect = normalizeBooleanAnswer(subItem.correctAnswer);
-        const isCorrect =
-          Boolean(userAnswer) &&
-          normalizedUser !== null &&
-          normalizedCorrect !== null &&
-          normalizedUser === normalizedCorrect;
+      const pointPerCorrect = Number((points / correctCount).toFixed(2)).toFixed(2);
 
-        if (isCorrect) {
-          await this.upsertGradedAnswer({
-            attemptId,
-            subItemId: subItem.id,
-            selectedAnswer: userAnswer,
-            isCorrect: true,
-            pointsEarned: pointPerCorrect.toFixed(2),
-          });
+      for (const row of rows) {
+        if (row.isCorrect) {
+          row.pointsEarned = pointPerCorrect;
         }
       }
     }
 
-    return { points, answeredCount };
+    return { points, answeredCount, rows };
   }
 
-  private async gradeStandardQuestion({
+  private gradeStandardQuestion({
     attemptId,
     sectionType,
     subItems,
@@ -868,9 +955,10 @@ export class AttemptsService {
     sectionType: string;
     subItems: Array<typeof quizSubItems.$inferSelect>;
     answerMap: Map<string, string | null>;
-  }): Promise<{ points: number; answeredCount: number }> {
+  }): { points: number; answeredCount: number; rows: TGradedAnswerRow[] } {
     let earnedPoints = 0;
     let answeredCount = 0;
+    const rows: TGradedAnswerRow[] = [];
 
     for (const subItem of subItems) {
       const userAnswer = answerMap.get(subItem.id);
@@ -902,76 +990,42 @@ export class AttemptsService {
 
       earnedPoints += pointsEarned;
 
-      await this.upsertGradedAnswer({
+      rows.push({
         attemptId,
         subItemId: subItem.id,
-        selectedAnswer: userAnswer,
+        selectedAnswer: userAnswer ?? null,
         isCorrect,
         pointsEarned: pointsEarned.toFixed(2),
       });
     }
 
-    return { points: earnedPoints, answeredCount };
+    return { points: earnedPoints, answeredCount, rows };
   }
 
   private async loadExamRoomSections(quizId: string): Promise<TExamRoomSection[]> {
-    const sectionsRows = await this.database
-      .select()
-      .from(quizSections)
-      .where(eq(quizSections.quizId, quizId))
-      .orderBy(quizSections.orderIndex);
+    const structure = await loadQuizStructure(this.database, quizId);
 
-    const result: TExamRoomSection[] = [];
-
-    for (const section of sectionsRows) {
-      const questionRows = await this.database
-        .select()
-        .from(quizQuestions)
-        .where(eq(quizQuestions.sectionId, section.id))
-        .orderBy(quizQuestions.orderIndex);
-
-      const questions: TExamRoomQuestion[] = [];
-
-      for (const question of questionRows) {
-        const subItemRows = await this.database
-          .select({
-            id: quizSubItems.id,
-            orderIndex: quizSubItems.orderIndex,
-            label: quizSubItems.label,
-            content: quizSubItems.content,
-            options: quizSubItems.options,
-            points: quizSubItems.points,
-          })
-          .from(quizSubItems)
-          .where(eq(quizSubItems.questionId, question.id))
-          .orderBy(quizSubItems.orderIndex);
-
-        questions.push({
-          id: question.id,
-          orderIndex: question.orderIndex,
-          contextContent: question.contextContent,
-          imageUrl: question.imageUrl,
-          subItems: subItemRows.map((si) => ({
-            id: si.id,
-            orderIndex: si.orderIndex,
-            label: si.label,
-            content: si.content,
-            options: si.options,
-            points: si.points,
-          })),
-        });
-      }
-
-      result.push({
-        id: section.id,
-        sectionType: section.sectionType,
-        title: section.title,
-        orderIndex: section.orderIndex,
-        questions,
-      });
-    }
-
-    return result;
+    // Không gửi đáp án đúng/giải thích xuống học sinh: chỉ chọn các trường được phép.
+    return structure.map((section) => ({
+      id: section.id,
+      sectionType: section.sectionType,
+      title: section.title,
+      orderIndex: section.orderIndex,
+      questions: section.questions.map((question) => ({
+        id: question.id,
+        orderIndex: question.orderIndex,
+        contextContent: question.contextContent,
+        imageUrl: question.imageUrl,
+        subItems: question.subItems.map((si) => ({
+          id: si.id,
+          orderIndex: si.orderIndex,
+          label: si.label,
+          content: si.content,
+          options: si.options,
+          points: si.points,
+        })),
+      })),
+    }));
   }
 
   private async loadFullQuizForGrading(quizId: string) {
@@ -981,41 +1035,7 @@ export class AttemptsService {
       .where(eq(quizzes.id, quizId))
       .limit(1);
 
-    const sectionsRows = await this.database
-      .select()
-      .from(quizSections)
-      .where(eq(quizSections.quizId, quizId))
-      .orderBy(quizSections.orderIndex);
-
-    const sections = [];
-
-    for (const section of sectionsRows) {
-      const questionRows = await this.database
-        .select()
-        .from(quizQuestions)
-        .where(eq(quizQuestions.sectionId, section.id))
-        .orderBy(quizQuestions.orderIndex);
-
-      const questions = [];
-
-      for (const question of questionRows) {
-        const subItemRows = await this.database
-          .select()
-          .from(quizSubItems)
-          .where(eq(quizSubItems.questionId, question.id))
-          .orderBy(quizSubItems.orderIndex);
-
-        questions.push({
-          ...question,
-          subItems: subItemRows,
-        });
-      }
-
-      sections.push({
-        ...section,
-        questions,
-      });
-    }
+    const sections = await loadQuizStructure(this.database, quizId);
 
     return { totalPoints: quiz?.totalPoints ?? "150.00", sections };
   }

@@ -7,6 +7,9 @@ export const UserRoleSchema = t.Union([
 ]);
 export type TUserRole = Static<typeof UserRoleSchema>;
 
+/** URL ảnh đại diện: chỉ https, không khoảng trắng, giới hạn độ dài. */
+export const AvatarUrlSchema = t.String({ pattern: "^https://[^\\s]+$", maxLength: 2048 });
+
 export const UserGenderSchema = t.Union([
   t.Literal("male"),
   t.Literal("female"),
@@ -110,7 +113,7 @@ export const CreateUserBodySchema = t.Object({
   role: UserRoleSchema,
   password: t.String({ minLength: 6 }),
   sendResetEmail: t.Optional(t.Boolean()),
-  avatarUrl: t.Optional(t.Nullable(t.String())),
+  avatarUrl: t.Optional(t.Nullable(AvatarUrlSchema)),
   gender: t.Optional(t.Nullable(UserGenderSchema)),
   studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),
   teacherProfile: t.Optional(t.Nullable(TeacherProfileInputSchema)),
@@ -120,7 +123,7 @@ export type TCreateUserBody = Static<typeof CreateUserBodySchema>;
 export const UpdateUserBodySchema = t.Object({
   fullName: t.Optional(t.String({ minLength: 1 })),
   role: t.Optional(UserRoleSchema),
-  avatarUrl: t.Optional(t.Nullable(t.String())),
+  avatarUrl: t.Optional(t.Nullable(AvatarUrlSchema)),
   gender: t.Optional(t.Nullable(UserGenderSchema)),
   isActive: t.Optional(t.Boolean()),
   studentProfile: t.Optional(t.Nullable(StudentProfileInputSchema)),

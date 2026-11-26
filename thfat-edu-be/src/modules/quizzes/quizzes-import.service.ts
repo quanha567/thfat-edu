@@ -21,6 +21,8 @@ export type TImportJob = {
   listeners: Array<(event: string, data: unknown) => void>;
 };
 
+const JOB_RETENTION_MS = 10 * 60 * 1000;
+
 class ExamImportJobManager {
   private jobs = new Map<string, TImportJob>();
 
@@ -81,6 +83,7 @@ class ExamImportJobManager {
   public completeJob(jobId: string, data: TCreateQuizInput): void {
     const job = this.jobs.get(jobId);
     if (!job) return;
+    this.scheduleCleanup(jobId);
 
     job.status = "completed";
     job.data = data;
@@ -91,6 +94,7 @@ class ExamImportJobManager {
   public failJob(jobId: string, error: string): void {
     const job = this.jobs.get(jobId);
     if (!job) return;
+    this.scheduleCleanup(jobId);
 
     job.status = "failed";
     job.error = error;
@@ -100,6 +104,13 @@ class ExamImportJobManager {
 
   public cleanup(jobId: string): void {
     this.jobs.delete(jobId);
+  }
+
+  /** Job xong/lỗi được giữ -e phút (đủ để client nhận kết quả) rồi tự xoá. */
+  private scheduleCleanup(jobId: string): void {
+    const timer = setTimeout(() => this.cleanup(jobId), JOB_RETENTION_MS);
+
+    timer.unref?.();
   }
 }
 

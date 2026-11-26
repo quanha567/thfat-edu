@@ -52,7 +52,7 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       return quizzesService.getQuizById(id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       detail: {
         tags: ["Quizzes"],
         summary: "Lấy chi tiết đề thi gồm 4 phần và các tiểu mục",
@@ -61,8 +61,8 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
   )
   .post(
     "/",
-    async ({ quizzesService, body }) => {
-      return quizzesService.createQuiz(body);
+    async ({ quizzesService, body, currentUser }) => {
+      return quizzesService.createQuiz(body, currentUser.id);
     },
     {
       body: CreateQuizSchema,
@@ -78,7 +78,7 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       return quizzesService.updateQuiz(id, body);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       body: UpdateQuizSchema,
       detail: {
         tags: ["Quizzes"],
@@ -92,7 +92,7 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       return quizzesService.deleteQuiz(id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       detail: {
         tags: ["Quizzes"],
         summary: "Xóa đề thi (Soft delete)",
@@ -206,7 +206,7 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       );
     },
     {
-      params: t.Object({ jobId: t.String() }),
+      params: t.Object({ jobId: t.String({ format: "uuid" }) }),
       detail: {
         tags: ["Quizzes"],
         summary: "SSE Stream cập nhật tiến trình bóc tách đề thi theo thời gian thực",

@@ -4,6 +4,8 @@ import { createModuleLogger } from "../../config/logger";
 const nimLogger = createModuleLogger("nvidia-nim");
 
 const NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1";
+// Quá thời gian này (kể cả khi đang stream) thì huỷ để không treo tài nguyên.
+const NIM_REQUEST_TIMEOUT_MS = 120_000;
 
 export type TNimMessage = {
   role: "system" | "user" | "assistant";
@@ -119,6 +121,7 @@ export class NvidiaNimService {
 
     const res = await fetch(`${NVIDIA_BASE_URL}/chat/completions`, {
       method: "POST",
+      signal: AbortSignal.timeout(NIM_REQUEST_TIMEOUT_MS),
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
@@ -271,7 +274,10 @@ EXAM SECTION RULES:
 
 - If this is Phần IV (Tự luận ngắn):
   * Extract all calculation and short answer questions.
-  * Extract all calculation and short answer questions, each with "points": "6.00".
+  * Each question has exactly ONE answer box, so output exactly 1 subItem per question with "points": "6.00".
+  * "contextContent": MUST contain the COMPLETE question text exactly as printed (the full statement, every numbered sentence/statement such as (1), (2), ..., data, tables, and the final ask such as "Có bao nhiêu phát biểu đúng?"). NEVER leave it empty and NEVER output only a label like "Câu 5".
+  * "subItems[0].content": MUST be an empty string "" (do NOT repeat the question text here).
+  * "subItems[0].label": "1". "subItems[0].options": null. "subItems[0].correctAnswer": null.
 
 - Output ONLY valid JSON starting with {"questions": [ ... ]}.`;
 

@@ -43,7 +43,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       return usersService.getUserById(id);
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: UserDetailResponseSchema,
       detail: {
         tags: ["Users"],
@@ -75,7 +75,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       });
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       body: UpdateUserBodySchema,
       response: UserDetailResponseSchema,
       detail: {
@@ -94,7 +94,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       });
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       body: ToggleActiveBodySchema,
       response: UserDetailResponseSchema,
       detail: {
@@ -112,7 +112,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       });
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       body: ResetPasswordBodySchema,
       response: ActionSuccessResponseSchema,
       detail: {
@@ -132,7 +132,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       return { message: "Đã xóa mềm người dùng thành công." };
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: ActionSuccessResponseSchema,
       detail: {
         tags: ["Users"],
@@ -151,7 +151,7 @@ export const usersRoutes = new Elysia({ prefix: "/users" })
       };
     },
     {
-      params: t.Object({ id: t.String() }),
+      params: t.Object({ id: t.String({ format: "uuid" }) }),
       response: ActionSuccessResponseSchema,
       detail: {
         tags: ["Users"],

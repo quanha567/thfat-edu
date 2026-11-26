@@ -50,6 +50,13 @@
       "when": 1795703593551,
       "tag": "0006_breezy_tempest",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1795713500706,
+      "tag": "0007_harden_exam_indexes",
+      "breakpoints": true
     }
   ]
 }

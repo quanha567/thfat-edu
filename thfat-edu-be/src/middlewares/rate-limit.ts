@@ -64,18 +64,17 @@ export function resolveBucket({
   return WRITE_METHODS.has(method) ? "write" : "read";
 }
 
+/**
+ * Khoá theo IP, không theo cookie/token (client tự đặt được nên đổi giá trị là né giới hạn). Lấy
+ * phần tử CUỐI của `x-forwarded-for` vì proxy tin cậy luôn thêm IP thật vào cuối, còn các phần tử
+ * trước đó do client tự gửi.
+ */
 function resolveClientKey(request: Request): string {
-  const sessionMatch = /(?:^|;\s*)session_token=([^;]+)/.exec(request.headers.get("cookie") ?? "");
-  const bearer = request.headers.get("authorization");
-  const sessionKey = sessionMatch?.[1] ?? bearer?.replace(/^Bearer\s+/i, "");
-
-  if (sessionKey) {
-    return `s:${sessionKey}`;
-  }
-
+  const forwarded = request.headers.get("x-forwarded-for")?.split(",");
   const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("cf-connecting-ip") ||
+    request.headers.get("x-vercel-forwarded-for")?.trim() ||
+    request.headers.get("cf-connecting-ip")?.trim() ||
+    forwarded?.[forwarded.length - 1]?.trim() ||
     "unknown";
 
   return `ip:${ip}`;
@@ -115,6 +114,15 @@ export function rateLimitPlugin(options: TRateLimitOptions = {}) {
       if (entry.resetAt <= now) {
         windows.delete(key);
       }
+    }
+
+    // Trần cứng: nếu vẫn đầy (nhiều key chưa hết hạn) thì loại các key cũ nhất.
+    for (const key of windows.keys()) {
+      if (windows.size < MAX_TRACKED_KEYS) {
+        break;
+      }
+
+      windows.delete(key);
     }
   }
 

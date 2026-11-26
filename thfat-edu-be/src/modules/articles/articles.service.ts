@@ -1,6 +1,7 @@
 import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
+import { containsPattern } from "../../db/like";
 import {
   articleCategories,
   articles,
@@ -278,7 +279,7 @@ export class ArticlesService {
     }
 
     if (query.search && query.search.trim()) {
-      const pattern = `%${query.search.trim()}%`;
+      const pattern = containsPattern(query.search);
       conditions.push(or(ilike(articles.title, pattern), ilike(articles.excerpt, pattern)));
     }
 

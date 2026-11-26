@@ -9,12 +9,37 @@ const uploadLogger = createModuleLogger("upload");
 const IMAGEKIT_UPLOAD_URL = "https://upload.imagekit.io/api/v1/files/upload";
 const IMAGEKIT_UPLOAD_TIMEOUT_MS = 30_000;
 
-const MIME_EXTENSIONS: Record<string, string> = {
-  "image/jpeg": "jpg",
-  "image/jpg": "jpg",
-  "image/png": "png",
-  "image/webp": "webp",
-};
+const SAFE_FOLDER_PATTERN = /^\/[A-Za-z0-9_\-/]{1,200}$/;
+
+type TDetectedImage = { extension: "jpg" | "png" | "webp" };
+
+function startsWith(bytes: Uint8Array, signature: number[], offset = 0): boolean {
+  return signature.every((value, index) => bytes[offset + index] === value);
+}
+
+export function detectImageType(bytes: Uint8Array): TDetectedImage | null {
+  if (startsWith(bytes, [0xff, 0xd8, 0xff])) return { extension: "jpg" };
+  if (startsWith(bytes, [0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a])) {
+    return { extension: "png" };
+  }
+
+  // RIFF....WEBP
+  if (
+    startsWith(bytes, [0x52, 0x49, 0x46, 0x46]) &&
+    startsWith(bytes, [0x57, 0x45, 0x42, 0x50], 8)
+  ) {
+    return { extension: "webp" };
+  }
+
+  return null;
+}
+
+export function sanitizeFileName(fileName: string): string {
+  const withoutExtension = fileName.replace(/\.\w{1,5}$/, "");
+  const cleaned = withoutExtension.replace(/[^A-Za-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "");
+
+  return cleaned.slice(0, 80) || "image";
+}
 
 type TUploadOptions = {
   file: File;
@@ -34,13 +59,23 @@ export class UploadService {
       throw new BadRequestError(`File quá lớn. Kích thước tối đa là 5MB.`);
     }
 
+    // Không tin MIME do client gửi: kiểm tra chữ ký (magic bytes) thực của file.
+    const detectedType = detectImageType(new Uint8Array(await file.slice(0, 12).arrayBuffer()));
+
+    if (!detectedType) {
+      throw new BadRequestError("Nội dung file không phải ảnh jpg, png hoặc webp hợp lệ.");
+    }
+
+    if (!SAFE_FOLDER_PATTERN.test(folder) || folder.includes("..") || folder.includes("//")) {
+      throw new BadRequestError("Thư mục tải lên không hợp lệ.");
+    }
+
+    const baseName = sanitizeFileName(fileName);
+
     // The `imagekit` SDK hangs under Bun (axios + form-data), so call the REST API directly.
     const formData = new FormData();
     formData.append("file", file);
-    formData.append(
-      "fileName",
-      /\.\w+$/.test(fileName) ? fileName : `${fileName}.${MIME_EXTENSIONS[file.type] ?? "jpg"}`,
-    );
+    formData.append("fileName", `${baseName}.${detectedType.extension}`);
     formData.append("folder", folder);
     formData.append("useUniqueFileName", "true");
 

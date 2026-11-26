@@ -207,7 +207,7 @@ describe("Users Module (Routes & Access Control)", () => {
 
   it("should allow admin to update user", async () => {
     const res = await testApp.handle(
-      new Request("http://localhost/users/user-1", {
+      new Request("http://localhost/users/11111111-1111-4111-8111-111111111111", {
         method: "PATCH",
         headers: {
           authorization: "Bearer admin-token",
@@ -226,7 +226,7 @@ describe("Users Module (Routes & Access Control)", () => {
 
   it("should allow admin to toggle active status", async () => {
     const res = await testApp.handle(
-      new Request("http://localhost/users/user-1/toggle-active", {
+      new Request("http://localhost/users/11111111-1111-4111-8111-111111111111/toggle-active", {
         method: "PATCH",
         headers: {
           authorization: "Bearer admin-token",
@@ -245,7 +245,7 @@ describe("Users Module (Routes & Access Control)", () => {
 
   it("should allow admin to reset password", async () => {
     const res = await testApp.handle(
-      new Request("http://localhost/users/user-1/reset-password", {
+      new Request("http://localhost/users/11111111-1111-4111-8111-111111111111/reset-password", {
         method: "POST",
         headers: {
           authorization: "Bearer admin-token",
@@ -264,7 +264,7 @@ describe("Users Module (Routes & Access Control)", () => {
 
   it("should allow admin to soft delete user", async () => {
     const res = await testApp.handle(
-      new Request("http://localhost/users/user-1", {
+      new Request("http://localhost/users/11111111-1111-4111-8111-111111111111", {
         method: "DELETE",
         headers: {
           authorization: "Bearer admin-token",
