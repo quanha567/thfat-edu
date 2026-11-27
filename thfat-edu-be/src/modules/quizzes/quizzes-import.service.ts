@@ -14,14 +14,16 @@ export type TImportJobProgress = {
 
 export type TImportJob = {
   id: string;
-  status: "pending" | "processing" | "completed" | "failed";
+  status: "pending" | "processing" | "completed" | "failed" | "cancelled";
   progress: TImportJobProgress;
   data: TCreateQuizInput | null;
   error: string | null;
   listeners: Array<(event: string, data: unknown) => void>;
+  abortController: AbortController;
 };
 
-const JOB_RETENTION_MS = 10 * 60 * 1000;
+// Giữ kết quả đủ lâu để người dùng back ra rồi quay lại vẫn lấy được đề đã bóc tách.
+const JOB_RETENTION_MS = 60 * 60 * 1000;
 
 class ExamImportJobManager {
   private jobs = new Map<string, TImportJob>();
@@ -38,6 +40,7 @@ class ExamImportJobManager {
       data: null,
       error: null,
       listeners: [],
+      abortController: new AbortController(),
     };
     this.jobs.set(jobId, job);
 
@@ -82,7 +85,7 @@ class ExamImportJobManager {
 
   public completeJob(jobId: string, data: TCreateQuizInput): void {
     const job = this.jobs.get(jobId);
-    if (!job) return;
+    if (!job || job.status === "cancelled") return;
     this.scheduleCleanup(jobId);
 
     job.status = "completed";
@@ -93,7 +96,7 @@ class ExamImportJobManager {
 
   public failJob(jobId: string, error: string): void {
     const job = this.jobs.get(jobId);
-    if (!job) return;
+    if (!job || job.status === "cancelled") return;
     this.scheduleCleanup(jobId);
 
     job.status = "failed";
@@ -102,11 +105,29 @@ class ExamImportJobManager {
     this.emit(jobId, "failed", { error });
   }
 
+  /** Người dùng chủ động huỷ: dừng mọi request AI đang chạy và báo cho client đang theo dõi. */
+  public cancelJob(jobId: string): boolean {
+    const job = this.jobs.get(jobId);
+    if (!job) return false;
+    if (job.status === "completed" || job.status === "failed" || job.status === "cancelled") {
+      return true;
+    }
+    this.scheduleCleanup(jobId);
+
+    job.status = "cancelled";
+    job.error = "Tác vụ import đã bị huỷ.";
+    job.abortController.abort();
+    importLogger.info({ jobId }, "exam import job cancelled");
+    this.emit(jobId, "cancelled", { error: job.error });
+
+    return true;
+  }
+
   public cleanup(jobId: string): void {
     this.jobs.delete(jobId);
   }
 
-  /** Job xong/lỗi được giữ -e phút (đủ để client nhận kết quả) rồi tự xoá. */
+  /** Job xong/lỗi/huỷ được giữ một thời gian (đủ để client nhận lại kết quả) rồi tự xoá. */
   private scheduleCleanup(jobId: string): void {
     const timer = setTimeout(() => this.cleanup(jobId), JOB_RETENTION_MS);
 
@@ -132,6 +153,8 @@ export async function processExamPdfImport(
   pdfBuffer: Buffer,
   fileName?: string,
 ): Promise<void> {
+  const signal = examImportJobManager.getJob(jobId)?.abortController.signal;
+
   try {
     importLogger.info({ jobId, sizeBytes: pdfBuffer.length }, "exam import job started");
     examImportJobManager.updateProgress(jobId, 1, "Đang đọc và phân tích cấu trúc tài liệu PDF...");
@@ -168,31 +191,41 @@ export async function processExamPdfImport(
     );
 
     const [part1Result, part2Result, part3Result, part4Result] = await Promise.allSettled([
-      nvidiaNimService.extractSectionContent("true_false", part1Markdown, (chunk) => {
-        examImportJobManager.emit(jobId, "ai_raw_token", {
-          section: "Phần I",
-          chunk,
-        });
+      nvidiaNimService.extractSectionContent({
+        sectionType: "true_false",
+        markdownContent: part1Markdown,
+        signal,
+        onChunk: (chunk) => {
+          examImportJobManager.emit(jobId, "ai_raw_token", { section: "Phần I", chunk });
+        },
       }),
-      nvidiaNimService.extractSectionContent("group_mcq", part2Markdown, (chunk) => {
-        examImportJobManager.emit(jobId, "ai_raw_token", {
-          section: "Phần II",
-          chunk,
-        });
+      nvidiaNimService.extractSectionContent({
+        sectionType: "group_mcq",
+        markdownContent: part2Markdown,
+        signal,
+        onChunk: (chunk) => {
+          examImportJobManager.emit(jobId, "ai_raw_token", { section: "Phần II", chunk });
+        },
       }),
-      nvidiaNimService.extractSectionContent("matching", part3Markdown, (chunk) => {
-        examImportJobManager.emit(jobId, "ai_raw_token", {
-          section: "Phần III",
-          chunk,
-        });
+      nvidiaNimService.extractSectionContent({
+        sectionType: "matching",
+        markdownContent: part3Markdown,
+        signal,
+        onChunk: (chunk) => {
+          examImportJobManager.emit(jobId, "ai_raw_token", { section: "Phần III", chunk });
+        },
       }),
-      nvidiaNimService.extractSectionContent("short_answer", part4Markdown, (chunk) => {
-        examImportJobManager.emit(jobId, "ai_raw_token", {
-          section: "Phần IV",
-          chunk,
-        });
+      nvidiaNimService.extractSectionContent({
+        sectionType: "short_answer",
+        markdownContent: part4Markdown,
+        signal,
+        onChunk: (chunk) => {
+          examImportJobManager.emit(jobId, "ai_raw_token", { section: "Phần IV", chunk });
+        },
       }),
     ]);
+
+    if (signal?.aborted) return;
 
     const sections: TQuizSectionInput[] = [];
 
@@ -271,6 +304,17 @@ export async function processExamPdfImport(
       }
     }
 
+    if (sections.length === 0) {
+      const reasons = partResults
+        .map((r) => (r.status === "rejected" ? String(r.reason) : null))
+        .filter(Boolean)
+        .join(" | ");
+
+      examImportJobManager.failJob(jobId, `AI không trích xuất được phần thi nào. ${reasons}`);
+
+      return;
+    }
+
     examImportJobManager.updateProgress(
       jobId,
       5,
@@ -300,8 +344,12 @@ export async function processExamPdfImport(
       sections: imported.sections,
     };
 
+    if (signal?.aborted) return;
+
     examImportJobManager.completeJob(jobId, parsedQuiz);
   } catch (err) {
+    if (signal?.aborted) return;
+
     importLogger.error({ err, jobId }, "exam import job crashed");
     examImportJobManager.failJob(jobId, String(err));
   }

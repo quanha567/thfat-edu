@@ -59,6 +59,7 @@ export type TQuizListItem = {
   pdfUrl: string | null;
   totalQuestions: number;
   totalSubItems: number;
+  attemptCount: number;
   createdAt: string;
   updatedAt: string;
 };

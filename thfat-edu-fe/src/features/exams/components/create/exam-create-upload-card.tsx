@@ -9,6 +9,7 @@ export type TExamCreateUploadCardProps = {
   selectedFile: File | null;
   onSelectFile: (file: File | null) => void;
   onStart: () => void;
+  onCancel: () => void;
   isUploading: boolean;
   isProcessing: boolean;
   hasResult: boolean;
@@ -18,6 +19,7 @@ export function ExamCreateUploadCard({
   selectedFile,
   onSelectFile,
   onStart,
+  onCancel,
   isUploading,
   isProcessing,
   hasResult,
@@ -145,6 +147,18 @@ export function ExamCreateUploadCard({
             </>
           )}
         </Button>
+
+        {isBusy && (
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onCancel}
+            className="w-full gap-2 text-xs font-semibold"
+          >
+            <X className="size-4" />
+            <span>Huỷ tác vụ</span>
+          </Button>
+        )}
       </CardContent>
     </Card>
   );

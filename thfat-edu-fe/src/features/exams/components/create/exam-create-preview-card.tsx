@@ -16,6 +16,15 @@ export type TExamCreatePreviewCardProps = {
   isProcessing: boolean;
 };
 
+type TPreviewSubItems = NonNullable<
+  NonNullable<TCreateQuizInput["sections"]>[number]["questions"][number]["subItems"]
+>;
+
+/** Phần tự luận ngắn có nội dung câu hỏi nằm hết ở contextContent, sub-item chỉ là ô trả lời rỗng. */
+function visibleSubItems(subItems: TPreviewSubItems | undefined): TPreviewSubItems {
+  return (subItems ?? []).filter((si) => si.content.trim().length > 0);
+}
+
 export function ExamCreatePreviewCard({
   parsedData,
   customTitle,
@@ -138,9 +147,9 @@ export function ExamCreatePreviewCard({
                     </div>
                   </div>
 
-                  {q.subItems && q.subItems.length > 0 && (
+                  {visibleSubItems(q.subItems).length > 0 && (
                     <div className="border-border mt-2 space-y-1.5 border-l-2 pl-3">
-                      {q.subItems.map((si, sIdx) => (
+                      {visibleSubItems(q.subItems).map((si, sIdx) => (
                         <div
                           key={si.orderIndex || sIdx}
                           className="text-muted-foreground flex items-start gap-2"

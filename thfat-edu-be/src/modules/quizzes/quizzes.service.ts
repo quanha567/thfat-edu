@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
 import { containsPattern } from "../../db/like";
@@ -76,6 +76,27 @@ export class QuizzesService {
       quizList.map((quiz) => quiz.id),
     );
 
+    const attemptRows =
+      quizList.length === 0
+        ? []
+        : await this.database
+            .select({
+              quizId: examAttempts.quizId,
+              attemptCount: sql<number>`count(*)::int`,
+            })
+            .from(examAttempts)
+            .where(
+              and(
+                inArray(
+                  examAttempts.quizId,
+                  quizList.map((quiz) => quiz.id),
+                ),
+                eq(examAttempts.status, "submitted"),
+              ),
+            )
+            .groupBy(examAttempts.quizId);
+    const attemptCounts = new Map(attemptRows.map((row) => [row.quizId, row.attemptCount]));
+
     const items = quizList.map((quiz) => ({
       id: quiz.id,
       title: quiz.title,
@@ -86,6 +107,7 @@ export class QuizzesService {
       pdfUrl: quiz.pdfUrl,
       totalQuestions: counts.get(quiz.id)?.totalQuestions ?? 0,
       totalSubItems: counts.get(quiz.id)?.totalSubItems ?? 0,
+      attemptCount: attemptCounts.get(quiz.id) ?? 0,
       createdAt: quiz.createdAt.toISOString(),
       updatedAt: quiz.updatedAt.toISOString(),
     }));

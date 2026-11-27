@@ -16,8 +16,17 @@ export function ExamCreatePageClient() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [userTitle, setUserTitle] = useState<string | null>(null);
 
-  const { isUploading, isProcessing, progress, logs, parsedData, error, startImport } =
-    useExamImport();
+  const {
+    isUploading,
+    isProcessing,
+    progress,
+    logs,
+    parsedData,
+    error,
+    startImport,
+    cancel,
+    reset,
+  } = useExamImport();
 
   const createExamMutation = useCreateExam();
   const currentTitle = userTitle ?? parsedData?.title ?? "";
@@ -37,6 +46,7 @@ export function ExamCreatePageClient() {
         title: currentTitle.trim() || parsedData.title,
       });
 
+      reset();
       toast.success("Đã lưu đề thi thành công vào Ngân hàng Đề!");
       router.push(`/admin/exams/${created.id}/edit`);
     } catch (err) {
@@ -61,6 +71,7 @@ export function ExamCreatePageClient() {
             selectedFile={selectedFile}
             onSelectFile={setSelectedFile}
             onStart={handleStartImport}
+            onCancel={() => void cancel()}
             isUploading={isUploading}
             isProcessing={isProcessing}
             hasResult={Boolean(parsedData)}

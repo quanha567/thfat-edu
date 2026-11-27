@@ -69,7 +69,7 @@ export function createExamColumns({
       id: "attempts",
       header: "Lượt thi",
       cell: ({ row }) => {
-        const attempts = getExamAttempts(row.original, row.index);
+        const attempts = getExamAttempts(row.original);
 
         return <span className="text-foreground text-xs font-semibold">{attempts}</span>;
       },

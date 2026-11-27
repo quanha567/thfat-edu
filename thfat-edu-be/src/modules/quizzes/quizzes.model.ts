@@ -117,6 +117,7 @@ export const QuizListItemSchema = t.Object({
   pdfUrl: t.Nullable(t.String()),
   totalQuestions: t.Number(),
   totalSubItems: t.Number(),
+  attemptCount: t.Number(),
   createdAt: t.String(),
   updatedAt: t.String(),
 });
