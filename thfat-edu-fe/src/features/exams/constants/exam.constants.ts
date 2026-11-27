@@ -95,13 +95,11 @@ export function getExamTopic(exam: TQuizListItem, index?: number): TChemistryTop
   return CHEMISTRY_TOPICS[seed % CHEMISTRY_TOPICS.length];
 }
 
-export function getExamAttempts(exam: TQuizListItem, index?: number): string {
-  const attemptsList = ["8.5K", "6.2K", "4.7K", "3.9K", "3.1K", "2.8K", "2.2K", "1.9K"];
-  if (typeof index === "number" && index < attemptsList.length) {
-    return attemptsList[index];
-  }
+/** Số lượt thi thực tế (bài đã nộp), rút gọn dạng 1.2K khi từ 1000 trở lên. */
+export function getExamAttempts(exam: Pick<TQuizListItem, "attemptCount">): string {
+  const count = exam.attemptCount ?? 0;
 
-  const base = (((index ?? 0) * 13 + exam.totalSubItems * 7 + 31) % 90) + 10;
+  if (count < 1000) return String(count);
 
-  return `${(base / 10).toFixed(1)}K`;
+  return `${(count / 1000).toFixed(1).replace(/\.0$/, "")}K`;
 }

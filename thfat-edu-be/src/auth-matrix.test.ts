@@ -34,6 +34,7 @@ const ROUTES: readonly TRoute[] = [
   { method: "POST", path: "/quizzes/ai/solve-question", allowed: STAFF },
   { method: "POST", path: "/quizzes/import/jobs", allowed: STAFF },
   { method: "GET", path: "/quizzes/import/jobs/x/stream", allowed: STAFF },
+  { method: "DELETE", path: "/quizzes/import/jobs/x", allowed: STAFF },
   // Analytics: teacher/admin
   { method: "GET", path: "/analytics/dashboard", allowed: STAFF },
   // Admin only

@@ -148,6 +148,13 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       set.headers["Connection"] = "keep-alive";
       set.headers["X-Accel-Buffering"] = "no";
 
+      let pingInterval: ReturnType<typeof setInterval> | undefined;
+      let unsubscribe: (() => void) | undefined;
+      const cleanupStream = () => {
+        if (pingInterval) clearInterval(pingInterval);
+        unsubscribe?.();
+      };
+
       return new Response(
         new ReadableStream({
           start(controller) {
@@ -160,39 +167,42 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
             sendEvent("progress", job.progress);
 
             // Heartbeat ping mỗi 15 giây để ngăn trình duyệt/proxy timeout kết nối SSE
-            const pingInterval = setInterval(() => {
+            pingInterval = setInterval(() => {
               try {
                 controller.enqueue(new TextEncoder().encode(": keep-alive ping\n\n"));
               } catch {
-                clearInterval(pingInterval);
+                cleanupStream();
               }
             }, 15000);
 
             if (job.status === "completed" && job.data) {
-              clearInterval(pingInterval);
+              cleanupStream();
               sendEvent("completed", job.data);
               controller.close();
 
               return;
             }
 
-            if (job.status === "failed") {
-              clearInterval(pingInterval);
-              sendEvent("failed", { error: job.error });
+            if (job.status === "failed" || job.status === "cancelled") {
+              cleanupStream();
+              sendEvent(job.status, { error: job.error });
               controller.close();
 
               return;
             }
 
-            const unsubscribe = examImportJobManager.subscribe(jobId, (event, data) => {
+            unsubscribe = examImportJobManager.subscribe(jobId, (event, data) => {
               sendEvent(event, data);
 
-              if (event === "completed" || event === "failed") {
-                clearInterval(pingInterval);
-                unsubscribe();
+              if (event === "completed" || event === "failed" || event === "cancelled") {
+                cleanupStream();
                 controller.close();
               }
             });
+          },
+          // Client đóng tab / back ra: chỉ ngừng theo dõi, job vẫn chạy tiếp trên server.
+          cancel() {
+            cleanupStream();
           },
         }),
         {
@@ -210,6 +220,25 @@ export const quizzesRoutes = new Elysia({ prefix: "/quizzes" })
       detail: {
         tags: ["Quizzes"],
         summary: "SSE Stream cập nhật tiến trình bóc tách đề thi theo thời gian thực",
+      },
+    },
+  )
+  .delete(
+    "/import/jobs/:jobId",
+    ({ params: { jobId }, set }) => {
+      if (!examImportJobManager.cancelJob(jobId)) {
+        set.status = 404;
+
+        return { message: "Không tìm thấy job import." };
+      }
+
+      return { message: "Đã huỷ tác vụ import đề thi." };
+    },
+    {
+      params: t.Object({ jobId: t.String({ format: "uuid" }) }),
+      detail: {
+        tags: ["Quizzes"],
+        summary: "Huỷ tác vụ import đề thi đang chạy",
       },
     },
   );

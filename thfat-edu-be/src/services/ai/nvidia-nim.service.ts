@@ -4,8 +4,6 @@ import { createModuleLogger } from "../../config/logger";
 const nimLogger = createModuleLogger("nvidia-nim");
 
 const NVIDIA_BASE_URL = "https://integrate.api.nvidia.com/v1";
-// Quá thời gian này (kể cả khi đang stream) thì huỷ để không treo tài nguyên.
-const NIM_REQUEST_TIMEOUT_MS = 120_000;
 
 export type TNimMessage = {
   role: "system" | "user" | "assistant";
@@ -23,6 +21,15 @@ export type TNimChatOptions = {
   response_format?: { type: "json_object" };
   stream?: boolean;
   onToken?: (chunk: string) => void;
+  /** Huỷ request (kể cả khi đang stream) khi người dùng chủ động dừng tác vụ. */
+  signal?: AbortSignal;
+};
+
+export type TExtractSectionOptions = {
+  sectionType: "true_false" | "group_mcq" | "matching" | "short_answer";
+  markdownContent: string;
+  onChunk?: (chunk: string) => void;
+  signal?: AbortSignal;
 };
 
 function extractTokenFromSseLine(line: string): string {
@@ -121,7 +128,7 @@ export class NvidiaNimService {
 
     const res = await fetch(`${NVIDIA_BASE_URL}/chat/completions`, {
       method: "POST",
-      signal: AbortSignal.timeout(NIM_REQUEST_TIMEOUT_MS),
+      signal: options.signal,
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
@@ -185,11 +192,8 @@ export class NvidiaNimService {
     });
   }
 
-  public async extractSectionContent(
-    sectionType: "true_false" | "group_mcq" | "matching" | "short_answer",
-    markdownContent: string,
-    onChunk?: (chunk: string) => void,
-  ): Promise<string> {
+  public async extractSectionContent(options: TExtractSectionOptions): Promise<string> {
+    const { markdownContent, onChunk, signal } = options;
     const model = "nvidia/nemotron-3-ultra-550b-a55b";
 
     const systemPrompt = `You are an expert OCR & extraction engine for Vietnamese Chemistry and Science exams.
@@ -209,7 +213,6 @@ Schema for each question:
       "content": "Nội dung câu hỏi con hoặc phát biểu",
       "options": ["...", "...", "...", "..."], // Bắt buộc cho Phần II (4 phương án sạch không tiền tố A, B, C, D). null cho Phần I, III, IV
       "correctAnswer": null,
-      "points": "6.00",
       "points": "1.50", // "1.50" cho Phần I và III; "6.00" cho Phần II và IV
       "explanation": null
     }
@@ -291,6 +294,7 @@ EXAM SECTION RULES:
       max_tokens: 8192,
       stream: Boolean(onChunk),
       onToken: onChunk,
+      signal,
       response_format: { type: "json_object" },
     });
 
