@@ -6,6 +6,7 @@ import {
   jsonb,
   numeric,
   pgEnum,
+  pgSequence,
   pgTable,
   text,
   timestamp,
@@ -24,8 +25,11 @@ export const sectionTypeEnum = pgEnum("section_type", [
   "short_answer",
 ]);
 
+export const quizCodeSeq = pgSequence("quiz_code_seq");
+
 export const quizzes = pgTable("quizzes", {
   id: uuid("id").defaultRandom().primaryKey(),
+  code: varchar("code", { length: 16 }).notNull().unique(),
   title: varchar("title", { length: 255 }).notNull(),
   description: text("description"),
   durationMinutes: integer("duration_minutes").default(50).notNull(),

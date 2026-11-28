@@ -1,115 +1,85 @@
 import { BaseAvatar } from "@/components/base";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Calendar, Eye } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
 import { DEFAULT_ARTICLE_THUMBNAIL } from "../constants";
 import type { TArticleDetail } from "../types/article.types";
+import { formatArticleDate, formatViewCount } from "../utils/format-article";
 import { ArticleMarkdownRenderer } from "./article-markdown-renderer";
+import { ArticleRelatedSection } from "./article-related-section";
 
 export type TArticleDetailViewProps = {
   article: TArticleDetail;
 };
 
 export function ArticleDetailView({ article }: TArticleDetailViewProps) {
-  const publishedDate = article.publishedAt
-    ? new Date(article.publishedAt).toLocaleDateString("vi-VN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      })
-    : new Date(article.createdAt).toLocaleDateString("vi-VN", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
-
   return (
-    <article className="mx-auto max-w-4xl space-y-8 pb-16">
-      {/* Back Button */}
-      <div>
-        <Button
-          asChild
-          variant="ghost"
-          size="sm"
-          className="text-muted-foreground hover:text-foreground gap-1.5"
+    <article className="space-y-10 pb-8">
+      <div className="mx-auto max-w-3xl space-y-6">
+        <nav
+          aria-label="Breadcrumb"
+          className="text-muted-foreground flex items-center gap-1.5 text-sm"
         >
-          <Link href="/articles">
-            <ArrowLeft className="size-4" />
-            Quay lại danh sách bài viết
+          <Link href="/articles" className="hover:text-foreground transition-colors">
+            Bài viết
           </Link>
-        </Button>
-      </div>
+          {article.category && (
+            <>
+              <ChevronRight className="size-3.5" />
+              <Link
+                href={`/articles?category=${article.category.slug}`}
+                className="hover:text-foreground transition-colors"
+              >
+                {article.category.name}
+              </Link>
+            </>
+          )}
+        </nav>
 
-      {/* Article Header */}
-      <div className="space-y-4">
-        {article.category && (
-          <Link href={`/articles?category=${article.category.slug}`}>
-            <Badge variant="secondary" className="text-xs font-semibold">
-              {article.category.name}
-            </Badge>
-          </Link>
-        )}
-
-        <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl md:text-4xl">
+        <h1 className="text-foreground text-3xl leading-tight font-black tracking-tight sm:text-4xl lg:text-5xl">
           {article.title}
         </h1>
 
         {article.excerpt && (
-          <p className="text-muted-foreground text-base leading-relaxed font-normal sm:text-lg">
-            {article.excerpt}
-          </p>
+          <p className="text-muted-foreground text-lg leading-relaxed">{article.excerpt}</p>
         )}
 
-        {/* Metadata Bar */}
-        <div className="border-border flex flex-wrap items-center justify-between gap-4 border-y py-3 text-xs sm:text-sm">
-          <div className="flex items-center gap-3">
-            <BaseAvatar
-              src={article.author?.avatarUrl}
-              name={article.author?.fullName}
-              size="md"
-              className="border-border size-9 border"
-            />
-            <div className="flex flex-col">
-              <span className="text-foreground text-xs font-semibold sm:text-sm">
-                {article.author?.fullName ?? "Quản trị viên ThFat Edu"}
-              </span>
-              <span className="text-muted-foreground text-xxs sm:text-xs">Tác giả bài viết</span>
-            </div>
-          </div>
-
-          <div className="text-muted-foreground flex items-center gap-4 text-xs">
-            <span className="flex items-center gap-1.5">
-              <Calendar className="size-3.5" />
-              {publishedDate}
-            </span>
-            <span className="flex items-center gap-1.5">
-              <Eye className="size-3.5" />
-              {article.viewCount} lượt xem
-            </span>
+        <div className="flex items-center gap-3">
+          <BaseAvatar
+            src={article.author?.avatarUrl}
+            name={article.author?.fullName}
+            size="md"
+            className="border-border size-10 border"
+          />
+          <div className="text-sm">
+            <p className="text-foreground font-semibold">
+              {article.author?.fullName ?? "ThFat Edu"}
+            </p>
+            <p className="text-muted-foreground">
+              {formatArticleDate(article, "long")} · {formatViewCount(article.viewCount)}
+            </p>
           </div>
         </div>
       </div>
 
-      {/* Featured Thumbnail */}
-      <div className="border-border bg-muted relative aspect-video w-full overflow-hidden rounded-2xl border shadow-sm">
+      <div className="bg-muted relative mx-auto aspect-video w-full max-w-5xl overflow-hidden rounded-3xl">
         <Image
           src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
           alt={article.title}
           fill
-          sizes="(max-width: 1024px) 100vw, 896px"
-          className="object-cover"
           priority
+          sizes="(max-width: 1024px) 100vw, 1024px"
+          className="object-cover"
         />
       </div>
 
-      {/* Article Markdown Content */}
       <ArticleMarkdownRenderer
         content={article.content}
-        className="text-foreground/90 leading-relaxed"
+        className="text-foreground/90 mx-auto max-w-3xl text-lg leading-relaxed"
       />
+
+      <ArticleRelatedSection currentId={article.id} categoryId={article.categoryId} />
     </article>
   );
 }

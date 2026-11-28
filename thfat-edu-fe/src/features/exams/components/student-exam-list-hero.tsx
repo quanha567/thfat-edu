@@ -1,18 +1,11 @@
-export type TStudentExamListHeroProps = {
-  totalExams?: number;
-};
-
-export function StudentExamListHero(_props?: TStudentExamListHeroProps) {
+export function StudentExamListHero() {
   return (
     <div className="space-y-2">
-      <h1 className="text-foreground text-2xl font-black tracking-tight sm:text-3xl lg:text-4xl">
-        Ngân hàng đề thi thử Hóa học
+      <h1 className="text-foreground text-3xl font-black tracking-tight sm:text-4xl">
+        Thi thử <span className="text-primary-600 dark:text-primary-400">Hóa học</span>
       </h1>
 
-      <p className="text-muted-foreground max-w-3xl text-sm leading-relaxed sm:text-base">
-        Hệ thống đề thi mô phỏng bám sát cấu trúc đề mới của Bộ GD&amp;ĐT và định dạng V-SAT. Rèn
-        luyện phản xạ, làm quen áp lực phòng thi và đánh giá chính xác năng lực bản thân.
-      </p>
+      <p className="text-muted-foreground text-base">Đề mô phỏng cấu trúc V-SAT của Bộ GD&amp;ĐT</p>
     </div>
   );
 }

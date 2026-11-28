@@ -29,7 +29,7 @@ function renderContent(options: {
 }) {
   if (options.isLoading) {
     return (
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {SKELETON_KEYS.map((key) => (
           <ExamCardSkeleton key={key} />
         ))}
@@ -47,7 +47,7 @@ function renderContent(options: {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
       {options.exams.map((exam) => (
         <StudentExamCard key={exam.id} exam={exam} />
       ))}
@@ -60,7 +60,10 @@ export function StudentExamListContainer() {
   const [status, setStatus] = useQueryState("status", parseAsString.withDefault("all"));
   const [page, setPage] = useQueryState("page", parseAsInteger.withDefault(1));
 
-  const { data, isLoading } = useStudentExams({ search: search || undefined, limit: 100 });
+  const { data, isLoading } = useStudentExams({
+    search: search || undefined,
+    limit: 100,
+  });
   const allItems = useMemo(() => data?.items ?? [], [data?.items]);
 
   const counts: TExamFilterCounts = useMemo(
@@ -105,8 +108,8 @@ export function StudentExamListContainer() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
-      <StudentExamListHero totalExams={data?.total ?? allItems.length} />
+    <div className="mx-auto max-w-7xl space-y-8 px-4 py-10 sm:px-6 lg:px-8">
+      <StudentExamListHero />
 
       <StudentExamFilterBar
         status={status}

@@ -38,6 +38,7 @@ export const AttemptResultSchema = t.Object({
 
 export const StudentExamListItemSchema = t.Object({
   id: t.String(),
+  code: t.String(),
   title: t.String(),
   description: t.Nullable(t.String()),
   durationMinutes: t.Number(),

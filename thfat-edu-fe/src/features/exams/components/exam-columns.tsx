@@ -4,7 +4,7 @@ import { DataTableRowActions, getDataTableSelectColumn } from "@/components/data
 import { type ColumnDef } from "@tanstack/react-table";
 import { ExternalLink, PauseCircle, Pencil, PlayCircle, Trash2 } from "lucide-react";
 
-import { formatExamCode, getExamAttempts, getExamDifficulty } from "../constants/exam.constants";
+import { getExamAttempts, getExamDifficulty } from "../constants/exam.constants";
 import { type TQuizListItem } from "../types";
 import { ExamDifficultyBadge } from "./exam-difficulty-badge";
 import { ExamStatusBadge } from "./exam-status-badge";
@@ -24,7 +24,7 @@ export function createExamColumns({
       id: "code",
       header: "Mã đề",
       cell: ({ row }) => {
-        const code = formatExamCode(row.original.id, row.index);
+        const code = row.original.code;
 
         return (
           <span className="bg-muted text-muted-foreground rounded px-2 py-0.5 font-mono text-xs">

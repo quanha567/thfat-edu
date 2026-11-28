@@ -51,6 +51,7 @@ export type TQuizDetail = {
 
 export type TQuizListItem = {
   id: string;
+  code: string;
   title: string;
   description: string | null;
   durationMinutes: number;
@@ -116,6 +117,7 @@ export type TStudentExamStatus = "not_started" | "in_progress" | "submitted";
 
 export type TStudentExamListItem = {
   id: string;
+  code: string;
   title: string;
   description: string | null;
   durationMinutes: number;

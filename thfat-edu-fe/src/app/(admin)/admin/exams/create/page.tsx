@@ -1,8 +1,8 @@
 import { ExamCreatePageClient } from "@/features/exams/components/create/exam-create-page-client";
 
 export const metadata = {
-  title: "Tạo đề thi từ tệp | ThFat Edu Admin",
-  description: "Tải lên tệp đề thi PDF để bóc tách câu hỏi và lưu vào hệ thống",
+  title: "Tạo đề thi mới | ThFat Edu Admin",
+  description: "Nhập đề thi thủ công hoặc tạo bằng AI từ tệp PDF",
 };
 
 export default function AdminExamCreatePage() {

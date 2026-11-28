@@ -109,6 +109,7 @@ export type TUpdateQuizInput = Static<typeof UpdateQuizSchema>;
 
 export const QuizListItemSchema = t.Object({
   id: t.String(),
+  code: t.String(),
   title: t.String(),
   description: t.Nullable(t.String()),
   durationMinutes: t.Number(),
