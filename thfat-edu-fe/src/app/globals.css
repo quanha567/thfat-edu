@@ -820,3 +820,34 @@ select:-webkit-autofill:active {
     animation: none !important;
   }
 }
+
+@media print {
+  @page {
+    size: A4 landscape;
+    margin: 0;
+  }
+
+  /* Exam certificate: exactly one landscape A4 page, kept in normal flow. */
+  html:has(#certificate-print-area),
+  body:has(#certificate-print-area) {
+    width: 297mm;
+    height: 210mm;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  #certificate-print-area,
+  #certificate-print-area * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  #certificate-print-area {
+    width: 297mm;
+    height: 210mm;
+    margin: 0;
+    aspect-ratio: auto;
+    break-inside: avoid;
+  }
+}

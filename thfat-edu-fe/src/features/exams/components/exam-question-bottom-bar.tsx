@@ -55,7 +55,11 @@ export function ExamQuestionBottomBar({
       if (state.isFlagged) flagged++;
     }
 
-    return { completedCount: completed, partialCount: partial, flaggedCount: flagged };
+    return {
+      completedCount: completed,
+      partialCount: partial,
+      flaggedCount: flagged,
+    };
   }, [flattenedQuestions, answersMap]);
 
   const unansweredCount = Math.max(0, totalQuestions - completedCount - partialCount);

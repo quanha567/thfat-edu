@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, or, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
 import { containsPattern } from "../../db/like";
@@ -212,7 +212,10 @@ export class AttemptsService {
     const baseConditions = [eq(quizzes.status, "published"), sql`${quizzes.deletedAt} IS NULL`];
 
     if (options.search) {
-      baseConditions.push(ilike(quizzes.title, containsPattern(options.search)));
+      const pattern = containsPattern(options.search);
+      const searchCondition = or(ilike(quizzes.title, pattern), ilike(quizzes.code, pattern));
+
+      if (searchCondition) baseConditions.push(searchCondition);
     }
 
     const whereClause = and(...baseConditions);
@@ -227,6 +230,7 @@ export class AttemptsService {
     const quizRows = await this.database
       .select({
         id: quizzes.id,
+        code: quizzes.code,
         title: quizzes.title,
         description: quizzes.description,
         durationMinutes: quizzes.durationMinutes,
@@ -301,6 +305,7 @@ export class AttemptsService {
 
       items.push({
         id: quiz.id,
+        code: quiz.code,
         title: quiz.title,
         description: quiz.description,
         durationMinutes: quiz.durationMinutes,

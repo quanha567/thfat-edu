@@ -1,4 +1,4 @@
-import { formatExamCode, getExamDifficulty } from "../constants/exam.constants";
+import { getExamDifficulty } from "../constants/exam.constants";
 import { type TQuizListItem } from "../types";
 
 type TFilterExamsOptions = {
@@ -25,7 +25,7 @@ export function filterExams({
 
     if (search.trim()) {
       const query = search.trim().toLowerCase();
-      const code = formatExamCode(exam.id, index).toLowerCase();
+      const code = exam.code.toLowerCase();
       const matchesCode = code.includes(query);
       const matchesTitle = exam.title.toLowerCase().includes(query);
       if (!matchesCode && !matchesTitle) return false;

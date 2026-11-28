@@ -60,7 +60,11 @@ export function ExamQuestionStrip({
     );
 
     if (activeEl) {
-      activeEl.scrollIntoView({ behavior: "smooth", inline: "nearest", block: "nearest" });
+      activeEl.scrollIntoView({
+        behavior: "smooth",
+        inline: "nearest",
+        block: "nearest",
+      });
       setTimeout(checkScroll, 300);
     }
   }, [activeQuestionId, checkScroll]);

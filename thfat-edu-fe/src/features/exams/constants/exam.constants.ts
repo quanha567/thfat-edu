@@ -68,19 +68,6 @@ export const EXAM_DIFFICULTY_CONFIG: Record<
   },
 };
 
-export function formatExamCode(id: string, index?: number): string {
-  if (typeof index === "number") {
-    return `VSAT-${String(index + 1).padStart(4, "0")}`;
-  }
-
-  const numericPart = id.replace(/\D/g, "");
-  if (numericPart.length >= 4) {
-    return `VSAT-${numericPart.slice(-4)}`;
-  }
-
-  return `VSAT-${id.slice(0, 4).toUpperCase()}`;
-}
-
 export function getExamDifficulty(exam: TQuizListItem, index?: number): TExamDifficulty {
   const seed = (index ?? 0) + exam.totalQuestions + (exam.title.length % 5);
   if (seed % 3 === 0) return "easy";

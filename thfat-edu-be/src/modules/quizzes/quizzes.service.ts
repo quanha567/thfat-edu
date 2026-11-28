@@ -1,4 +1,4 @@
-import { and, desc, eq, ilike, inArray, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, isNull, or, sql } from "drizzle-orm";
 
 import { type Database, db } from "../../db";
 import { containsPattern } from "../../db/like";
@@ -26,6 +26,17 @@ import {
 
 type TExecutor = Parameters<Parameters<Database["transaction"]>[0]>[0] | Database;
 
+async function generateQuizCode(executor: TExecutor): Promise<string> {
+  const result = await executor.execute<{ n: string }>(sql`SELECT nextval('quiz_code_seq') AS n`);
+  const [row] = Array.from(result);
+
+  if (!row) {
+    throw new Error("Không thể sinh mã đề thi.");
+  }
+
+  return `VSAT-${row.n.padStart(4, "0")}`;
+}
+
 export class QuizzesService {
   constructor(private readonly database: Database = db) {}
 
@@ -41,7 +52,10 @@ export class QuizzesService {
     }
 
     if (query.search) {
-      conditions.push(ilike(quizzes.title, containsPattern(query.search)));
+      const pattern = containsPattern(query.search);
+      const searchCondition = or(ilike(quizzes.title, pattern), ilike(quizzes.code, pattern));
+
+      if (searchCondition) conditions.push(searchCondition);
     }
 
     const whereClause = and(...conditions);
@@ -56,6 +70,7 @@ export class QuizzesService {
     const quizList = await this.database
       .select({
         id: quizzes.id,
+        code: quizzes.code,
         title: quizzes.title,
         description: quizzes.description,
         durationMinutes: quizzes.durationMinutes,
@@ -99,6 +114,7 @@ export class QuizzesService {
 
     const items = quizList.map((quiz) => ({
       id: quiz.id,
+      code: quiz.code,
       title: quiz.title,
       description: quiz.description,
       durationMinutes: quiz.durationMinutes,
@@ -140,9 +156,11 @@ export class QuizzesService {
 
   public async createQuiz(input: TCreateQuizInput, userId?: string): Promise<TQuiz> {
     return this.database.transaction(async (tx) => {
+      const code = await generateQuizCode(tx);
       const [quiz] = await tx
         .insert(quizzes)
         .values({
+          code,
           title: input.title,
           description: input.description,
           durationMinutes: input.durationMinutes,

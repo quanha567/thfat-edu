@@ -70,7 +70,7 @@ Khu vực quản trị danh sách đề thi thử, theo dõi số liệu làm b�
 _Avoid_: quiz management, test manager
 
 **Exam Code**:
-Định danh rút gọn duy nhất của đề thi (ví dụ `VSAT-0001`), hiển thị trong danh sách quản lý và hỗ trợ tìm kiếm nhanh.
+Định danh rút gọn duy nhất của đề thi (ví dụ `VSAT-0001`), hiển thị trong danh sách quản lý, danh sách học sinh và hỗ trợ tìm kiếm nhanh. Lưu ở cột `quizzes.code`, cấp tuần tự từ sequence `quiz_code_seq` khi tạo đề và không bao giờ đổi.
 _Avoid_: exam id, quiz id, mã bài thi
 
 **User**:

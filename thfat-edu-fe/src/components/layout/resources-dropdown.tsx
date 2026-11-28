@@ -10,8 +10,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Skeleton } from "@/components/ui/skeleton";
+import { DEFAULT_ARTICLE_THUMBNAIL } from "@/features/articles/constants";
 import { useArticles } from "@/features/articles/hooks/use-articles";
-import { ArrowRight, ChevronDown, Newspaper } from "lucide-react";
+import { formatArticleDate } from "@/features/articles/utils/format-article";
+import { ArrowRight, ChevronDown } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -34,11 +37,14 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
   function renderArticleList() {
     if (isLoading) {
       return (
-        <div className="flex flex-col gap-2 p-2">
+        <div className="flex flex-col gap-3 p-2.5">
           {["skel-res-1", "skel-res-2", "skel-res-3", "skel-res-4", "skel-res-5"].map((key) => (
-            <div key={key} className="flex flex-col gap-1.5">
-              <Skeleton className="h-4 w-4/5 bg-white/15" />
-              <Skeleton className="h-3 w-1/3 bg-white/10" />
+            <div key={key} className="flex gap-3">
+              <Skeleton className="h-14 w-20 rounded-lg bg-white/10" />
+              <div className="flex-1 space-y-2 pt-1">
+                <Skeleton className="h-4 w-4/5 bg-white/15" />
+                <Skeleton className="h-3 w-1/3 bg-white/10" />
+              </div>
             </div>
           ))}
         </div>
@@ -46,38 +52,40 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
     }
 
     if (articles.length === 0) {
-      return <div className="py-6 text-center text-xs text-white/60">Chưa có bài viết nào</div>;
+      return <div className="py-6 text-center text-sm text-white/60">Chưa có bài viết nào</div>;
     }
 
     return (
-      <div className="flex flex-col gap-0.5">
-        {articles.slice(0, 5).map((article) => {
-          const formattedDate = article.publishedAt
-            ? new Date(article.publishedAt).toLocaleDateString("vi-VN")
-            : new Date(article.createdAt).toLocaleDateString("vi-VN");
+      <div className="flex flex-col">
+        {articles.slice(0, 5).map((article) => (
+          <DropdownMenuItem
+            key={article.id}
+            asChild
+            className="group cursor-pointer items-start gap-3 rounded-xl p-2.5 text-white/90 transition-colors hover:bg-white/10 focus:bg-white/10 focus:text-white"
+          >
+            <Link href={`/articles/${article.slug}`} className="flex w-full items-start gap-3">
+              <span className="relative h-14 w-20 shrink-0 overflow-hidden rounded-lg bg-white/10">
+                <Image
+                  src={article.thumbnailUrl || DEFAULT_ARTICLE_THUMBNAIL}
+                  alt=""
+                  fill
+                  sizes="80px"
+                  className="object-cover"
+                />
+              </span>
 
-          return (
-            <DropdownMenuItem
-              key={article.id}
-              asChild
-              className="group cursor-pointer rounded-lg p-2.5 text-white/90 transition-colors hover:bg-white/10 focus:bg-white/10 focus:text-white"
-            >
-              <Link href={`/articles/${article.slug}`} className="flex w-full flex-col gap-1">
-                <span className="group-hover:text-primary-300 line-clamp-2 text-xs leading-snug font-semibold text-white/95 transition-colors">
+              <span className="flex min-w-0 flex-1 flex-col gap-1 text-left">
+                <span className="group-hover:text-primary-300 line-clamp-2 text-sm leading-snug font-semibold text-white transition-colors">
                   {article.title}
                 </span>
-                <div className="text-xxs flex items-center gap-2 text-white/60">
-                  {article.category && (
-                    <span className="rounded bg-white/15 px-1.5 py-0.5 font-medium text-white/85">
-                      {article.category.name}
-                    </span>
-                  )}
-                  <span>{formattedDate}</span>
-                </div>
-              </Link>
-            </DropdownMenuItem>
-          );
-        })}
+                <span className="text-xs text-white/60">
+                  {article.category ? `${article.category.name} · ` : ""}
+                  {formatArticleDate(article)}
+                </span>
+              </span>
+            </Link>
+          </DropdownMenuItem>
+        ))}
       </div>
     );
   }
@@ -100,29 +108,21 @@ export function ResourcesDropdown({ label, href }: TResourcesDropdownProps) {
 
       <DropdownMenuContent
         align="center"
-        className="bg-surface-dark-mid/95 w-80 border-white/10 p-2 text-white shadow-xl backdrop-blur-xl sm:w-96"
+        className="bg-surface-dark-mid/95 w-96 rounded-2xl border-white/10 p-2 text-white shadow-xl backdrop-blur-xl sm:w-[26rem]"
       >
-        <DropdownMenuLabel className="flex items-center justify-between px-2.5 py-1.5 text-xs font-semibold text-white/80">
-          <span className="flex items-center gap-1.5">
-            <Newspaper className="text-primary-300 h-3.5 w-3.5" />
-            <span>Bài viết mới nhất</span>
-          </span>
-          <span className="text-xxs rounded-full bg-white/10 px-2 py-0.5 font-medium text-white/70">
-            5 bài mới
-          </span>
+        <DropdownMenuLabel className="px-2.5 py-1.5 text-xs font-semibold tracking-wide text-white/60 uppercase">
+          Bài viết mới nhất
         </DropdownMenuLabel>
-
-        <DropdownMenuSeparator className="my-1 bg-white/10" />
 
         {renderArticleList()}
 
-        <DropdownMenuSeparator className="my-1 bg-white/10" />
+        <DropdownMenuSeparator className="my-1.5 bg-white/10" />
 
         <DropdownMenuItem
           asChild
-          className="text-primary-300 focus:text-primary-200 cursor-pointer rounded-lg p-2 text-center text-xs font-semibold hover:bg-white/10 focus:bg-white/10"
+          className="text-primary-300 focus:text-primary-200 cursor-pointer rounded-lg p-2 text-sm font-semibold hover:bg-white/10 focus:bg-white/10"
         >
-          <Link href={href} className="flex w-full items-center justify-center gap-1.5 py-1">
+          <Link href={href} className="flex w-full items-center justify-between gap-1.5 py-1">
             <span>Xem tất cả bài viết</span>
             <ArrowRight className="h-3.5 w-3.5" />
           </Link>
